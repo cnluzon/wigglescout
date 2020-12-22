@@ -1,0 +1,48 @@
+Package: wigglescout
+Title: Explore And Visualize Genomics BigWig Data
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Carmen",
+           family = "Navarro",
+           role = c("aut", "cre"),
+           email = "carmen.navarro@scilifelab.se"
+           )
+Description: A set of tools to easily extract, visualize and perform statistical
+  tests on sets of bigWig files.
+License: GPL-3 + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: R (>= 3.6)
+biocViews:
+Imports:
+  rtracklayer,
+  rmarkdown,
+  dplyr,
+  tidyselect,
+  grDevices,
+  stats,
+  methods,
+  ggplot2,
+  stringr,
+  reshape2,
+  GenomeInfoDb,
+  GenomeInfoDbData,
+  GenomicRanges,
+  IRanges,
+  purrr,
+  prettydoc,
+  scales,
+  RColorBrewer,
+  RCurl,
+  pheatmap,
+  DESeq2,
+  tools
+Suggests: 
+    knitr,
+    testthat,
+    mockery
+VignetteBuilder: knitr
+URL: https://github.com/cnluzon/wigglescout
+BugReports: https://github.com/cnluzon/wigglescout/issues
