@@ -67,7 +67,7 @@ jobs:
         run: |
           options(repos = c(getOption("repos"), BiocManager::repositories()))
           remotes::install_deps(dependencies = TRUE)
-          remotes::install_cran(c("rcmdcheck", "covr")
+          remotes::install_cran(c("rcmdcheck", "covr"))
         shell: Rscript {0}
 
       - name: Session info
