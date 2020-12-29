@@ -1,9 +1,9 @@
 Package: wigglescout
 Title: Explore And Visualize Genomics BigWig Data
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Carmen",
-           family = "Navarro",
+           family = "Navarro Luzón",
            role = c("aut", "cre"),
            email = "carmen.navarro@scilifelab.se"
            )
