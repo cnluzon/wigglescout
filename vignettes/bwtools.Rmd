@@ -1,0 +1,215 @@
+---
+title: "Calculating summary values over bigWig files"
+author: "Carmen Navarro"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Value calculation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{wigglescout}
+  %\VignetteEncoding{UTF-8}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Summary
+
+`wigglescout` allows you to summarize bigWig files in two main ways:
+
+- **Genome-wide**. Genome is partitioned on equally-sized bins and
+their aggregated value is calculated. Useful to get a general idea of the
+signal distribution without looking at specific places.
+- **Across a set of *loci***. This can be either summarized categories, or
+individual values, as in genome-wide analyses.
+
+`wigglescout` functionality is built in two layers. Names of functions that
+calculate values over bigWig files start with `bw_`. These return `GRanges`
+objects when possible, `data.frame` objects otherwise (i.e. when values are
+summarized over some category, genomic location is lost in this process).
+
+# Available functions
+
+bigWig data can be summarized genome-wide using `bw_bins` function or across
+a set of *loci* using either: `bw_bed`, `bw_heatmap` or `bw_profile`.
+
+
+# About bundled data
+
+This package comes with a set of small files to show functionality. These
+have been built from a published data from Simon Elsässer's lab and correspond
+to a H3.3 and H3K9me3 ChIP + input (`GSE149080`), subset across a
+500kbp genomic region: `chr15-102600000-103100000`, which overlaps with the
+*HOXC* gene cluster. A ChromHMM annotation has also been subset to overlap 
+with such region.
+
+```{r setup, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(scales)
+library(rtracklayer)
+library(GenomicRanges)
+library(wigglescout)
+
+h33_chip <- system.file("extdata", "sample_H33_ChIP.bw", package = "wigglescout")
+h3k9me3_chip <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package = "wigglescout")
+input_chip <- system.file("extdata", "sample_Input.bw", package = "wigglescout")
+genes <- system.file("extdata", "sample_genes_mm9.bed", package = "wigglescout")
+chromhmm <- system.file("extdata", "sample_chromhmm.bed", package = "wigglescout")
+
+locus <- GRanges(seqnames = "chr15", IRanges(102600000, 103100000))
+```
+
+All these values are paths to bigWig and BED files.
+
+# Genome-wide analysis
+
+`bw_bins` function returns a `GRanges` object where each entry is a locus of 
+length `bin_size` and its score is the mean coverage.
+
+**Note:** Small bin sizes (< 5000bp) take longer to run.
+
+```{r, warning = FALSE, message = FALSE}
+# Several bwfiles can be provided at once
+bw_bins(c(h33_chip, input_chip),
+        bin_size = 50000,
+        genome = "mm9",
+        selection = locus)
+```
+
+It is also possible to provide a list of bigWig files to be used as background
+to normalize the bin values to. For instance, in the previous case, one could
+want to use the input values to normalize the H3.3 ChIP data:
+
+```{r, warning = FALSE, message = FALSE}
+bw_bins(h33_chip, bg_bwfiles = input_chip,
+        bin_size = 50000,
+        genome = "mm9",
+        selection = locus)
+```
+If `log2` is passed as `norm_func` parameter, we get the log2 ratio sample / input:
+
+```{r, warning = FALSE, message = FALSE}
+bw_bins(h33_chip, bg_bwfiles = input_chip,
+        bin_size = 50000,
+        genome = "mm9",
+        selection = locus,
+        norm_func = log2) # Note this is not a string, but the actual function
+```
+
+# Locus-based analysis
+
+These functions are useful when you have some genomic annotations you want to
+look at, rather than general genome-wide trends.
+
+## Individual loci
+
+To calculate values on a *locus* specific manner you can use `bw_bed` function.
+For instance, we can look at the genes at this region:
+
+```{r, warning = FALSE, message = FALSE}
+bw_bed(c(h33_chip, input_chip), bedfile = genes)
+```
+
+Many of the options available for `bw_bins` are shared with `bw_bed`, so you can
+also use background bigWig files:
+
+```{r, warning = FALSE, message = FALSE}
+bw_bed(h33_chip, bg_bwfiles = input_chip, bedfile = genes)
+```
+
+A name column is provided if the given `BED` file includes *loci* IDs.
+
+## Aggregated loci
+
+It is also possible to aggregate values by some kind of category. This is 
+useful for `BED` files where ID is not an individual entity but rather a 
+category, for instance, ChromHMM annotations:
+
+```{r, warning = FALSE, message = FALSE}
+chrom_ranges <- import(chromhmm)
+
+chrom_ranges
+```
+
+It is possible to get a single value per category using `aggregate_by` parameter.
+
+```{r, warning = FALSE, message = FALSE}
+# If aggregate_by is not provided, you get a non-aggregated GRanges
+bw_bed(h33_chip,
+       bg_bwfiles = input_chip,
+       bedfile = chromhmm,
+       aggregate_by = "mean") 
+```
+
+**Note:** In this case you will not get a `GRanges` object but a `data.frame`.
+
+For these calculations you **always** get some kind of **average** per locus. 
+However, different ways of treating the average values are available by changing
+the `aggregate_by` parameter:
+
+- `true_mean`: This calculates a mean adding up all the values included per *locus*. 
+It is most meaningful when loci represent categories rather than biological
+entities.
+- `mean`: This calculates a mean-of-means instead, where each *locus* mean value
+is calculated and the mean of this distribution of means is returned as a result.
+- `median`: This calculates a median-of-means. It is useful to perform an analysis
+that is more robust to outliers, but it does not work well with sparse data.
+
+## Profile averages
+
+You may be interested in the **shape** the signal takes across a set of *loci*.
+This is calculated by `bw_profile`. This function takes each *locus* in the 
+provided bed file and slices it into a fixed number of bins (this is determined
+by `bin_size` parameter). Each bin is aggregated together across loci.
+
+
+```{r, warning = FALSE, message = FALSE}
+profile <- bw_profile(h33_chip, bedfile = genes, bin_size = 100)
+
+head(profile)
+```
+
+**Note:**. `bw_profile` returns data as long format, since it returns more than
+one value per data point. You get: mean, standard error, median value per point.
+Each point is represented by index. This index determines its bin.
+
+You can also provide `upstream` and `downstream` base pairs values to include
+in this calculation.
+
+```{r, warning = FALSE, message = FALSE}
+profile <- bw_profile(h33_chip, bedfile = genes, bin_size = 100,
+                      upstream = 500, downstream = 500)
+
+head(profile)
+```
+
+Additionally, you can use `mode` parameter to define how these locus are aligned
+before binning. Available modes are: `start`, `end`, `center` (align the loci around
+these points) or `stretch` which anchors features `start` to `end` and stretches
+them when length is different.
+
+## Per-locus profiles
+
+This shape created by `bw_profile` function is still an average. So you may be
+interested on a per-locus profile value. This is what you get with `bw_heatmap`.
+`bw_heatmap` returns a `matrix` where each row is a locus and each column is
+a bin. The rest of parameters are analogous to `bw_profile`:
+
+```{r, warning = FALSE, message = FALSE}
+mat <- bw_heatmap(h33_chip, bedfile = genes, bin_size = 1000,
+                  upstream = 5000, downstream = 5000)
+
+# Note that bw_heatmap returns a list of matrices, so it supports arrays of 
+# bwfiles as input as well.
+head(mat[[1]])
+```
+
