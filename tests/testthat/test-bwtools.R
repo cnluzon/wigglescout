@@ -2,84 +2,42 @@ context("Test functions for bigWig handling")
 library(GenomicRanges)
 library(rtracklayer)
 
-toy_example <- function(bw1,
-                        bw2,
-                        bw_special,
-                        bed_with_names,
-                        bg1,
-                        bg2,
-                        unnamed_bed) {
-  granges <- GRanges(
-    seqnames = Rle(c("chr1", "chr2"), c(10, 10)),
-    ranges = IRanges(c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
-                     c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
-    score = 1:20
-  )
-
-  gr2 <- GRanges(
-    seqnames = Rle(c("chr1", "chr2"), c(10, 10)),
-    ranges = IRanges(c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
-                     c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
-    score = 20:1
-  )
-
-  gr_bg1 <- GRanges(
-    seqnames = Rle(c("chr1", "chr2"), c(10, 10)),
-    ranges = IRanges(c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
-                     c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
-    score = rep(1, 20)
-  )
-
-  gr_bg2 <- GRanges(
-    seqnames = Rle(c("chr1", "chr2"), c(10, 10)),
-    ranges = IRanges(c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
-                     c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
-    score = rep(2, 20)
-  )
-
-  labeled_gr <- GRanges(
-    seqnames = c("chr1", "chr1", "chr2", "chr2", "chr2"),
-    ranges = IRanges(c(21,  61, 21, 111, 161),
-                     c(40, 100, 40, 130, 180))
-  )
-
-  export(labeled_gr, unnamed_bed)
-  labeled_gr$name <- c("typeA", "typeB", "typeA", "typeB", "typeB")
-
-  chromsizes <- c(200, 200)
-
-  seqlengths(granges) <- chromsizes
-  seqlengths(gr2) <- chromsizes
-  seqlengths(labeled_gr) <- chromsizes
-  seqlengths(gr_bg1) <- chromsizes
-  seqlengths(gr_bg2) <- chromsizes
-
-  export(granges, bw1)
-  export(gr2, bw2)
-  export(gr2, bw_special)
-  export(labeled_gr, bed_with_names)
-  export(gr_bg1, bg1)
-  export(gr_bg2, bg2)
+bed_to_bw <- function(bed, bw, chromsizes) {
+  ranges <- import(bed)
+  seqlengths(ranges) <- chromsizes
+  export(ranges, bw)
 }
 
 bw1 <- tempfile("bigwig", fileext = ".bw")
 bw2 <- tempfile("bigwig", fileext = ".bw")
 bg1 <- tempfile("bigwig_bg1", fileext = ".bw")
 bg2 <- tempfile("bigwig_bg2", fileext = ".bw")
-bw_special <- tempfile("bigwig", fileext = ".bw")
-bed_with_names <- tempfile("bed", fileext = ".bed")
-unnamed_bed <- tempfile("bed2", fileext=".bed")
+bw_special <- tempfile("bigwñg", fileext = ".bw")
+
+bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
+unnamed_bed <- system.file("testdata", "not_labeled.bed", package = "wigglescout")
 
 tiles <- tileGenome(c(chr1 = 200, chr2 = 200),
                     tilewidth = 20,
-                    cut.last.tile.in.chrom = TRUE
-)
+                    cut.last.tile.in.chrom = TRUE)
 
+setup({
+  chromsizes <- c(200, 200)
+  # Read bed files and transform these to bigwig
+  bed_to_bw(system.file("testdata", "bed1.bed", package = "wigglescout"), bw1, chromsizes)
+  bed_to_bw(system.file("testdata", "bed2.bed", package = "wigglescout"), bw2, chromsizes)
+  bed_to_bw(system.file("testdata", "bg1.bed", package = "wigglescout"), bg1, chromsizes)
+  bed_to_bw(system.file("testdata", "bg2.bed", package = "wigglescout"), bg2, chromsizes)
+  bed_to_bw(system.file("testdata", "bg2.bed", package = "wigglescout"), bw_special, chromsizes)
 
-setup(toy_example(bw1, bw2, bw_special, bed_with_names, bg1, bg2, unnamed_bed))
+})
 
 teardown({
-  unlink(c(bw1, bw2, bg1, bg2, bw_special, bed_with_names))
+  unlink(bw1)
+  unlink(bw2)
+  unlink(bg1)
+  unlink(bg2)
+  unlink(bw_special)
 })
 
 test_that("Setup files exist", {

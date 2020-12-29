@@ -474,11 +474,15 @@ bw_ranges <- function(bwfile,
 #'     median: median-of-distribution. The median of the aggregated value per
 #'       locus is reported.
 #'
+#' FIXME: importFrom tidyselect where does not work according to:
+#' https://github.com/r-lib/tidyselect/issues/201
+#' This does not pass the checks but does not break the build process either
+#' so I left it as is, so the note thrown by build is noted everytime.
+#'
 #' @importFrom dplyr group_by_at summarise across `%>%`
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
-  # print(scored_granges)
   validate_group_col(scored_granges, group_col)
 
   # GRanges objects are 1-based and inclusive [start, end]
