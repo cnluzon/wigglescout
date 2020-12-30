@@ -38,7 +38,9 @@ Imports:
   RCurl,
   pheatmap,
   DESeq2,
-  tools
+  tools,
+  furrr,
+  future
 Suggests: 
     knitr,
     testthat,

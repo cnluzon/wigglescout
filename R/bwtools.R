@@ -192,10 +192,10 @@ bw_heatmap <- function(bwfiles,
   )
 
   if (is.null(bg_bwfiles)) {
-    values_list <- purrr::map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
+    values_list <- furrr::future_map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
 
   } else {
-    values_list <- purrr::map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
+    values_list <- furrr::future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
   }
 
   values_list
@@ -278,11 +278,11 @@ bw_profile <- function(bwfiles,
                                 )
 
   if (is.null(bg_bwfiles)) {
-    values_list <- purrr::map2(bwfiles, labels, calculate_bw_profile_fixed,
+    values_list <- furrr::future_map2(bwfiles, labels, calculate_bw_profile_fixed,
                      bg_bw = NULL
                    )
   } else {
-    values_list <- purrr::pmap(list(bwfiles, bg_bwfiles, labels),
+    values_list <- furrr::future_pmap(list(bwfiles, bg_bwfiles, labels),
                      calculate_bw_profile_fixed
                    )
   }
@@ -330,11 +330,12 @@ multi_bw_ranges <- function(bwfiles,
                             per_locus_stat = "mean",
                             selection = NULL) {
 
+
   if (length(bwfiles) != length(labels)) {
     stop("BigWig file list and column names must have the same length.")
   }
 
-  summaries <- purrr::map(bwfiles, bw_ranges,
+  summaries <- furrr::future_map(bwfiles, bw_ranges,
                  granges = granges,
                  per_locus_stat = per_locus_stat,
                  selection = selection
