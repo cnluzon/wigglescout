@@ -213,3 +213,49 @@ mat <- bw_heatmap(h33_chip, bedfile = genes, bin_size = 1000,
 head(mat[[1]])
 ```
 
+# Using multiple processors
+
+As of version 0.2.0, `wigglescout` core functions support `future` specifications
+using `furrr` library. This means you can run the code in multiple R sessions:
+
+```{r, warning = FALSE, message = FALSE}
+# You just have to set the plan
+library(future)
+plan(multisession, workers = 2)
+
+# Then run the functions just the same
+bw_bins(c(h33_chip, input_chip),
+        bin_size = 50000,
+        genome = "mm9",
+        selection = locus,
+        norm_func = log2) # Note this is not a string, but the actual function
+```
+
+It is advised against implementing future planning within library function 
+according to [`future` documentation](https://www.rdocumentation.org/packages/future/versions/1.21.0/topics/plan):
+
+>Please refrain from modifying the future strategy inside your packages / functions, i.e. do not call plan() in your code. Instead, leave the control on what backend to use to the end user. This idea is part of the core philosophy of the future framework - as a developer you can never know what future backends the user have access to. Moreover, by not making any assumptions about what backends are available, your code will also work automatically with any new backends developed after you wrote your code.
+
+## How to find the best configuration
+
+Parallelization in `wigglescout` setting is based on the fact that operations
+on multiple files are done separately and independently of each other. However,
+doing this requires some passing of data back and forth, which means that if 
+your bigWig files are large (or the results you get from them, for instance,
+big `GRanges` objects), or you don't have many, you may suffer the overhead
+without getting any benefit from it.
+
+An easy rule of thumb is: swap from `sequential` (which is the default) to
+`multisession` if you are running functions on multiple files at once. It seems
+like there is benefit to do this pretty much for any number of files larger 
+than one.
+
+However, adding more sessions does not seem to help a lot. Best guess is going
+for 2 or 4 workers. With 2 workers you already see a considerable reduction
+in time.
+
+My expectation is that `multicore` may be faster. However I have not benchmarked
+it, as it does not run within Rstudio.
+
+
+

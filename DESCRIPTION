@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore And Visualize Genomics BigWig Data
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
@@ -38,7 +38,9 @@ Imports:
   RCurl,
   pheatmap,
   DESeq2,
-  tools
+  tools,
+  furrr,
+  future
 Suggests: 
     knitr,
     testthat,

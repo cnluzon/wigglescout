@@ -1,6 +1,7 @@
 context("Test functions for bigWig handling")
 library(GenomicRanges)
 library(rtracklayer)
+library(future)
 
 bed_to_bw <- function(bed, bw, chromsizes) {
   ranges <- import(bed)
@@ -82,6 +83,18 @@ test_that("multi_bw_ranges returns correct values", {
   expect_equal(values[1]$bw2, 20)
   expect_equal(values[2]$bw1, 2)
   expect_equal(values[2]$bw2, 19)
+})
+
+test_that("multi_bw_ranges several processors returns correct values", {
+  future::plan(multisession, workers=2)
+  values <- multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
+
+  expect_is(values, "GRanges")
+  expect_equal(values[1]$bw1, 1)
+  expect_equal(values[1]$bw2, 20)
+  expect_equal(values[2]$bw1, 2)
+  expect_equal(values[2]$bw2, 19)
+  future::plan(sequential)
 })
 
 test_that(
