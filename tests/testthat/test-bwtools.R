@@ -22,6 +22,8 @@ tiles <- tileGenome(c(chr1 = 200, chr2 = 200),
                     tilewidth = 20,
                     cut.last.tile.in.chrom = TRUE)
 
+granges <- import(bed_with_names)
+
 setup({
   chromsizes <- c(200, 200)
   # Read bed files and transform these to bigwig
@@ -167,6 +169,13 @@ test_that("multi_bw_ranges returns correct values on subset", {
 
 test_that("bw_bed returns correct per locus values", {
   values <- bw_bed(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
+  expect_is(values, "GRanges")
+  expect_equal(values[1]$bw1, 2)
+  expect_equal(values[2]$bw1, 4.5)
+})
+
+test_that("bw_bed accepts GRanges objects", {
+  values <- bw_bed(bw1, granges, labels = "bw1", per_locus_stat = "mean")
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
@@ -342,6 +351,18 @@ test_that("bw_profile runs quiet on valid parameters", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
                          bedfile = bed_with_names,
+                         upstream = 1,
+                         downstream = 1,
+                         bin_size = 1
+    )
+  })
+
+})
+
+test_that("bw_profile runs on GRanges object", {
+  expect_silent({
+    values <- bw_profile(c(bw1, bw2),
+                         bedfile = granges,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1
@@ -618,6 +639,28 @@ test_that("bw_heatmap returns correct values", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = NULL,
                        bedfile = bed_with_names,
+                       upstream = 5,
+                       downstream = 5,
+                       bin_size = 1,
+                       mode = "start"
+  )
+
+  expect_is(values[[1]], "matrix")
+  expect_equal(nrow(values[[1]]), 5)
+  expect_equal(ncol(values[[1]]), 10)
+
+  expect_equal(values[[1]][1, ], c(rep(1,5), rep(2,5)))
+  expect_equal(values[[1]][2, ], c(rep(3,5), rep(4,5)))
+  expect_equal(values[[1]][3, ], c(rep(11, 5), rep(12, 5)))
+  expect_equal(values[[1]][4, ], rep(16, 10))
+  expect_equal(values[[1]][5, ], c(rep(18,5), rep(19,5)))
+
+})
+
+test_that("bw_heatmap returns correct values on GRanges object", {
+  values <- bw_heatmap(bw1,
+                       bg_bwfiles = NULL,
+                       bedfile = granges,
                        upstream = 5,
                        downstream = 5,
                        bin_size = 1,
