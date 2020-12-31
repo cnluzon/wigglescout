@@ -128,6 +128,15 @@ bw_bed(h33_chip, bg_bwfiles = input_chip, bedfile = genes)
 
 A name column is provided if the given `BED` file includes *loci* IDs.
 
+You can also provide `GRanges` objects instead of `BED` files:
+
+```{r, warning = FALSE, message = FALSE}
+genes_granges <- rtracklayer::import(genes, format = "BED")
+
+bw_bed(h33_chip, bg_bwfiles = input_chip, bedfile = genes_granges)
+```
+
+
 ## Aggregated loci
 
 It is also possible to aggregate values by some kind of category. This is 
@@ -146,7 +155,7 @@ It is possible to get a single value per category using `aggregate_by` parameter
 # If aggregate_by is not provided, you get a non-aggregated GRanges
 bw_bed(h33_chip,
        bg_bwfiles = input_chip,
-       bedfile = chromhmm,
+       bedfile = chrom_ranges,
        aggregate_by = "mean") 
 ```
 
