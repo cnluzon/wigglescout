@@ -30,15 +30,14 @@ bw_bed <- function(bwfiles,
                    norm_func = identity) {
 
   validate_filelist(bwfiles)
-  validate_filelist(bedfile)
+  validate_locus_parameter(bedfile)
 
   if (is.null(labels)) {
     labels <- make_label_from_filename(bwfiles)
   }
 
-  bed <- import(bedfile)
-  bed <- sortSeqlevels(bed)
-  bed <- sort(bed, ignore.strand = FALSE)
+  bed <- loci_to_granges(bedfile)
+
   result <- NULL
   if (is.null(aggregate_by)) {
     if (is.null(bg_bwfiles)) {
@@ -84,6 +83,16 @@ bw_bed <- function(bwfiles,
   result
 }
 
+loci_to_granges <- function(loci) {
+  bed <- loci
+  if (class(loci) == "character") {
+    bed <- import(loci, format = "BED")
+  }
+
+  bed <- sortSeqlevels(bed)
+  bed <- sort(bed, ignore.strand = FALSE)
+  bed
+}
 
 #' Build a binned-scored GRanges object from a bigWig file
 #'
@@ -153,6 +162,9 @@ bw_bins <- function(bwfiles,
 #' Calculate heatmap matrix of a bigWig file over a BED file
 #'
 #' @inheritParams bw_profile
+#' @importFrom furrr future_map future_map2
+#' @importFrom rtracklayer import
+#' @importFrom purrr partial
 #' @export
 bw_heatmap <- function(bwfiles,
                        bg_bwfiles = NULL,
@@ -167,8 +179,8 @@ bw_heatmap <- function(bwfiles,
                        norm_func = identity) {
 
   validate_filelist(bwfiles)
-  validate_filelist(bedfile)
-  granges <- rtracklayer::import(bedfile)
+  validate_locus_parameter(bedfile)
+  granges <- loci_to_granges(bedfile)
 
   validate_profile_parameters(bin_size, upstream, downstream)
 
@@ -180,22 +192,21 @@ bw_heatmap <- function(bwfiles,
     stop("labels and bwfiles must have the same length")
   }
 
-  calculate_matrix_norm_fixed <- purrr::partial(calculate_matrix_norm,
-                                                granges = granges,
-                                                mode = mode,
-                                                bin_size = bin_size,
-                                                upstream = upstream,
-                                                downstream = downstream,
-                                                middle = middle,
-                                                ignore_strand = ignore_strand,
-                                                norm_func = norm_func
-  )
+  calculate_matrix_norm_fixed <- partial(calculate_matrix_norm,
+                                   granges = granges,
+                                   mode = mode,
+                                   bin_size = bin_size,
+                                   upstream = upstream,
+                                   downstream = downstream,
+                                   middle = middle,
+                                   ignore_strand = ignore_strand,
+                                   norm_func = norm_func
+                                 )
 
   if (is.null(bg_bwfiles)) {
-    values_list <- furrr::future_map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
-
+    values_list <- future_map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
   } else {
-    values_list <- furrr::future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
+    values_list <- future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
   }
 
   values_list
@@ -253,8 +264,8 @@ bw_profile <- function(bwfiles,
                        norm_func = identity) {
 
   validate_filelist(bwfiles)
-  validate_filelist(bedfile)
-  granges <- rtracklayer::import(bedfile)
+  validate_locus_parameter(bedfile)
+  granges <- loci_to_granges(bedfile)
 
   validate_profile_parameters(bin_size, upstream, downstream)
 
@@ -278,7 +289,8 @@ bw_profile <- function(bwfiles,
                                 )
 
   if (is.null(bg_bwfiles)) {
-    values_list <- furrr::future_map2(bwfiles, labels, calculate_bw_profile_fixed,
+    values_list <- furrr::future_map2(bwfiles, labels,
+                     calculate_bw_profile_fixed,
                      bg_bw = NULL
                    )
   } else {
@@ -442,7 +454,7 @@ bw_ranges <- function(bwfile,
                       selection = NULL) {
 
   valid_bwfile <- bwfile
-  if ( RCurl::url.exists(bwfile) ) {
+  if (RCurl::url.exists(bwfile)) {
     valid_bwfile <- tempfile()
     download.file(bwfile, valid_bwfile)
   }
@@ -575,16 +587,16 @@ calculate_bw_profile <- function(bw,
     label <- basename(bw)
   }
 
-  full <- calculate_matrix_norm(bw,
-                           granges,
-                           bg_bw = bg_bw,
-                           mode = mode,
-                           bin_size = bin_size,
-                           upstream = upstream,
-                           downstream = downstream,
-                           middle = middle,
-                           ignore_strand = ignore_strand,
-                           norm_func = identity)
+  full <- calculate_matrix_norm(bw, granges,
+            bg_bw = bg_bw,
+            mode = mode,
+            bin_size = bin_size,
+            upstream = upstream,
+            downstream = downstream,
+            middle = middle,
+            ignore_strand = ignore_strand,
+            norm_func = identity
+          )
 
   summarize_matrix(full, label)
 }
@@ -605,20 +617,20 @@ calculate_matrix_norm <- function(bw,
                                   norm_func = identity) {
   if (mode == "stretch") {
     full <- calculate_stretch_matrix(bw, granges,
-                                     bin_size = bin_size,
-                                     upstream = upstream,
-                                     downstream = downstream,
-                                     middle = middle,
-                                     ignore_strand = ignore_strand
-    )
+              bin_size = bin_size,
+              upstream = upstream,
+              downstream = downstream,
+              middle = middle,
+              ignore_strand = ignore_strand
+            )
 
     if (!is.null(bg_bw)) {
       bg <- calculate_stretch_matrix(bg_bw, granges,
-                                     bin_size = bin_size,
-                                     upstream = upstream,
-                                     downstream = downstream,
-                                     ignore_strand = ignore_strand
-      )
+              bin_size = bin_size,
+              upstream = upstream,
+              downstream = downstream,
+              ignore_strand = ignore_strand
+            )
 
       full <- norm_func(full / bg)
     }
@@ -629,7 +641,7 @@ calculate_matrix_norm <- function(bw,
 
     # To properly center one needs to floor separately upstream and downstream.
     # This way the tick will always be in between bins.
-    npoints <- floor(upstream/bin_size) + floor(downstream / bin_size)
+    npoints <- floor(upstream / bin_size) + floor(downstream / bin_size)
 
     full <- intersect_bw_and_granges(
       bw,
@@ -640,11 +652,11 @@ calculate_matrix_norm <- function(bw,
 
     if (!is.null(bg_bw)) {
       bg <- intersect_bw_and_granges(
-        bg_bw,
-        granges,
-        npoints = npoints,
-        ignore_strand = FALSE
-      )
+              bg_bw,
+              granges,
+              npoints = npoints,
+              ignore_strand = FALSE
+            )
 
       full <- norm_func(full / bg)
     }
@@ -786,7 +798,7 @@ summarize_matrix <- function(matrix, label) {
 fetch_bigwig <- function(bw) {
   if (!is.null(bw)) {
     valid_bwfile <- bw
-    if ( RCurl::url.exists(bw) ) {
+    if (RCurl::url.exists(bw)) {
       valid_bwfile <- tempfile()
       download.file(bw, valid_bwfile)
     }
@@ -885,6 +897,23 @@ validate_filelist <- function(filelist) {
   if (! all(existence_flag)) {
     msg <- paste("Files not found:", filelist[!existence_flag])
     stop(msg)
+  }
+}
+
+#' Validate that a locus parameter is valid. Checks for paths and also whether
+#' the parameter is otherwise a GRanges object, which is also valid.
+#'
+#' @param locus_param Parameter to validate
+#'
+validate_locus_parameter <- function(locus_param) {
+  if (class(locus_param) == "character") {
+    validate_filelist(locus_param)
+  }
+  else {
+    if (class(locus_param) != "GRanges") {
+      msg <- paste0("Unexpected type: ", class(locus_param))
+      stop(msg)
+    }
   }
 }
 
