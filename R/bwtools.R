@@ -83,17 +83,6 @@ bw_bed <- function(bwfiles,
   result
 }
 
-loci_to_granges <- function(loci) {
-  bed <- loci
-  if (class(loci) == "character") {
-    bed <- import(loci, format = "BED")
-  }
-
-  bed <- sortSeqlevels(bed)
-  bed <- sort(bed, ignore.strand = FALSE)
-  bed
-}
-
 #' Build a binned-scored GRanges object from a bigWig file
 #'
 #' Build a binned-scored GRanges object from a bigWig file. The aggregating
@@ -313,16 +302,12 @@ bw_profile <- function(bwfiles,
 #' @param bin_size Bin size.
 #' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
 #' @importFrom GenomicRanges tileGenome
+#' @importFrom GenomeInfoDb Seqinfo seqlengths
 #' @return A GRanges object
 #' @export
 build_bins <- function(bin_size = 10000, genome = "mm9") {
-  data_name <- paste(genome, "seqinfo", sep = "_")
-  if (!exists(data_name)) {
-    stop("Supported genomes: mm9, mm10, hg38, hg38_latest")
-  }
-
-  seq_lengths <- get(data_name)
-  tileGenome(seq_lengths, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
+  seqinfo <- seqlengths(Seqinfo(genome=genome))
+  tileGenome(seqinfo, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
 }
 
 
@@ -833,6 +818,25 @@ granges_cbind <- function(grlist, labels) {
 
   result <- makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
   result
+}
+
+
+#' Processes a loci and returns a GRanges object, sorted and with its seqlevels
+#' also sorted.
+#'
+#' @param loci Either a BED file or a GRanges object
+#'
+#' @importFrom rtracklayer import
+#' @importFrom GenomeInfoDb sortSeqlevels
+loci_to_granges <- function(loci) {
+  bed <- loci
+  if (class(loci) == "character") {
+    bed <- import(loci, format = "BED")
+  }
+
+  bed <- sortSeqlevels(bed)
+  bed <- sort(bed, ignore.strand = FALSE)
+  bed
 }
 
 
