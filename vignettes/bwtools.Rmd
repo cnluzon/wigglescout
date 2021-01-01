@@ -105,6 +105,14 @@ bw_bins(h33_chip, bg_bwfiles = input_chip,
         norm_func = log2) # Note this is not a string, but the actual function
 ```
 
+## Supported genomes
+
+`bw_bins` function is based on `tileGenome` function from `GenomicRanges`, which
+requires information about chromosome length. This is obtained relying on
+function `Seqinfo` from `GenomeInfoDb` package. So, in theory, any genome ID
+that would return a `Seqinfo` object by doing `Seqinfo(genome="your_genome")`
+should work.
+
 # Locus-based analysis
 
 These functions are useful when you have some genomic annotations you want to
