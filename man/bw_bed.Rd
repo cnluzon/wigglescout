@@ -11,7 +11,8 @@ bw_bed(
   labels = NULL,
   per_locus_stat = "mean",
   aggregate_by = NULL,
-  norm_func = identity
+  norm_func = identity,
+  remove_top = 0
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ Choices: min, max, sd, mean.}
 not aggregated. This is the behavior by default.}
 
 \item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \description{
 Build a scored GRanges object from a bigWig file list and a BED file.

@@ -9,7 +9,8 @@ multi_bw_ranges(
   labels,
   granges,
   per_locus_stat = "mean",
-  selection = NULL
+  selection = NULL,
+  remove_top = 0
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ Choices: min, max, sd, mean.}
 \item{selection}{A GRanges object to restrict binning to a certain set of
 intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \value{
 A sorted GRanges object.

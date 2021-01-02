@@ -12,7 +12,8 @@ bw_bins(
   bin_size = 10000,
   genome = "mm9",
   selection = NULL,
-  norm_func = identity
+  norm_func = identity,
+  remove_top = 0
 )
 }
 \arguments{
@@ -36,6 +37,9 @@ intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
 
 \item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \value{
 A GRanges object with each bwfile as a metadata column named

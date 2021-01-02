@@ -167,6 +167,69 @@ test_that("multi_bw_ranges returns correct values on subset", {
   expect_equal(values[2]$bw2, 18)
 })
 
+test_that("multi_bw_ranges removes value even if quantile very small, due to interpolation", {
+  # Note the use of bw1 twice. bw1 + bw2 means are always 10.5, so it would not
+  # remove any rows.
+  values <- multi_bw_ranges(c(bw1, bw1),
+                            c("bw1", "bw2"),
+                            tiles,
+                            remove_top = 0.01
+  )
+
+  expect_is(values, "GRanges")
+  expect_equal(max(values$bw1), 19)
+  expect_equal(max(values$bw2), 19)
+})
+
+test_that("multi_bw_ranges removes percentile", {
+  values <- multi_bw_ranges(c(bw1, bw1),
+                            c("bw1", "bw2"),
+                            tiles,
+                            remove_top = 0.05
+  )
+
+  expect_is(values, "GRanges")
+  expect_equal(max(values$bw1), 19)
+  expect_equal(max(values$bw2), 19)
+})
+
+test_that("multi_bw_ranges removes percentile single column", {
+  values <- multi_bw_ranges(c(bw1),
+                            c("bw1"),
+                            tiles,
+                            remove_top = 0.1
+  )
+
+  expect_is(values, "GRanges")
+  expect_equal(max(values$bw1), 18)
+})
+
+test_that("multi_bw_ranges_norm removes percentile", {
+  values <- multi_bw_ranges_norm(c(bw1, bw1),
+                            c(bg1, bg1),
+                            c("bw1", "bw2"),
+                            tiles,
+                            remove_top = 0.1
+  )
+
+  expect_is(values, "GRanges")
+  expect_equal(max(values$bw1), 18)
+  expect_equal(max(values$bw2), 18)
+})
+
+test_that("multi_bw_ranges_norm removes percentile single column", {
+  values <- multi_bw_ranges_norm(c(bw1), c(bg1),
+                            c("bw1"),
+                            tiles,
+                            remove_top = 0.1
+  )
+
+  expect_is(values, "GRanges")
+  expect_equal(max(values$bw1), 18)
+})
+
+
+
 test_that("bw_bed returns correct per locus values", {
   values <- bw_bed(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
   expect_is(values, "GRanges")
@@ -383,6 +446,20 @@ test_that("bw_profile runs quiet on valid parameters, mode start", {
   })
 
 })
+
+
+test_that("calculate_matrix_norm removes percentile", {
+  values <- calculate_matrix_norm(bw1, import(bed_with_names), bin_size = 2,
+                                  upstream = 6, downstream = 6,
+                                  remove_top = 0.05)
+
+  expect_is(values, "matrix")
+  expect_equal(nrow(values), 4)
+  expect_equal(max(values), 17)
+
+})
+
+
 
 test_that(
   "bw_profile runs quiet on valid parameters, mode start, with background", {

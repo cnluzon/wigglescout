@@ -27,7 +27,8 @@ bw_bed <- function(bwfiles,
                    labels = NULL,
                    per_locus_stat = "mean",
                    aggregate_by = NULL,
-                   norm_func = identity) {
+                   norm_func = identity,
+                   remove_top = 0) {
 
   validate_filelist(bwfiles)
   validate_locus_parameter(bedfile)
@@ -43,7 +44,8 @@ bw_bed <- function(bwfiles,
     if (is.null(bg_bwfiles)) {
       result <- multi_bw_ranges(bwfiles, labels,
                   granges = bed,
-                  per_locus_stat = per_locus_stat
+                  per_locus_stat = per_locus_stat,
+                  remove_top = remove_top
       )
     }
     else {
@@ -54,15 +56,18 @@ bw_bed <- function(bwfiles,
         labels = labels,
         granges = bed,
         per_locus_stat = per_locus_stat,
-        norm_func = norm_func
+        norm_func = norm_func,
+        remove_top = remove_top,
       )
     }
+
   } else {
     result <- multi_bw_ranges_aggregated(bwfiles,
                 labels = labels,
                 granges = bed,
                 per_locus_stat = per_locus_stat,
-                aggregate_by = aggregate_by
+                aggregate_by = aggregate_by,
+                remove_top = remove_top
               )
 
     if (!is.null(bg_bwfiles)) {
@@ -70,13 +75,15 @@ bw_bed <- function(bwfiles,
               labels = labels,
               granges = bed,
               per_locus_stat = per_locus_stat,
-              aggregate_by = aggregate_by
+              aggregate_by = aggregate_by,
+              remove_top = remove_top
             )
 
       rows <- rownames(result)
       result <- data.frame(norm_func(result[rows, labels] / bg[rows, labels]))
       rownames(result) <- rows
       colnames(result) <- labels
+
     }
   }
 
@@ -112,6 +119,8 @@ bw_bed <- function(bwfiles,
 #'     intervals. This is useful for debugging and improving performance of
 #'     locus specific analyses.
 #' @param norm_func Function to apply to normalize bin values f(bw / bw_bg).
+#' @param remove_top Return range 0-(1-remove_top). By default returns the
+#'     whole distribution (remove_top == 0).
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
@@ -122,7 +131,8 @@ bw_bins <- function(bwfiles,
                     bin_size = 10000,
                     genome = "mm9",
                     selection = NULL,
-                    norm_func = identity) {
+                    norm_func = identity,
+                    remove_top = 0) {
 
   validate_filelist(bwfiles)
 
@@ -135,13 +145,15 @@ bw_bins <- function(bwfiles,
   if (is.null(bg_bwfiles)) {
     result <- multi_bw_ranges(bwfiles, labels, tiles,
                 per_locus_stat = per_locus_stat,
-                selection = selection
+                selection = selection,
+                remove_top = remove_top
               )
   } else {
     result <- multi_bw_ranges_norm(bwfiles, bg_bwfiles, labels, tiles,
                 per_locus_stat = per_locus_stat,
                 selection = selection,
-                norm_func = norm_func
+                norm_func = norm_func,
+                remove_top = remove_top
               )
   }
 
@@ -189,7 +201,8 @@ bw_heatmap <- function(bwfiles,
                                    downstream = downstream,
                                    middle = middle,
                                    ignore_strand = ignore_strand,
-                                   norm_func = norm_func
+                                   norm_func = norm_func,
+                                   remove_top = 0
                                  )
 
   if (is.null(bg_bwfiles)) {
@@ -250,7 +263,8 @@ bw_profile <- function(bwfiles,
                        downstream = 2500,
                        middle = NULL,
                        ignore_strand = FALSE,
-                       norm_func = identity) {
+                       norm_func = identity,
+                       remove_top = 0) {
 
   validate_filelist(bwfiles)
   validate_locus_parameter(bedfile)
@@ -274,7 +288,8 @@ bw_profile <- function(bwfiles,
                                   downstream = downstream,
                                   middle = middle,
                                   ignore_strand = ignore_strand,
-                                  norm_func = norm_func
+                                  norm_func = norm_func,
+                                  remove_top = remove_top
                                 )
 
   if (is.null(bg_bwfiles)) {
@@ -319,13 +334,15 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 #' @param granges GRanges object to intersect
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomeInfoDb sortSeqlevels
+#' @importFrom stats quantile
 #' @inheritParams bw_bins
 #' @return A sorted GRanges object.
 multi_bw_ranges <- function(bwfiles,
                             labels,
                             granges,
                             per_locus_stat = "mean",
-                            selection = NULL) {
+                            selection = NULL,
+                            remove_top = 0) {
 
 
   if (length(bwfiles) != length(labels)) {
@@ -347,6 +364,24 @@ multi_bw_ranges <- function(bwfiles,
     result$name <- granges$name
   }
 
+  # Filter percentile. Avoid operating if 0 for performance.
+  if (remove_top > 0) {
+    if (ncol(mcols(result)) > 1) {
+      means <- rowMeans(data.frame(mcols(result)))
+      top_quantile <- quantile(means, probs = c(1-remove_top), na.rm=TRUE)
+      result$means <- means
+      result <- result[!is.na(result$means), ]
+      result <- result[result$means <= top_quantile, ]
+      result$means <- NULL
+    }
+    else {
+      top_quantile <- quantile(mcols(result)[, 1],
+                        probs = c(1-remove_top), na.rm = TRUE)
+      result <- result[!is.na(mcols(result)[, 1]), ]
+      result <- result[mcols(result)[, 1] <= top_quantile, ]
+    }
+  }
+
   result
 }
 
@@ -360,11 +395,13 @@ multi_bw_ranges_aggregated <- function(bwfiles,
                                        labels,
                                        granges,
                                        per_locus_stat,
-                                       aggregate_by) {
+                                       aggregate_by,
+                                       remove_top) {
 
   result <- multi_bw_ranges(bwfiles, labels,
               granges = granges,
-              per_locus_stat = per_locus_stat
+              per_locus_stat = per_locus_stat,
+              remove_top = remove_top
             )
 
   df <- aggregate_scores(
@@ -388,6 +425,7 @@ multi_bw_ranges_aggregated <- function(bwfiles,
 #' @param selection A GRanges object to restrict analysis to.
 #' @param norm_func Function to apply after bw/bg_bw.
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
+#' @importFrom stats quantile
 #' @inheritParams bw_bins
 #' @return a sorted GRanges object
 multi_bw_ranges_norm <- function(bwfilelist,
@@ -396,7 +434,8 @@ multi_bw_ranges_norm <- function(bwfilelist,
                                  granges,
                                  per_locus_stat = "mean",
                                  selection = NULL,
-                                 norm_func = identity) {
+                                 norm_func = identity,
+                                 remove_top = 0) {
 
   if (length(bwfilelist) != length(bg_bwfilelist)) {
     stop("Background and signal bwfile lists must have the same length.")
@@ -415,6 +454,15 @@ multi_bw_ranges_norm <- function(bwfilelist,
   result_df <- data.frame(result)
   bg_df <- data.frame(bg)
   result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
+
+  if (remove_top > 0) {
+    means <- rowMeans(result_df[, labels, drop = FALSE])
+    result_df$means_aggr <- means
+    top_quantile <- quantile(means, probs = c(1-remove_top), na.rm = TRUE)
+    result_df <- result_df[!is.na(result_df$means_aggr), ]
+    result_df <- result_df[result_df$means_aggr <= top_quantile, ]
+    result_df$means_aggr <- NULL
+  }
 
   makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
 }
@@ -565,7 +613,8 @@ calculate_bw_profile <- function(bw,
                                  downstream = 2500,
                                  middle = NULL,
                                  ignore_strand = FALSE,
-                                 norm_func = identity) {
+                                 norm_func = identity,
+                                 remove_top = 0) {
 
 
   if (is.null(label)) {
@@ -580,7 +629,8 @@ calculate_bw_profile <- function(bw,
             downstream = downstream,
             middle = middle,
             ignore_strand = ignore_strand,
-            norm_func = identity
+            norm_func = identity,
+            remove_top = remove_top
           )
 
   summarize_matrix(full, label)
@@ -589,7 +639,7 @@ calculate_bw_profile <- function(bw,
 #' Calculate a normalized heatmap matrix for a bigWig file over a BED file
 #'
 #' @inheritParams calculate_bw_profile
-#' @export
+#' @importFrom stats quantile
 calculate_matrix_norm <- function(bw,
                                   granges,
                                   bg_bw = NULL,
@@ -599,7 +649,8 @@ calculate_matrix_norm <- function(bw,
                                   downstream = 2500,
                                   middle = NULL,
                                   ignore_strand = FALSE,
-                                  norm_func = identity) {
+                                  norm_func = identity,
+                                  remove_top = 0) {
   if (mode == "stretch") {
     full <- calculate_stretch_matrix(bw, granges,
               bin_size = bin_size,
@@ -646,6 +697,12 @@ calculate_matrix_norm <- function(bw,
       full <- norm_func(full / bg)
     }
   }
+
+  if (remove_top > 0) {
+      top_quantile <- quantile(rowMeans(full), probs = c(1-remove_top))
+      full <- full[rowMeans(full) <= top_quantile, ]
+  }
+
   full
 }
 

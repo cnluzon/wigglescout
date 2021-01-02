@@ -9,7 +9,8 @@ multi_bw_ranges_aggregated(
   labels,
   granges,
   per_locus_stat,
-  aggregate_by
+  aggregate_by,
+  remove_top
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ Choices: min, max, sd, mean.}
 
 \item{aggregate_by}{Statistic to aggregate per group. If NULL, values are
 not aggregated. This is the behavior by default.}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \value{
 An aggregated dataframe

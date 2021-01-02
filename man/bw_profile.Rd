@@ -15,7 +15,8 @@ bw_profile(
   downstream = 2500,
   middle = NULL,
   ignore_strand = FALSE,
-  norm_func = identity
+  norm_func = identity,
+  remove_top = 0
 )
 }
 \arguments{
@@ -52,6 +53,9 @@ mode). If not provided, median length of all loci is used.}
 \item{ignore_strand}{Whether to use strand information in BED file.}
 
 \item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \value{
 a data frame in long format
