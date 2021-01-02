@@ -11,7 +11,8 @@ multi_bw_ranges_norm(
   granges,
   per_locus_stat = "mean",
   selection = NULL,
-  norm_func = identity
+  norm_func = identity,
+  remove_top = 0
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ Choices: min, max, sd, mean.}
 \item{selection}{A GRanges object to restrict analysis to.}
 
 \item{norm_func}{Function to apply after bw/bg_bw.}
+
+\item{remove_top}{Return range 0-(1-remove_top). By default returns the
+whole distribution (remove_top == 0).}
 }
 \value{
 a sorted GRanges object
