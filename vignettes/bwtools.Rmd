@@ -230,6 +230,27 @@ mat <- bw_heatmap(h33_chip, bedfile = genes, bin_size = 1000,
 head(mat[[1]])
 ```
 
+# General shared options
+
+Each `wigglescout` function has a different set of parameters. You can check
+the documentation with `?` operator: `?bw_bins`.
+
+Here are a few that are commonly appearing in many of the functions:
+
+- `labels`: This parameter gives name to the value column of the `data.frame` or
+`GRanges` object obtained. By default the names correspond to the file names.
+- `remove_top`: Exclude a certain top quantile of the returning object. This 
+value must be in [0, 1] and by default is 0 (no values removed). Underneath,
+threshold value is calculated by `quantile` function and used as a threshold,
+where the exact value is included (values <= threshold are returned). 
+If the calculated data structure has more than one column (i.e. multiple files
+are provided), quantiles are calculated over `rowMeans`. This prioritizes cases
+where outliers are such in more than one sample. In the case where `NA` values
+are found, these are also dropped if `remove_top > 0`.
+- `per_locus_stat`: Aggregating function per locus. This is an interface with
+the underlying `rtracklayer` summary function. It defaults to `mean` and it is
+not recommended to change it.
+
 # Using multiple processors
 
 As of version 0.2.0, `wigglescout` core functions support `future` specifications
