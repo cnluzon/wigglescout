@@ -77,7 +77,9 @@ plot_bw_bins_scatter <- function(x, y,
          remove_top = remove_top
       )
 
-  verbose_tag <- ""
+  plot <- plot_results$plot + ggtitle(paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")) +
+    xlab(x_label) + ylab(y_label) + default_theme()
+
   if (verbose) {
     # Show parameters and relevant values
     relevant_params <- list(genome=genome,
@@ -90,10 +92,10 @@ plot_bw_bins_scatter <- function(x, y,
                         NAs=plot_results$na_points)
 
     verbose_tag <- make_caption(relevant_params, crop_values)
+    plot <- plot + labs(caption=verbose_tag)
   }
 
-  plot_results$plot + ggtitle(paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")) +
-    xlab(x_label) + ylab(y_label) + default_theme() + labs(caption=verbose_tag)
+  plot
 }
 
 #' Locus-based scatterplot of a pair of bigWig files
@@ -172,12 +174,14 @@ plot_bw_loci_scatter <- function(x, y,
                                       remove_top = remove_top
   )
 
-  verbose_tag <- ""
   # Show parameters and relevant values
   loci_name <- "GRanges object"
   if (class(loci) == "character") {
     loci_name <- basename(loci)
   }
+
+  plot <- plot_results$plot + ggtitle(paste("Per-locus coverage (", loci_name, ")", sep = "")) +
+    xlab(x_label) + ylab(y_label) + default_theme()
 
   if (verbose) {
     relevant_params <- list(loci=loci_name,
@@ -189,11 +193,85 @@ plot_bw_loci_scatter <- function(x, y,
                         NAs=plot_results$na_points)
 
     verbose_tag <- make_caption(relevant_params, crop_values)
+    plot <- plot + labs(caption=verbose_tag)
   }
 
-  plot_results$plot + ggtitle(paste("Per-locus coverage (", loci_name, ")", sep = "")) +
-    xlab(x_label) + ylab(y_label) + default_theme() + labs(caption=verbose_tag)
+  plot
 }
+
+
+#' Summary heatmap of a categorized BED or GRanges object
+#'
+#' Make a summary heatmap where each cell contains an aggregated value of a
+#' bigWig file from bwfiles and a category of a BED file or GRanges (loci). The
+#' provided loci must have a name field that is valid (i.e. can be grouped,
+#' representing some type of category).
+#'
+#' @param labels Labels to use for in the plot for the bw files.
+#' @param loci BED file or GRanges object.
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @inheritParams bw_bed
+#' @return A ggplot object
+#' @export
+plot_bw_loci_summary_heatmap <- function(bwfiles,
+                                         loci,
+                                         bg_bwfiles = NULL,
+                                         labels = NULL,
+                                         aggregate_by = "true_mean",
+                                         norm_func = identity,
+                                         remove_top = 0,
+                                         verbose = TRUE) {
+
+  summary_values <- bw_bed(bwfiles, loci,
+                           bg_bwfiles = bg_bwfiles,
+                           aggregate_by = aggregate_by,
+                           norm_func = norm_func,
+                           labels = labels,
+                           remove_top = remove_top
+  )
+
+
+  if (sum(summary_values) == 0) {
+    warning("All zero-values matrix. Using same background as bw input?")
+  }
+
+
+
+  legend_label = make_norm_label(substitute(norm_func), bg_bwfiles)
+  colorscale <- scale_fill_gradient(name=legend_label, low = "white", high="#B22222")
+  if (!is.null(bg_bwfiles)) {
+    colorscale <- scale_fill_gradient2(name=legend_label, low = "#2e6694", mid="white", high="#B22222")
+  }
+
+  summary_values$type <- rownames(summary_values)
+  vals_melted <- reshape2::melt(summary_values, id.vars="type")
+
+  title <- paste("Coverage per region (", aggregate_by, ")")
+  title <- paste(title, "-", make_norm_label(substitute(norm_func), bg_bwfiles))
+
+  plot <- ggplot(vals_melted, aes_string("type", "variable", fill="value")) +
+    geom_tile() + geom_text(aes(label=round(value, 2)), size=3.5) +
+    coord_fixed() + colorscale +
+    scale_y_discrete(position="right") + theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle=45, hjust=1),
+          legend.position=c(1,1.2),
+          legend.direction="horizontal",
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) + xlab("") + ylab("") +
+    ggtitle(title)
+
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(aggregate_by=aggregate_by,
+                            remove_top=remove_top)
+
+    verbose_tag <- make_caption(relevant_params, list())
+    plot <- plot + labs(caption=verbose_tag)
+  }
+
+  plot
+}
+
 
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'

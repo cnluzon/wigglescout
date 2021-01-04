@@ -367,7 +367,9 @@ multi_bw_ranges <- function(bwfiles,
   # Filter percentile. Avoid operating if 0 for performance.
   if (remove_top > 0) {
     if (ncol(mcols(result)) > 1) {
-      means <- rowMeans(data.frame(mcols(result)))
+      valid_columns <- data.frame(mcols(result))
+      valid_columns <- valid_columns[,!names(valid_columns) %in% c("name")]
+      means <- rowMeans(valid_columns)
       top_quantile <- quantile(means, probs = c(1-remove_top), na.rm=TRUE)
       result$means <- means
       result <- result[!is.na(result$means), ]

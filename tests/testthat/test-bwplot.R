@@ -92,6 +92,15 @@ test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption",
   })
 })
 
+test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
 test_that("plot_bw_loci_scatter with remove_top returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
   with_mock(bw_bins = m, {
@@ -100,7 +109,6 @@ test_that("plot_bw_loci_scatter with remove_top returns a plot", {
     expect_true("caption" %in% names(p$labels))
   })
 })
-
 
 test_that("plot_bw_bins_scatter with highlight colors set returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
@@ -189,4 +197,65 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
   )
 })
 
+test_that(
+  "plot_bw_loci_summary_heatmap with defaults returns a ggplot object", {
+    m <- mock(summary_values)
+    with_mock(bw_bed = m, {
+      p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed)
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that("plot_bw_loci_summary_heatmap with verbose set returns a plot with a caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, verbose = TRUE)
+    expect_is(p, "ggplot")
+    expect_true("caption" %in% names(p$labels))
+  })
+})
+
+test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot without a caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, verbose = FALSE)
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
+test_that(
+  "plot_bw_loci_summary_heatmap passes parameters on", {
+    m <- mock(summary_values)
+    with_mock(bw_bed = m, {
+      p <- plot_bw_loci_summary_heatmap(c(bw1, bw2),
+                                       loci = bed,
+                                       bg_bwfiles <- c(bg_bw, bg_bw),
+                                       aggregate_by = "median",
+                                       norm_func = log2,
+                                       labels = c("bw1", "bw2")
+      )
+    })
+
+    expect_call(m, 1,
+                bw_bed(bwfiles,
+                       loci,
+                       bg_bwfiles = bg_bwfiles,
+                       aggregate_by = aggregate_by,
+                       norm_func = norm_func,
+                       labels = labels,
+                       remove_top = remove_top
+                )
+    )
+
+    expect_args(m, 1,
+                bwfiles = c(bw1, bw2),
+                loci = bed,
+                bg_bwfiles = c(bg_bw, bg_bw),
+                aggregate_by = "median",
+                norm_func = log2,
+                labels = c("bw1", "bw2"),
+                remove_top = 0
+    )
+  })
 
