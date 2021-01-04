@@ -9,13 +9,13 @@ plot_bw_bins_scatter(
   y,
   bg_x = NULL,
   bg_y = NULL,
+  norm_func_x = identity,
+  norm_func_y = identity,
   bin_size = 10000,
   genome = "mm9",
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
-  norm_func_x = identity,
-  norm_func_y = identity,
   highlight_colors = NULL,
   remove_top = 0,
   verbose = TRUE
@@ -30,6 +30,10 @@ plot_bw_bins_scatter(
 
 \item{bg_y}{BigWig file to be used as y axis background (us. input).}
 
+\item{norm_func_x}{Function to use after x / x_bg.}
+
+\item{norm_func_y}{Function to use after y / y_bg.}
+
 \item{bin_size}{Bin size.}
 
 \item{genome}{Genome. Available choices are mm9, hg38.}
@@ -41,14 +45,12 @@ plot_bw_bins_scatter(
 \item{highlight_label}{Labels for the highlight groups.
 If not provided, filenames are used.}
 
-\item{norm_func_x}{Function to use after x / x_bg.}
-
-\item{norm_func_y}{Function to use after y / y_bg.}
-
 \item{highlight_colors}{Array of color values for the highlighting groups}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{verbose}{Put a caption with relevant parameters on the plot.}
 }
 \value{
 A ggplot object.

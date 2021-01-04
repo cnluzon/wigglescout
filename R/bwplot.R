@@ -20,26 +20,27 @@
 #' @param y BigWig file corresponding to the y axis.
 #' @param bg_x BigWig file to be used as x axis background (us. input).
 #' @param bg_y BigWig file to be used as y axis background (us. input).
+#' @param norm_func_x Function to use after x / x_bg.
+#' @param norm_func_y Function to use after y / y_bg.
 #' @param highlight List of bed files to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a bin to be highlighted
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, filenames are used.
-#' @param norm_func_x Function to use after x / x_bg.
-#' @param norm_func_y Function to use after y / y_bg.
 #' @param highlight_colors Array of color values for the highlighting groups
+#' @param verbose Put a caption with relevant parameters on the plot.
 #' @import ggplot2
 #' @inheritParams bw_bins
 #' @return A ggplot object.
 #' @export
 plot_bw_bins_scatter <- function(x, y,
                                  bg_x = NULL, bg_y = NULL,
+                                 norm_func_x = identity,
+                                 norm_func_y = identity,
                                  bin_size = 10000,
                                  genome = "mm9",
                                  highlight = NULL,
                                  minoverlap = 0L,
                                  highlight_label = NULL,
-                                 norm_func_x = identity,
-                                 norm_func_y = identity,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
@@ -60,12 +61,7 @@ plot_bw_bins_scatter <- function(x, y,
                            labels = "y"
   )
 
-  if (!is.null(highlight)) {
-    gr_list <- lapply(highlight, rtracklayer::import, format = "BED")
-    if (is.null(highlight_label)) {
-      highlight_label <- basename(highlight)
-    }
-  }
+  highlight_data <- process_highlight_loci(highlight, highlight_label)
 
   x_label <- paste(make_label_from_filename(x), "-",
                    make_norm_label(substitute(norm_func_x), bg_x))
@@ -74,9 +70,9 @@ plot_bw_bins_scatter <- function(x, y,
                    make_norm_label(substitute(norm_func_y), bg_y))
 
   plot_results <- plot_ranges_scatter(bins_values_x, bins_values_y,
-         highlight = gr_list,
+         highlight = highlight_data$ranges,
          minoverlap = minoverlap,
-         highlight_label = highlight_label,
+         highlight_label = highlight_data$labels,
          highlight_colors = highlight_colors,
          remove_top = remove_top
       )
@@ -100,11 +96,12 @@ plot_bw_bins_scatter <- function(x, y,
     xlab(x_label) + ylab(y_label) + default_theme() + labs(caption=verbose_tag)
 }
 
-#' Bin-based scatterplot of a pair of bigWig files
+#' Locus-based scatterplot of a pair of bigWig files
 #'
-#' Plots a scatter plot from two given bigWig files and an optional set of BED
-#' files as highlighted annotations. Bins are highlighted if there is at least
-#' minoverlap base pairs overlap with any loci in BED file.
+#' Plots a scatter plot from two given bigWig files, a locus object and a
+#' set of BED files as highlighted annotations.
+#' Loci are highlighted if there is at least minoverlap base pairs overlap
+#' with any loci in BED file.
 #'
 #' If specifying minoverlap, you must take into account the bin_size parameter
 #' and the size of the loci you are providing as BED file.
@@ -120,27 +117,31 @@ plot_bw_bins_scatter <- function(x, y,
 #'
 #' @param x BigWig file corresponding to the x axis.
 #' @param y BigWig file corresponding to the y axis.
+#' @param loci Bed file or GRanges object to be plotted.
 #' @param bg_x BigWig file to be used as x axis background (us. input).
 #' @param bg_y BigWig file to be used as y axis background (us. input).
+#' @param norm_func_x Function to use after x / x_bg.
+#' @param norm_func_y Function to use after y / y_bg.
 #' @param highlight List of bed files to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a bin to be highlighted
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, filenames are used.
-#' @param norm_func_x Function to use after x / x_bg.
-#' @param norm_func_y Function to use after y / y_bg.
 #' @param highlight_colors Array of color values for the highlighting groups
+#' @param remove_top Return range 0-(1-remove_top). By default returns the
+#'     whole distribution (remove_top == 0).
+#' @param verbose Verbose plot. Returns a plot with all relevant parameters in
+#'   a caption.
 #' @import ggplot2
-#' @inheritParams bw_bins
 #' @return A ggplot object.
 #' @export
 plot_bw_loci_scatter <- function(x, y,
                                  loci,
                                  bg_x = NULL, bg_y = NULL,
+                                 norm_func_x = identity,
+                                 norm_func_y = identity,
                                  highlight = NULL,
                                  minoverlap = 0L,
                                  highlight_label = NULL,
-                                 norm_func_x = identity,
-                                 norm_func_y = identity,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
@@ -155,13 +156,7 @@ plot_bw_loci_scatter <- function(x, y,
                      labels = "y"
               )
 
-  gr_list <- NULL
-  if (!is.null(highlight)) {
-    gr_list <- lapply(highlight, rtracklayer::import, format = "BED")
-    if (is.null(highlight_label)) {
-      highlight_label <- basename(highlight)
-    }
-  }
+  highlight_data <- process_highlight_loci(highlight, highlight_label)
 
   x_label <- paste(make_label_from_filename(x), "-",
                    make_norm_label(substitute(norm_func_x), bg_x))
@@ -170,9 +165,9 @@ plot_bw_loci_scatter <- function(x, y,
                    make_norm_label(substitute(norm_func_y), bg_y))
 
   plot_results <- plot_ranges_scatter(values_x, values_y,
-                                      highlight = gr_list,
+                                      highlight = highlight_data$ranges,
                                       minoverlap = minoverlap,
-                                      highlight_label = highlight_label,
+                                      highlight_label = highlight_data$labels,
                                       highlight_colors = highlight_colors,
                                       remove_top = remove_top
   )
@@ -200,8 +195,6 @@ plot_bw_loci_scatter <- function(x, y,
     xlab(x_label) + ylab(y_label) + default_theme() + labs(caption=verbose_tag)
 }
 
-
-
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'
 #' Plots a scatter plot from two given GRanges objects and an optional set of
@@ -219,6 +212,8 @@ plot_bw_loci_scatter <- function(x, y,
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, column names are used.
 #' @param highlight_colors Array of color values for the highlighting groups
+#' @param remove_top Return range 0-(1-remove_top). By default returns the
+#'     whole distribution (remove_top == 0).
 #' @import ggplot2
 #' @return A ggplot object.
 plot_ranges_scatter <- function(x, y,
@@ -290,32 +285,13 @@ plot_ranges_scatter <- function(x, y,
   y_label <- "y"
 
   p <- ggplot(df, aes_string(x = "x", y = "y")) +
-    geom_point(color = "#cccccc", alpha = 0.8) +
+    geom_point(color = "#bbbbbb", alpha = 0.8) +
     xlab(x_label) +
     ylab(y_label) +
     extra_plot +
     extra_colors
 
   list(plot=p, na_points=n_removed, removed=n_filtered)
-}
-
-
-#' Generate a human-readable normalization function string
-#'
-#' @param f String representing normalization function.
-#' @param bg Background file.
-#'
-#' @return A string describing normalization.
-make_norm_label <- function(f, bg) {
-  label <- "RPGC"
-  if (!is.null(bg)) {
-    if (f != "identity") {
-      label <- paste(f, "(", label, " / background)", sep = "")
-    } else {
-      label <- paste(label, " / background", sep = "")
-    }
-  }
-  label
 }
 
 
@@ -340,3 +316,62 @@ make_caption <- function(params, outcome) {
   paste(verbose_params, verbose_crop, date, sep="\n")
 }
 
+
+#' Generate a human-readable normalization function string
+#'
+#' @param f String representing normalization function.
+#' @param bg Background file.
+#'
+#' @return A string describing normalization.
+make_norm_label <- function(f, bg) {
+  label <- "RPGC"
+  if (!is.null(bg)) {
+    if (f != "identity") {
+      label <- paste(f, "(", label, " / background)", sep = "")
+    } else {
+      label <- paste(label, " / background", sep = "")
+    }
+  }
+  label
+}
+
+
+#' Internal processing of loci sets and labels.
+#'
+#' This allows to process equally lists of GRanges objects or BED files. Note
+#' that GRanges objects need to be lists, as c(GRanges) concatenates elements
+#' in single GRanges object
+#'
+#' @param loci_sets One or more BED files or GRanges. These need to be either
+#'   all BED files or all GRanges objects.
+#' @param labels One or more labels. Lengths need to match loci_sets or be NULL,
+#'   in which case loci_sets are assumed to be BED files.
+
+#' @return a named list with ranges and labels.
+process_highlight_loci <- function(loci_sets, labels) {
+  gr_list <- loci_sets
+  lab_list <- labels
+  if (!is.null(gr_list)) {
+    if (class(gr_list) == "character") {
+      # list is used instead of c() because GRanges c() concatenates ranges
+      gr_list <- lapply(loci_sets, rtracklayer::import, format = "BED")
+      if (is.null(labels)) {
+        lab_list <- basename(loci_sets)
+      }
+    }
+    else {
+      if (is.null(labels)) {
+        stop("GRanges used as highlight loci but no labels provided")
+      }
+      if (class(gr_list) != "list") {
+        # If single GRanges was passed it needs to be converted to list
+        gr_list <- list(gr_list)
+      }
+    }
+  }
+  if (length(gr_list) != length(lab_list)) {
+    stop("Highlight loci sets don't match the number of labels provided")
+  }
+
+  list(ranges=gr_list, labels=lab_list)
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwplot.R
 \name{plot_bw_loci_scatter}
 \alias{plot_bw_loci_scatter}
-\title{Bin-based scatterplot of a pair of bigWig files}
+\title{Locus-based scatterplot of a pair of bigWig files}
 \usage{
 plot_bw_loci_scatter(
   x,
@@ -10,11 +10,11 @@ plot_bw_loci_scatter(
   loci,
   bg_x = NULL,
   bg_y = NULL,
+  norm_func_x = identity,
+  norm_func_y = identity,
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
-  norm_func_x = identity,
-  norm_func_y = identity,
   highlight_colors = NULL,
   remove_top = 0,
   verbose = TRUE
@@ -25,9 +25,15 @@ plot_bw_loci_scatter(
 
 \item{y}{BigWig file corresponding to the y axis.}
 
+\item{loci}{Bed file or GRanges object to be plotted.}
+
 \item{bg_x}{BigWig file to be used as x axis background (us. input).}
 
 \item{bg_y}{BigWig file to be used as y axis background (us. input).}
+
+\item{norm_func_x}{Function to use after x / x_bg.}
+
+\item{norm_func_y}{Function to use after y / y_bg.}
 
 \item{highlight}{List of bed files to use as highlight for subgroups.}
 
@@ -36,22 +42,22 @@ plot_bw_loci_scatter(
 \item{highlight_label}{Labels for the highlight groups.
 If not provided, filenames are used.}
 
-\item{norm_func_x}{Function to use after x / x_bg.}
-
-\item{norm_func_y}{Function to use after y / y_bg.}
-
 \item{highlight_colors}{Array of color values for the highlighting groups}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{verbose}{Verbose plot. Returns a plot with all relevant parameters in
+a caption.}
 }
 \value{
 A ggplot object.
 }
 \description{
-Plots a scatter plot from two given bigWig files and an optional set of BED
-files as highlighted annotations. Bins are highlighted if there is at least
-minoverlap base pairs overlap with any loci in BED file.
+Plots a scatter plot from two given bigWig files, a locus object and a
+set of BED files as highlighted annotations.
+Loci are highlighted if there is at least minoverlap base pairs overlap
+with any loci in BED file.
 }
 \details{
 If specifying minoverlap, you must take into account the bin_size parameter
