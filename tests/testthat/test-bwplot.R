@@ -19,6 +19,13 @@ bw_limits <- GRanges(seqnames = c("chr15"),
 
 reduced_bins <- bw_bins(bw1, selection = bw_limits, labels = "x")
 reduced_bins_2 <- bw_bins(bw2, selection = bw_limits, labels = "y")
+
+reduced_bg <-  bw_bins(bg_bw, selection = bw_limits, labels = "x_bg")
+reduced_bg_2 <-  bw_bins(bg_bw, selection = bw_limits, labels = "x_bg2")
+
+reduced_bins_all <- bw_bins(c(bw1, bw2), bg_bwfiles=c(bg_bw, bg_bw),
+                            selection = bw_limits, labels = c("x", "y"))
+
 summary_values <- bw_bed(c(bw1, bw2), bed_summary, aggregate_by = "mean")
 profile_values <- bw_profile(bw1,
                              bedfile = bed,
@@ -46,7 +53,6 @@ test_that("plot_bw_bins_scatter with defaults returns a plot", {
     expect_is(p, "ggplot")
   })
 })
-
 
 test_that("plot_bw_loci_scatter with defaults returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
@@ -197,6 +203,112 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
   )
 })
 
+
+test_that("plot_bw_bins_violin with defaults returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2))
+    expect_is(p, "ggplot")
+  })
+})
+
+test_that("plot_bw_bins_violin with bg files returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2), bg_bwfiles=c(bw1, bw2))
+    expect_is(p, "ggplot")
+  })
+})
+
+
+test_that("plot_bw_bins_violin verbose returns a plot with a caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = TRUE)
+    expect_is(p, "ggplot")
+    expect_true("caption" %in% names(p$labels))
+  })
+})
+
+test_that("plot_bw_bins_violin not verbose returns a plot with no caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE)
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
+test_that("plot_bw_bins_violin with highlight returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = bed)
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
+test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
+  m <- mock(reduced_bins_all)
+  with_mock(bw_bins = m, {
+    p <- p <- plot_bw_bins_violin(c(bw1, bw2),
+                                  bg_bwfiles = c(bg_bw, bg_bw),
+                                  labels = c("A", "B"),
+                                  highlight = bed,
+                                  bin_size = 5000,
+                                  norm_func = log2,
+                                  genome = "hg38",
+                                  remove_top = 0.01,
+                                  verbose = FALSE)
+
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
+
+test_that("plot_bw_bins_violin passes on parameters", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2),
+                             bg_bwfiles = c(bg_bw, bg_bw),
+                             labels = c("A", "B"),
+                             highlight = bed,
+                             bin_size = 5000,
+                             norm_func = log2,
+                             genome = "hg38",
+                             remove_top = 0
+    )
+  })
+
+  expect_call(m, 1,
+              bw_bins(bwfiles,
+                      bg_bwfiles = bg_bwfiles,
+                      labels = labels,
+                      bin_size = bin_size,
+                      genome = genome,
+                      per_locus_stat = per_locus_stat,
+                      norm_func = norm_func,
+                      # FIXME: Remove top is done outside this function
+                      remove_top = 0
+              )
+  )
+
+  expect_args(m, 1,
+              bwfiles = c(bw1, bw2),
+              bg_bwfiles = c(bg_bw, bg_bw),
+              labels = c("A", "B"),
+              bin_size = 5000,
+              genome = "hg38",
+              per_locus_stat = "mean",
+              norm_func = log2,
+              remove_top = 0
+  )
+
+})
+
+
+
 test_that(
   "plot_bw_loci_summary_heatmap with defaults returns a ggplot object", {
     m <- mock(summary_values)
@@ -223,6 +335,8 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
     expect_false("caption" %in% names(p$labels))
   })
 })
+
+
 
 test_that(
   "plot_bw_loci_summary_heatmap passes parameters on", {

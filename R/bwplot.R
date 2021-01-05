@@ -98,6 +98,125 @@ plot_bw_bins_scatter <- function(x, y,
   plot
 }
 
+#' Bin-based violin plot of a set of bigWig files
+#'
+#' Plots a violin plot of bin distribution of a set of bigWig files optionally
+#' overlaid with annotated bins. Bins overlapping loci of the provided BED
+#' file will be shown as a jitter plot on top of the violin plot.
+#'
+#' @param highlight BED file to use as highlight for subgroups.
+#' @param minoverlap Minimum overlap required for a bin to be highlighted.
+#' @param highlight_colors Array of color values for the highlighted groups.
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @inheritParams bw_bins
+#' @import ggplot2
+#' @importFrom reshape2 melt
+#' @return A ggplot object.
+#' @export
+plot_bw_bins_violin <- function(bwfiles,
+                                bg_bwfiles = NULL,
+                                labels = NULL,
+                                bin_size = 10000,
+                                per_locus_stat = "mean",
+                                genome = "mm9",
+                                highlight = NULL,
+                                minoverlap = 0L,
+                                norm_func = identity,
+                                highlight_colors = NULL,
+                                remove_top = 0,
+                                verbose = TRUE) {
+
+  bins_values <- bw_bins(bwfiles,
+                         bg_bwfiles = bg_bwfiles,
+                         labels = labels,
+                         bin_size = bin_size,
+                         genome = genome,
+                         per_locus_stat = per_locus_stat,
+                         norm_func = norm_func,
+                         remove_top = 0)
+
+
+  df <- data.frame(bins_values)
+  bwnames <- colnames(mcols(bins_values))
+  bin_id <- c("seqnames", "start", "end")
+
+  n_removed <- 0
+  n_filtered <- 0
+  if (remove_top > 0) {
+    df$means <- rowMeans(df[, bwnames])
+    df_clean <- df[!is.na(df$means), ]
+    n_removed <- nrow(df) - nrow(df_clean)
+
+    top_quantile = quantile(df_clean$means, probs=c(1-remove_top))
+    df <- df_clean[df_clean$means <= top_quantile, ]
+
+    n_filtered <- nrow(df_clean) - nrow(df)
+    df$means <- NULL
+
+    bins_values <- makeGRangesFromDataFrame(df, keep.extra.columns = T)
+  }
+
+
+  melted_bins <- reshape2::melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
+  title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
+  extra_plot <- NULL
+  extra_colors <- NULL
+
+  if (!is.null(highlight)) {
+    highlight_data <- process_highlight_loci(highlight, NULL)
+
+    highlight_values <- multi_ranges_overlap(bins_values,
+                          highlight_data$ranges,
+                          highlight_data$labels,
+                          minoverlap)
+
+    melted_highlight <- reshape2::melt(highlight_values,
+      id.vars=c("seqnames", "start", "end", "width", "strand", "group"))
+
+    extra_plot <- geom_jitter(data = melted_highlight,
+                    aes_string(x = "variable", y = "value", color = "variable"),
+                    alpha = 0.7
+    )
+
+    if (!is.null(highlight_colors)) {
+      extra_colors <- scale_color_manual(values = highlight_colors)
+    }
+
+  }
+
+  y_label <- make_norm_label(substitute(norm_func), bg_bwfiles)
+
+  plot <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
+    geom_violin(fill = "#cccccc") +
+    default_theme() +
+    xlab("") +
+    ylab(y_label) +
+    ggtitle(title) +
+    theme(legend.position = "none",
+          axis.text.x = element_text(angle = 45, hjust = 1)) +
+    extra_plot +
+    extra_colors
+
+
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(genome=genome,
+                            bin_size=bin_size,
+                            minoverlap=minoverlap,
+                            remove_top=remove_top)
+
+    crop_values <- list(points=length(bins_values),
+                        removed=n_filtered,
+                        NAs=n_removed)
+
+    verbose_tag <- make_caption(relevant_params, crop_values)
+    plot <- plot + labs(caption=verbose_tag)
+  }
+
+  plot
+}
+
+
 #' Locus-based scatterplot of a pair of bigWig files
 #'
 #' Plots a scatter plot from two given bigWig files, a locus object and a
@@ -198,7 +317,6 @@ plot_bw_loci_scatter <- function(x, y,
 
   plot
 }
-
 
 #' Summary heatmap of a categorized BED or GRanges object
 #'
@@ -302,14 +420,11 @@ plot_ranges_scatter <- function(x, y,
                                 remove_top = 0) {
 
 
-  label_df <- function(df, name) {
-    data.frame(df, group = name)
-  }
-
   values_x <- data.frame(x)
   values_y <- data.frame(y)
 
-  df <- merge(values_x, values_y, by=c("seqnames", "start", "end", "width", "strand"))
+  df <- merge(values_x, values_y,
+              by=c("seqnames", "start", "end", "width", "strand"))
 
   n_removed <- 0
   n_filtered <- 0
@@ -332,21 +447,12 @@ plot_ranges_scatter <- function(x, y,
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
-    subset_func <- purrr::partial(
-      IRanges::subsetByOverlaps,
-      x = ranges_values,
-      minoverlap = minoverlap
-    )
-
-    ranges_subset <- lapply(highlight, subset_func)
-    subset_df <- lapply(ranges_subset, data.frame)
-
-    df_values_labeled <- purrr::map2(subset_df, highlight_label, label_df)
-    highlight_values <- do.call(rbind, df_values_labeled)
-
-    # Order of factors need to match to assign properly colors to points
-    highlight_values$group <- factor(highlight_values$group,
-                                     levels = highlight_label)
+    highlight_values <- multi_ranges_overlap(
+                          ranges_values,
+                          highlight,
+                          highlight_label,
+                          minoverlap
+                        )
 
     extra_plot <- geom_point(
       data = highlight_values,
@@ -371,6 +477,43 @@ plot_ranges_scatter <- function(x, y,
 
   list(plot=p, na_points=n_removed, removed=n_filtered)
 }
+
+
+
+#' Calculate overlap of one GRanges with a main GRanges object
+#'
+#' @param main_ranges Main GRanges to which overlap is calculated.
+#' @param other_ranges A list of GRanges objects
+#' @param labels Labels to each of the other_ranges.
+#' @param minoverlap Minimum overlap to consider an overlap.
+#'
+#' @return A data.frame in tall format with the values of the overlapping loci.
+#'    Loci returned belong to other_ranges, NOT main_ranges. A group field
+#'    is added as factor.
+multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) {
+  label_df <- function(df, name) {
+    data.frame(df, group = name)
+  }
+
+  subset_func <- purrr::partial(
+    IRanges::subsetByOverlaps,
+    x = main_ranges,
+    minoverlap = minoverlap
+  )
+
+  ranges_subset <- lapply(other_ranges, subset_func)
+  subset_df <- lapply(ranges_subset, data.frame)
+
+  df_values_labeled <- purrr::map2(subset_df, labels, label_df)
+  highlight_values <- do.call(rbind, df_values_labeled)
+
+  # Order of factors need to match to assign properly colors to points
+  highlight_values$group <- factor(highlight_values$group,
+                                   levels = labels)
+
+  highlight_values
+}
+
 
 
 #' Set default theme as classic with larger font size
