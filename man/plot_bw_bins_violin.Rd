@@ -13,7 +13,7 @@ plot_bw_bins_violin(
   genome = "mm9",
   highlight = NULL,
   minoverlap = 0L,
-  norm_func = identity,
+  norm_mode = "fc",
   highlight_label = NULL,
   highlight_colors = NULL,
   remove_top = 0,
@@ -40,7 +40,8 @@ Choices: min, max, sd, mean.}
 
 \item{minoverlap}{Minimum overlap required for a bin to be highlighted.}
 
-\item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+\item{norm_mode}{Function to apply to normalize bin values. Default fc:
+divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 
 \item{highlight_label}{Label for the highlighted loci set}
 

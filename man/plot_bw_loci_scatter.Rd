@@ -10,8 +10,8 @@ plot_bw_loci_scatter(
   loci,
   bg_x = NULL,
   bg_y = NULL,
-  norm_func_x = identity,
-  norm_func_y = identity,
+  norm_mode_x = "fc",
+  norm_mode_y = "fc",
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
@@ -31,9 +31,9 @@ plot_bw_loci_scatter(
 
 \item{bg_y}{BigWig file to be used as y axis background (us. input).}
 
-\item{norm_func_x}{Function to use after x / x_bg.}
+\item{norm_mode_x}{Normalization mode for x axis.}
 
-\item{norm_func_y}{Function to use after y / y_bg.}
+\item{norm_mode_y}{Normalization mode for y axis.}
 
 \item{highlight}{List of bed files to use as highlight for subgroups.}
 

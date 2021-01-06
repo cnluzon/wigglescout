@@ -9,8 +9,8 @@ plot_bw_bins_scatter(
   y,
   bg_x = NULL,
   bg_y = NULL,
-  norm_func_x = identity,
-  norm_func_y = identity,
+  norm_mode_x = "fc",
+  norm_mode_y = "fc",
   bin_size = 10000,
   genome = "mm9",
   highlight = NULL,
@@ -30,9 +30,9 @@ plot_bw_bins_scatter(
 
 \item{bg_y}{BigWig file to be used as y axis background (us. input).}
 
-\item{norm_func_x}{Function to use after x / x_bg.}
+\item{norm_mode_x}{Normalization mode for x axis.}
 
-\item{norm_func_y}{Function to use after y / y_bg.}
+\item{norm_mode_y}{Normalization mode for y axis.}
 
 \item{bin_size}{Bin size.}
 

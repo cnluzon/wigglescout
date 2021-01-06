@@ -95,15 +95,18 @@ bw_bins(h33_chip, bg_bwfiles = input_chip,
         genome = "mm9",
         selection = locus)
 ```
-If `log2` is passed as `norm_func` parameter, we get the log2 ratio sample / input:
+If you want to get the log2 ratio sample / input, select `norm_mode = "log2fc"`:
 
 ```{r, warning = FALSE, message = FALSE}
 bw_bins(h33_chip, bg_bwfiles = input_chip,
         bin_size = 50000,
         genome = "mm9",
         selection = locus,
-        norm_func = log2) # Note this is not a string, but the actual function
+        norm_mode = "log2fc")
 ```
+
+`norm_mode` is set to `"fc"` by default, which means it shows fold change 
+sample / input, if input (background) is provided.
 
 ## Supported genomes
 
@@ -266,7 +269,7 @@ bw_bins(c(h33_chip, input_chip),
         bin_size = 50000,
         genome = "mm9",
         selection = locus,
-        norm_func = log2) # Note this is not a string, but the actual function
+        norm_mode = "log2fc")
 ```
 
 It is advised against implementing future planning within library function 

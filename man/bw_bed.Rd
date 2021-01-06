@@ -11,7 +11,7 @@ bw_bed(
   labels = NULL,
   per_locus_stat = "mean",
   aggregate_by = NULL,
-  norm_func = identity,
+  norm_mode = "fc",
   remove_top = 0
 )
 }
@@ -32,7 +32,8 @@ Choices: min, max, sd, mean.}
 \item{aggregate_by}{Statistic to aggregate per group. If NULL, values are
 not aggregated. This is the behavior by default.}
 
-\item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+\item{norm_mode}{Function to apply to normalize bin values. Default fc:
+divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}

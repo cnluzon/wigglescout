@@ -27,11 +27,12 @@ bw_bed <- function(bwfiles,
                    labels = NULL,
                    per_locus_stat = "mean",
                    aggregate_by = NULL,
-                   norm_func = identity,
+                   norm_mode = "fc",
                    remove_top = 0) {
 
   validate_filelist(bwfiles)
   validate_locus_parameter(bedfile)
+  norm_func <- process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
     labels <- make_label_from_filename(bwfiles)
@@ -90,6 +91,13 @@ bw_bed <- function(bwfiles,
   result
 }
 
+process_norm_mode <- function(mode) {
+  switch(mode,
+         "fc" = identity,
+         "log2fc" = log2
+         )
+}
+
 #' Build a binned-scored GRanges object from a bigWig file
 #'
 #' Build a binned-scored GRanges object from a bigWig file. The aggregating
@@ -118,7 +126,8 @@ bw_bed <- function(bwfiles,
 #' @param selection A GRanges object to restrict binning to a certain set of
 #'     intervals. This is useful for debugging and improving performance of
 #'     locus specific analyses.
-#' @param norm_func Function to apply to normalize bin values f(bw / bw_bg).
+#' @param norm_mode Function to apply to normalize bin values. Default fc:
+#'     divides bw / bg. Alternative: log2fc: returns log2(bw/bg).
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
 #' @return A GRanges object with each bwfile as a metadata column named
@@ -131,10 +140,11 @@ bw_bins <- function(bwfiles,
                     bin_size = 10000,
                     genome = "mm9",
                     selection = NULL,
-                    norm_func = identity,
+                    norm_mode = "fc",
                     remove_top = 0) {
 
   validate_filelist(bwfiles)
+  norm_func <- process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
     labels <- make_label_from_filename(bwfiles)
@@ -177,11 +187,12 @@ bw_heatmap <- function(bwfiles,
                        downstream = 2500,
                        middle = NULL,
                        ignore_strand = FALSE,
-                       norm_func = identity) {
+                       norm_mode = "fc") {
 
   validate_filelist(bwfiles)
   validate_locus_parameter(bedfile)
   granges <- loci_to_granges(bedfile)
+  norm_func <- process_norm_mode(norm_mode)
 
   validate_profile_parameters(bin_size, upstream, downstream)
 
@@ -263,12 +274,13 @@ bw_profile <- function(bwfiles,
                        downstream = 2500,
                        middle = NULL,
                        ignore_strand = FALSE,
-                       norm_func = identity,
+                       norm_mode = "fc",
                        remove_top = 0) {
 
   validate_filelist(bwfiles)
   validate_locus_parameter(bedfile)
   granges <- loci_to_granges(bedfile)
+  norm_func <- process_norm_mode(norm_mode)
 
   validate_profile_parameters(bin_size, upstream, downstream)
 
@@ -601,6 +613,7 @@ aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
 #' @param granges GRanges object
 #' @param bg_bw BigWig file to be used as background.
 #' @param label Name to give to the values
+#' @param norm_func Normalization function
 #' @importFrom rtracklayer BigWigFile import
 #' @importFrom utils download.file
 #' @inheritParams bw_profile
@@ -641,6 +654,7 @@ calculate_bw_profile <- function(bw,
 #' Calculate a normalized heatmap matrix for a bigWig file over a BED file
 #'
 #' @inheritParams calculate_bw_profile
+#' @param norm_func Normalization function
 #' @importFrom stats quantile
 calculate_matrix_norm <- function(bw,
                                   granges,
