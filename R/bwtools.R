@@ -813,7 +813,7 @@ remove_top_by_mean <- function(granges, quantile, columns) {
       n_na <- sum(is.na(granges$means))
       granges <- granges[!is.na(granges$means), ]
 
-      n_filtered <- length(granges[granges$means <= top_quantile, ])
+      n_filtered <- length(granges[granges$means > top_quantile, ])
       granges <- granges[granges$means <= top_quantile, ]
       granges$means <- NULL
     }
@@ -829,7 +829,9 @@ remove_top_by_mean <- function(granges, quantile, columns) {
     }
   }
   list(ranges=granges,
-       calculated=list(na=n_na, filtered=n_filtered, quantile=top_quantile))
+       calculated=list(na=n_na, filtered=n_filtered,
+                       quantile=unname(top_quantile))
+      )
 }
 
 #' Summarize a intersect_bw_and_granges matrix

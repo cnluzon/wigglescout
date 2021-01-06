@@ -51,7 +51,7 @@ plot_bw_bins_scatter <- function(x, y,
                            bin_size = bin_size,
                            genome = genome,
                            norm_mode = norm_mode_x,
-                           labels = "x"
+                           labels = "score"
   )
 
   bins_values_y <- bw_bins(y,
@@ -59,7 +59,7 @@ plot_bw_bins_scatter <- function(x, y,
                            bin_size = bin_size,
                            genome = genome,
                            norm_mode = norm_mode_y,
-                           labels = "y"
+                           labels = "score"
   )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
@@ -88,9 +88,15 @@ plot_bw_bins_scatter <- function(x, y,
                             minoverlap=minoverlap,
                             remove_top=remove_top)
 
+    cutoff <- plot_results$calculated$quantile
+    if (!is.null(cutoff)) {
+      cutoff <- round(cutoff, 3)
+    }
+
     crop_values <- list(points=length(bins_values_x),
-                        removed=plot_results$removed,
-                        NAs=plot_results$na_points)
+                        removed=plot_results$calculated$filtered,
+                        NAs=plot_results$calculated$na,
+                        quantile_cutoff=cutoff)
 
     verbose_tag <- make_caption(relevant_params, crop_values)
     plot <- plot + labs(caption=verbose_tag)
@@ -139,39 +145,32 @@ plot_bw_bins_violin <- function(bwfiles,
                          remove_top = 0)
 
 
-  df <- data.frame(bins_values)
-  bwnames <- colnames(mcols(bins_values))
-  bin_id <- c("seqnames", "start", "end")
-
-  n_removed <- 0
-  n_filtered <- 0
-  if (remove_top > 0) {
-    df$means <- rowMeans(df[, bwnames])
-    df_clean <- df[!is.na(df$means), ]
-    n_removed <- nrow(df) - nrow(df_clean)
-
-    top_quantile = quantile(df_clean$means, probs=c(1-remove_top))
-    df <- df_clean[df_clean$means <= top_quantile, ]
-
-    n_filtered <- nrow(df_clean) - nrow(df)
-    df$means <- NULL
-
-    bins_values <- makeGRangesFromDataFrame(df, keep.extra.columns = T)
+  if (is.null(labels)) {
+    labels <- make_label_from_filename(bwfiles)
   }
 
+  bins_filtered <- remove_top_by_mean(bins_values, remove_top, labels)
+
+  df <- data.frame(bins_filtered$ranges)
+  bwnames <- colnames(mcols(bins_filtered$ranges))
+  bin_id <- c("seqnames", "start", "end")
 
   melted_bins <- reshape2::melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
   title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
   extra_plot <- NULL
   extra_colors <- NULL
 
+  n_highlighted_points <- 0
+
   if (!is.null(highlight)) {
     highlight_data <- process_highlight_loci(highlight, highlight_label)
 
-    highlight_values <- multi_ranges_overlap(bins_values,
+    highlight_values <- multi_ranges_overlap(bins_filtered$ranges,
                           highlight_data$ranges,
                           highlight_data$labels,
                           minoverlap)
+
+    n_highlighted_points <- nrow(highlight_values)
 
     melted_highlight <- reshape2::melt(highlight_values,
       id.vars=c("seqnames", "start", "end", "width", "strand", "group"))
@@ -208,9 +207,17 @@ plot_bw_bins_violin <- function(bwfiles,
                             minoverlap=minoverlap,
                             remove_top=remove_top)
 
+    cutoff <- bins_filtered$calculated$quantile
+    if (!is.null(cutoff)) {
+      cutoff <- round(cutoff, 3)
+    }
+
     crop_values <- list(points=length(bins_values),
-                        removed=n_filtered,
-                        NAs=n_removed)
+                        highlighted=n_highlighted_points,
+                        removed=bins_filtered$calculated$filtered,
+                        NAs=bins_filtered$calculated$na,
+                        quantile_cutoff=cutoff
+                    )
 
     verbose_tag <- make_caption(relevant_params, crop_values)
     plot <- plot + labs(caption=verbose_tag)
@@ -272,12 +279,12 @@ plot_bw_loci_scatter <- function(x, y,
 
   values_x <- bw_bed(x, bg_bwfiles = bg_x, bedfile = loci,
                      norm_mode = norm_mode_x,
-                     labels = "x"
+                     labels = "score"
               )
 
   values_y <- bw_bed(y, bg_bwfiles = bg_y, bedfile = loci,
                      norm_mode = norm_mode_y,
-                     labels = "y"
+                     labels = "score"
               )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
@@ -310,9 +317,15 @@ plot_bw_loci_scatter <- function(x, y,
                             minoverlap=minoverlap,
                             remove_top=remove_top)
 
+    cutoff <- plot_results$calculated$quantile
+    if (!is.null(cutoff)) {
+      cutoff <- round(cutoff, 3)
+    }
+
     crop_values <- list(points=length(values_x),
-                        removed=plot_results$removed,
-                        NAs=plot_results$na_points)
+                        removed=plot_results$calculated$filtered,
+                        NAs=plot_results$calculated$na,
+                        quantile_cutoff=cutoff)
 
     verbose_tag <- make_caption(relevant_params, crop_values)
     plot <- plot + labs(caption=verbose_tag)
@@ -355,8 +368,6 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
   if (sum(summary_values) == 0) {
     warning("All zero-values matrix. Using same background as bw input?")
   }
-
-
 
   legend_label = make_norm_label(norm_mode, bg_bwfiles)
   colorscale <- scale_fill_gradient(name=legend_label, low = "white", high="#B22222")
@@ -421,36 +432,15 @@ plot_ranges_scatter <- function(x, y,
                                 highlight_colors = NULL,
                                 remove_top = 0) {
 
-
-  values_x <- data.frame(x)
-  values_y <- data.frame(y)
-
-  df <- merge(values_x, values_y,
-              by=c("seqnames", "start", "end", "width", "strand"))
-
-  n_removed <- 0
-  n_filtered <- 0
-
-  if (remove_top > 0) {
-    column_names <- c("x", "y")
-    df$means <- rowMeans(df[, column_names])
-    df_clean <- df[!is.na(df$means), ]
-    n_removed <- nrow(df) - nrow(df_clean)
-
-    top_quantile = quantile(df_clean$means, probs=c(1-remove_top))
-    df <- df_clean[df_clean$means <= top_quantile, ]
-
-    n_filtered <- nrow(df_clean) - nrow(df)
-  }
-
-  ranges_values <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
+  values <- granges_cbind(list(x, y), list("x", "y"))
+  filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
 
   extra_plot <- NULL
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
     highlight_values <- multi_ranges_overlap(
-                          ranges_values,
+                          filtered_values$ranges,
                           highlight,
                           highlight_label,
                           minoverlap
@@ -470,6 +460,8 @@ plot_ranges_scatter <- function(x, y,
   x_label <- "x"
   y_label <- "y"
 
+  df <- data.frame(filtered_values$ranges)
+
   p <- ggplot(df, aes_string(x = "x", y = "y")) +
     geom_point(color = "#bbbbbb", alpha = 0.8) +
     xlab(x_label) +
@@ -477,9 +469,8 @@ plot_ranges_scatter <- function(x, y,
     extra_plot +
     extra_colors
 
-  list(plot=p, na_points=n_removed, removed=n_filtered)
+  list(plot=p, calculated=filtered_values$calculated)
 }
-
 
 
 #' Calculate overlap of one GRanges with a main GRanges object
@@ -515,7 +506,6 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
 
   highlight_values
 }
-
 
 
 #' Set default theme as classic with larger font size

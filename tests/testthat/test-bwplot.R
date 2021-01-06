@@ -17,8 +17,8 @@ bed_summary <- get_file_path("sample_chromhmm.bed")
 bw_limits <- GRanges(seqnames = c("chr15"),
                      ranges = IRanges(c(102723600, 102959000)))
 
-reduced_bins <- bw_bins(bw1, selection = bw_limits, labels = "x")
-reduced_bins_2 <- bw_bins(bw2, selection = bw_limits, labels = "y")
+reduced_bins <- bw_bins(bw1, selection = bw_limits, labels = "score")
+reduced_bins_2 <- bw_bins(bw2, selection = bw_limits, labels = "score")
 
 reduced_bg <-  bw_bins(bg_bw, selection = bw_limits, labels = "x_bg")
 reduced_bg_2 <-  bw_bins(bg_bw, selection = bw_limits, labels = "x_bg2")
@@ -180,7 +180,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
                 bin_size = bin_size,
                 genome = genome,
                 norm_mode = norm_mode_x,
-                labels = "x"
+                labels = "score"
               )
   )
 
@@ -190,7 +190,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bin_size = 10000,
               genome = "mm9",
               norm_mode = "fc",
-              labels = "x"
+              labels = "score"
   )
 
   expect_args(m, 2,
@@ -199,7 +199,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bin_size = 10000,
               genome = "mm9",
               norm_mode = "fc",
-              labels = "y"
+              labels = "score"
   )
 })
 
@@ -262,7 +262,7 @@ test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
   with_mock(bw_bins = m, {
     p <- p <- plot_bw_bins_violin(c(bw1, bw2),
                                   bg_bwfiles = c(bg_bw, bg_bw),
-                                  labels = c("A", "B"),
+                                  labels = c("x", "y"),
                                   highlight = bed,
                                   bin_size = 5000,
                                   norm_mode = "log2fc",
