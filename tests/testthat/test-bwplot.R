@@ -248,6 +248,15 @@ test_that("plot_bw_bins_violin with highlight returns a plot", {
   })
 })
 
+test_that("plot_bw_bins_violin with highlight GRanges returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = import(bed), highlight_label="Bedfile")
+    expect_is(p, "ggplot")
+    expect_false("caption" %in% names(p$labels))
+  })
+})
+
 test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
   m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {

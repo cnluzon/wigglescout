@@ -106,6 +106,7 @@ plot_bw_bins_scatter <- function(x, y,
 #'
 #' @param highlight BED file to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a bin to be highlighted.
+#' @param highlight_label Label for the highlighted loci set
 #' @param highlight_colors Array of color values for the highlighted groups.
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @inheritParams bw_bins
@@ -122,6 +123,7 @@ plot_bw_bins_violin <- function(bwfiles,
                                 highlight = NULL,
                                 minoverlap = 0L,
                                 norm_func = identity,
+                                highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0,
                                 verbose = TRUE) {
@@ -163,7 +165,7 @@ plot_bw_bins_violin <- function(bwfiles,
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
-    highlight_data <- process_highlight_loci(highlight, NULL)
+    highlight_data <- process_highlight_loci(highlight, highlight_label)
 
     highlight_values <- multi_ranges_overlap(bins_values,
                           highlight_data$ranges,

@@ -14,6 +14,7 @@ plot_bw_bins_violin(
   highlight = NULL,
   minoverlap = 0L,
   norm_func = identity,
+  highlight_label = NULL,
   highlight_colors = NULL,
   remove_top = 0,
   verbose = TRUE
@@ -40,6 +41,8 @@ Choices: min, max, sd, mean.}
 \item{minoverlap}{Minimum overlap required for a bin to be highlighted.}
 
 \item{norm_func}{Function to apply to normalize bin values f(bw / bw_bg).}
+
+\item{highlight_label}{Label for the highlighted loci set}
 
 \item{highlight_colors}{Array of color values for the highlighted groups.}
 
