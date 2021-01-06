@@ -20,8 +20,8 @@
 #' @param y BigWig file corresponding to the y axis.
 #' @param bg_x BigWig file to be used as x axis background (us. input).
 #' @param bg_y BigWig file to be used as y axis background (us. input).
-#' @param norm_func_x Function to use after x / x_bg.
-#' @param norm_func_y Function to use after y / y_bg.
+#' @param norm_mode_x Normalization mode for x axis.
+#' @param norm_mode_y Normalization mode for y axis.
 #' @param highlight List of bed files to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a bin to be highlighted
 #' @param highlight_label Labels for the highlight groups.
@@ -34,8 +34,8 @@
 #' @export
 plot_bw_bins_scatter <- function(x, y,
                                  bg_x = NULL, bg_y = NULL,
-                                 norm_func_x = identity,
-                                 norm_func_y = identity,
+                                 norm_mode_x = "fc",
+                                 norm_mode_y = "fc",
                                  bin_size = 10000,
                                  genome = "mm9",
                                  highlight = NULL,
@@ -45,11 +45,12 @@ plot_bw_bins_scatter <- function(x, y,
                                  remove_top = 0,
                                  verbose = TRUE) {
 
+
   bins_values_x <- bw_bins(x,
                            bg_bwfiles = bg_x,
                            bin_size = bin_size,
                            genome = genome,
-                           norm_func = norm_func_x,
+                           norm_mode = norm_mode_x,
                            labels = "x"
   )
 
@@ -57,17 +58,17 @@ plot_bw_bins_scatter <- function(x, y,
                            bg_bwfiles = bg_y,
                            bin_size = bin_size,
                            genome = genome,
-                           norm_func = norm_func_y,
+                           norm_mode = norm_mode_y,
                            labels = "y"
   )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
   x_label <- paste(make_label_from_filename(x), "-",
-                   make_norm_label(substitute(norm_func_x), bg_x))
+                   make_norm_label(norm_mode_x, bg_x))
 
   y_label <- paste(make_label_from_filename(y), "-",
-                   make_norm_label(substitute(norm_func_y), bg_y))
+                   make_norm_label(norm_mode_y, bg_y))
 
   plot_results <- plot_ranges_scatter(bins_values_x, bins_values_y,
          highlight = highlight_data$ranges,
@@ -122,7 +123,7 @@ plot_bw_bins_violin <- function(bwfiles,
                                 genome = "mm9",
                                 highlight = NULL,
                                 minoverlap = 0L,
-                                norm_func = identity,
+                                norm_mode = "fc",
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0,
@@ -134,7 +135,7 @@ plot_bw_bins_violin <- function(bwfiles,
                          bin_size = bin_size,
                          genome = genome,
                          per_locus_stat = per_locus_stat,
-                         norm_func = norm_func,
+                         norm_mode = norm_mode,
                          remove_top = 0)
 
 
@@ -186,7 +187,7 @@ plot_bw_bins_violin <- function(bwfiles,
 
   }
 
-  y_label <- make_norm_label(substitute(norm_func), bg_bwfiles)
+  y_label <- make_norm_label(norm_mode, bg_bwfiles)
 
   plot <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
     geom_violin(fill = "#cccccc") +
@@ -241,10 +242,10 @@ plot_bw_bins_violin <- function(bwfiles,
 #' @param x BigWig file corresponding to the x axis.
 #' @param y BigWig file corresponding to the y axis.
 #' @param loci Bed file or GRanges object to be plotted.
+#' @param norm_mode_x Normalization mode for x axis.
+#' @param norm_mode_y Normalization mode for y axis.
 #' @param bg_x BigWig file to be used as x axis background (us. input).
 #' @param bg_y BigWig file to be used as y axis background (us. input).
-#' @param norm_func_x Function to use after x / x_bg.
-#' @param norm_func_y Function to use after y / y_bg.
 #' @param highlight List of bed files to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a bin to be highlighted
 #' @param highlight_label Labels for the highlight groups.
@@ -260,8 +261,8 @@ plot_bw_bins_violin <- function(bwfiles,
 plot_bw_loci_scatter <- function(x, y,
                                  loci,
                                  bg_x = NULL, bg_y = NULL,
-                                 norm_func_x = identity,
-                                 norm_func_y = identity,
+                                 norm_mode_x = "fc",
+                                 norm_mode_y = "fc",
                                  highlight = NULL,
                                  minoverlap = 0L,
                                  highlight_label = NULL,
@@ -270,22 +271,22 @@ plot_bw_loci_scatter <- function(x, y,
                                  verbose = TRUE) {
 
   values_x <- bw_bed(x, bg_bwfiles = bg_x, bedfile = loci,
-                     norm_func = norm_func_x,
+                     norm_mode = norm_mode_x,
                      labels = "x"
               )
 
   values_y <- bw_bed(y, bg_bwfiles = bg_y, bedfile = loci,
-                     norm_func = norm_func_y,
+                     norm_mode = norm_mode_y,
                      labels = "y"
               )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
   x_label <- paste(make_label_from_filename(x), "-",
-                   make_norm_label(substitute(norm_func_x), bg_x))
+                   make_norm_label(norm_mode_x, bg_x))
 
   y_label <- paste(make_label_from_filename(y), "-",
-                   make_norm_label(substitute(norm_func_y), bg_y))
+                   make_norm_label(norm_mode_y, bg_y))
 
   plot_results <- plot_ranges_scatter(values_x, values_y,
                                       highlight = highlight_data$ranges,
@@ -338,14 +339,14 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          bg_bwfiles = NULL,
                                          labels = NULL,
                                          aggregate_by = "true_mean",
-                                         norm_func = identity,
+                                         norm_mode = "fc",
                                          remove_top = 0,
                                          verbose = TRUE) {
 
   summary_values <- bw_bed(bwfiles, loci,
                            bg_bwfiles = bg_bwfiles,
                            aggregate_by = aggregate_by,
-                           norm_func = norm_func,
+                           norm_mode = norm_mode,
                            labels = labels,
                            remove_top = remove_top
   )
@@ -357,7 +358,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 
 
 
-  legend_label = make_norm_label(substitute(norm_func), bg_bwfiles)
+  legend_label = make_norm_label(norm_mode, bg_bwfiles)
   colorscale <- scale_fill_gradient(name=legend_label, low = "white", high="#B22222")
   if (!is.null(bg_bwfiles)) {
     colorscale <- scale_fill_gradient2(name=legend_label, low = "#2e6694", mid="white", high="#B22222")
@@ -366,8 +367,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
   summary_values$type <- rownames(summary_values)
   vals_melted <- reshape2::melt(summary_values, id.vars="type")
 
-  title <- paste("Coverage per region (", aggregate_by, ")")
-  title <- paste(title, "-", make_norm_label(substitute(norm_func), bg_bwfiles))
+  title <- paste("Coverage per region (", aggregate_by, ") - ", legend_label)
 
   plot <- ggplot(vals_melted, aes_string("type", "variable", fill="value")) +
     geom_tile() + geom_text(aes(label=round(value, 2)), size=3.5) +
@@ -549,11 +549,10 @@ make_caption <- function(params, outcome) {
 make_norm_label <- function(f, bg) {
   label <- "RPGC"
   if (!is.null(bg)) {
-    if (f != "identity") {
-      label <- paste(f, "(", label, " / background)", sep = "")
-    } else {
-      label <- paste(label, " / background", sep = "")
-    }
+    label = switch(f,
+                   "fc" = paste(label, " / background", sep = ""),
+                   "log2fc" = paste("log2(", label, " / background", sep = "")
+            )
   }
   label
 }

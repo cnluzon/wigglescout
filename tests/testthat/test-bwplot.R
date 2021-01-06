@@ -179,7 +179,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
                 bg_bwfiles = bg_x,
                 bin_size = bin_size,
                 genome = genome,
-                norm_func = norm_func_x,
+                norm_mode = norm_mode_x,
                 labels = "x"
               )
   )
@@ -189,7 +189,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bg_bwfiles = bg_bw,
               bin_size = 10000,
               genome = "mm9",
-              norm_func = identity,
+              norm_mode = "fc",
               labels = "x"
   )
 
@@ -198,7 +198,7 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bg_bwfiles = bg_bw,
               bin_size = 10000,
               genome = "mm9",
-              norm_func = identity,
+              norm_mode = "fc",
               labels = "y"
   )
 })
@@ -265,7 +265,7 @@ test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
                                   labels = c("A", "B"),
                                   highlight = bed,
                                   bin_size = 5000,
-                                  norm_func = log2,
+                                  norm_mode = "log2fc",
                                   genome = "hg38",
                                   remove_top = 0.01,
                                   verbose = FALSE)
@@ -284,7 +284,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
                              labels = c("A", "B"),
                              highlight = bed,
                              bin_size = 5000,
-                             norm_func = log2,
+                             norm_mode = "log2fc",
                              genome = "hg38",
                              remove_top = 0
     )
@@ -297,7 +297,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
                       bin_size = bin_size,
                       genome = genome,
                       per_locus_stat = per_locus_stat,
-                      norm_func = norm_func,
+                      norm_mode = norm_mode,
                       # FIXME: Remove top is done outside this function
                       remove_top = 0
               )
@@ -310,7 +310,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
               bin_size = 5000,
               genome = "hg38",
               per_locus_stat = "mean",
-              norm_func = log2,
+              norm_mode = "log2fc",
               remove_top = 0
   )
 
@@ -355,7 +355,7 @@ test_that(
                                        loci = bed,
                                        bg_bwfiles <- c(bg_bw, bg_bw),
                                        aggregate_by = "median",
-                                       norm_func = log2,
+                                       norm_mode = "log2fc",
                                        labels = c("bw1", "bw2")
       )
     })
@@ -365,7 +365,7 @@ test_that(
                        loci,
                        bg_bwfiles = bg_bwfiles,
                        aggregate_by = aggregate_by,
-                       norm_func = norm_func,
+                       norm_mode = norm_mode,
                        labels = labels,
                        remove_top = remove_top
                 )
@@ -376,7 +376,7 @@ test_that(
                 loci = bed,
                 bg_bwfiles = c(bg_bw, bg_bw),
                 aggregate_by = "median",
-                norm_func = log2,
+                norm_mode = "log2fc",
                 labels = c("bw1", "bw2"),
                 remove_top = 0
     )
