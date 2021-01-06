@@ -376,29 +376,11 @@ multi_bw_ranges <- function(bwfiles,
     result$name <- granges$name
   }
 
-  # Filter percentile. Avoid operating if 0 for performance.
-  if (remove_top > 0) {
-    if (ncol(mcols(result)) > 1) {
-      valid_columns <- data.frame(mcols(result))
-      valid_columns <- valid_columns[,!names(valid_columns) %in% c("name")]
-      means <- rowMeans(valid_columns)
-      top_quantile <- quantile(means, probs = c(1-remove_top), na.rm=TRUE)
-      result$means <- means
-      result <- result[!is.na(result$means), ]
-      result <- result[result$means <= top_quantile, ]
-      result$means <- NULL
-    }
-    else {
-      top_quantile <- quantile(mcols(result)[, 1],
-                        probs = c(1-remove_top), na.rm = TRUE)
-      result <- result[!is.na(mcols(result)[, 1]), ]
-      result <- result[mcols(result)[, 1] <= top_quantile, ]
-    }
-  }
+  result <- remove_top_by_mean(result, remove_top,
+                               !names(mcols(result)) %in% c("name"))
 
-  result
+  result$ranges
 }
-
 
 #' Intersect a list of bigWig files with a GRanges object and aggregate by name
 #'
@@ -469,16 +451,10 @@ multi_bw_ranges_norm <- function(bwfilelist,
   bg_df <- data.frame(bg)
   result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
 
-  if (remove_top > 0) {
-    means <- rowMeans(result_df[, labels, drop = FALSE])
-    result_df$means_aggr <- means
-    top_quantile <- quantile(means, probs = c(1-remove_top), na.rm = TRUE)
-    result_df <- result_df[!is.na(result_df$means_aggr), ]
-    result_df <- result_df[result_df$means_aggr <= top_quantile, ]
-    result_df$means_aggr <- NULL
-  }
+  result <- makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
+  result <- remove_top_by_mean(result, remove_top, labels)
 
-  makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
+  result$ranges
 }
 
 
@@ -808,6 +784,55 @@ intersect_bw_and_granges <- function(bw,
   values
 }
 
+
+#' Remove top loci in a GRanges column by mean of specified values
+#'
+#' @param granges GRanges object. Must have numerical mcols, and names of those
+#'   needs to match with columns.
+#' @param quantile Top quantile. Must be a number between zero and 1.
+#' @param columns Which columns to use. If more than one, quantile will be
+#'   selected according to means.
+#'
+#' @return A named list, fields ranges for the resulting GRanges, plus calculated
+#'   values: quantile_value, filtered, na_values.
+#' @export
+remove_top_by_mean <- function(granges, quantile, columns) {
+  # !names(valid_columns) %in% c("name")
+  n_na <- 0
+  n_filtered <- 0
+  top_quantile <- NULL
+
+  if (quantile > 0) {
+    if (ncol(mcols(granges)) > 1) {
+      valid_columns <- data.frame(mcols(granges))
+      valid_columns <- valid_columns[, columns]
+      means <- rowMeans(valid_columns)
+      top_quantile <- quantile(means, probs = c(1-quantile), na.rm=TRUE)
+      granges$means <- means
+
+      n_na <- sum(is.na(granges$means))
+      granges <- granges[!is.na(granges$means), ]
+
+      n_filtered <- length(granges[granges$means > top_quantile, ])
+      granges <- granges[granges$means <= top_quantile, ]
+      granges$means <- NULL
+    }
+    else {
+      top_quantile <- quantile(mcols(granges)[, 1],
+                               probs = c(1-quantile), na.rm = TRUE)
+
+      n_na <- sum(is.na(mcols(granges)[, 1]))
+      granges <- granges[!is.na(mcols(granges)[, 1]), ]
+
+      n_filtered <- length(granges[mcols(granges)[, 1] <= top_quantile, ])
+      granges <- granges[mcols(granges)[, 1] <= top_quantile, ]
+    }
+  }
+  list(ranges=granges,
+       calculated=list(na=n_na, filtered=n_filtered,
+                       quantile=unname(top_quantile))
+      )
+}
 
 #' Summarize a intersect_bw_and_granges matrix
 #'
