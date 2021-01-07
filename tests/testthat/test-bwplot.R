@@ -382,3 +382,123 @@ test_that(
     )
   })
 
+
+test_that(
+  "plot_bw_profile with defaults returns a ggplot object", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed)
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile with show_error has a ribbon layer", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, show_error=TRUE)
+      expect_is(p, "ggplot")
+      expect_true("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    })
+  })
+
+
+test_that(
+  "plot_bw_profile verbose returns a plot with a caption", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = TRUE)
+      expect_is(p, "ggplot")
+      expect_true("caption" %in% names(p$labels))
+    })
+  })
+
+test_that(
+  "plot_bw_profile mode start valid parameters returns a plot", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "start")
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile mode end valid parameters returns a plot", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "end")
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile mode center valid parameters returns a plot", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "center")
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile not verbose returns a plot without a caption", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = FALSE)
+      expect_is(p, "ggplot")
+      expect_false("caption" %in% names(p$labels))
+    })
+  })
+
+
+test_that(
+  "plot_bw_profile passes on parameters to bw_profile call", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2),
+                           bedfile = bed,
+                           bg_bwfiles = c(bg_bw, bg_bw),
+                           mode = "start",
+                           bin_size = 1000,
+                           upstream = 1500,
+                           downstream = 1500,
+                           middle = 1000,
+                           ignore_strand = TRUE,
+                           show_error = TRUE,
+                           norm_mode = "log2fc",
+                           remove_top = 0,
+                           labels = c("bw1", "bw2"),
+                           verbose = TRUE)
+    })
+
+    expect_call(m, 1,
+                bw_profile(bwfiles, bedfile,
+                           bg_bwfiles = bg_bwfiles,
+                           mode = mode,
+                           bin_size = bin_size,
+                           upstream = upstream,
+                           downstream = downstream,
+                           middle = middle,
+                           ignore_strand = ignore_strand,
+                           norm_mode = norm_mode,
+                           labels = labels,
+                           remove_top = remove_top
+                )
+    )
+
+    expect_args(m, 1,
+                c(bw1, bw2),
+                bedfile = bed,
+                bg_bwfiles = c(bg_bw, bg_bw),
+                mode = "start",
+                bin_size = 1000,
+                upstream = 1500,
+                downstream = 1500,
+                middle = 1000,
+                ignore_strand = TRUE,
+                norm_mode = "log2fc",
+                labels = c("bw1", "bw2"),
+                remove_top= 0
+    )
+  })
+
