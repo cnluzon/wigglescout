@@ -405,40 +405,12 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     remove_top = remove_top
   )
 
+  colorscale <- calculate_colorscale(norm_mode, bg_bwfiles)
+  plot <- plot_matrix_summary(summary_values)
 
-  if (sum(summary_values) == 0) {
-    warning("All zero-values matrix. Using same background as bw input?")
-  }
+  title <- paste("Coverage per region (", aggregate_by, ")")
 
-  legend_label <- make_norm_label(norm_mode, bg_bwfiles)
-  colorscale <- scale_fill_gradient(name = legend_label, low = "white", high = "#B22222")
-  if (!is.null(bg_bwfiles)) {
-    colorscale <- scale_fill_gradient2(name = legend_label, low = "#2e6694", mid = "white", high = "#B22222")
-  }
-
-  summary_values$type <- rownames(summary_values)
-  vals_melted <- reshape2::melt(summary_values, id.vars = "type")
-
-  title <- paste("Coverage per region (", aggregate_by, ") - ", legend_label)
-
-  plot <- ggplot(vals_melted, aes_string("type", "variable", fill = "value")) +
-    geom_tile() +
-    geom_text(aes(label = round(value, 2)), size = 3.5) +
-    coord_fixed() +
-    colorscale +
-    scale_y_discrete(position = "right") +
-    theme_minimal(base_size = 14) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = c(1, 1.2),
-      legend.direction = "horizontal",
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank()
-    ) +
-    xlab("") +
-    ylab("") +
-    ggtitle(title)
-
+  verbose_tag <- NULL
   if (verbose) {
     # Show parameters and relevant values
     relevant_params <- list(
@@ -447,10 +419,9 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     )
 
     verbose_tag <- make_caption(relevant_params, list())
-    plot <- plot + labs(caption = verbose_tag)
   }
 
-  plot
+  plot + colorscale + labs(title = title, caption = verbose_tag)
 }
 
 
@@ -514,14 +485,15 @@ plot_bw_profile <- function(bwfiles,
     verbose_tag <- make_caption(relevant_params, list())
   }
 
-  p <- plot_matrix_profile(values, show_error) +
-    matrix_heatmap_lines(loci, max(values$index), bin_size, upstream, downstream, mode) +
-    labs(title = title,
-         x = x_title,
-         y = y_label,
-         caption = verbose_tag)
-
-  p
+  plot_matrix_profile(values, show_error, colors) +
+    matrix_heatmap_lines(loci, max(values$index), bin_size,
+                         upstream, downstream, mode) +
+    labs(
+      title = "Profile plot",
+      x = x_title,
+      y = y_label,
+      caption = verbose_tag
+    )
 }
 
 # Helper plot functions ---------------------------------------------------
@@ -604,7 +576,14 @@ plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
   list(plot=p, calculated=calculated)
 }
 
-plot_matrix_profile <- function(values, show_error) {
+#' Helper function plots a profile from a dataframe
+#'
+#' @param values Values data frame in long format
+#' @param colors Alternative colors to plot the lines
+#' @param show_error Boolean wheter tho show error.
+#'
+#' @return A ggplot object
+plot_matrix_profile <- function(values, show_error, colors) {
 
   values$min_error <- values$mean - values$sderror
   values$max_error <- values$mean + values$sderror
@@ -637,6 +616,38 @@ plot_matrix_profile <- function(values, show_error) {
 
   p
 }
+
+
+#' Helper function for plotting a summary matrix
+#' @param values Summary matrix
+#'
+#' @importFrom reshape2 melt
+plot_matrix_summary <- function(values) {
+  if (sum(values) == 0) {
+    warning("All zero-values matrix. Using same background as bw input?")
+  }
+  values <- round(values, 2)
+  values$type <- rownames(values)
+
+  vals_long <- melt(values, id.vars = "type")
+
+  plot <- ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
+    geom_tile() +
+    geom_text(aes_string(label = "value", size = 3.5)) +
+    coord_fixed() +
+    scale_y_discrete(position = "right") +
+    theme_minimal(base_size = 14) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = c(1, 1.2),
+      legend.direction = "horizontal",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    )
+
+  plot
+}
+
 
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'
@@ -799,7 +810,8 @@ plot_ranges_violin <- function(gr,
 
 #' Helper function for calculating guide lines and labels in heatmap
 #'
-#' @param m Value matrix
+#' @param loci Number of loci (rows)
+#' @param nbins Number of bins (columns)
 #' @inheritParams plot_bw_heatmap
 #' @return A list of ggproto objects to be plotted.
 matrix_heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode) {
@@ -868,6 +880,22 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
   highlight_values
 }
 
+
+calculate_colorscale <- function(norm_mode, bg_bwfiles) {
+  legend_label <- make_norm_label(norm_mode, bg_bwfiles)
+  colorscale <-
+    scale_fill_gradient(name = legend_label, low = "white", high = "#B22222")
+  if (!is.null(bg_bwfiles)) {
+    colorscale <-
+      scale_fill_gradient2(
+        name = legend_label,
+        low = "#2e6694",
+        mid = "white",
+        high = "#B22222"
+      )
+  }
+  colorscale
+}
 
 #' Calculate color limits from a value matrix and provided parameters
 #'

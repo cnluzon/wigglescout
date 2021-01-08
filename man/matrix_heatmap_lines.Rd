@@ -4,10 +4,12 @@
 \alias{matrix_heatmap_lines}
 \title{Helper function for calculating guide lines and labels in heatmap}
 \usage{
-matrix_heatmap_lines(m, bin_size, upstream, downstream, mode)
+matrix_heatmap_lines(loci, nbins, bin_size, upstream, downstream, mode)
 }
 \arguments{
-\item{m}{Value matrix}
+\item{loci}{Number of loci (rows)}
+
+\item{nbins}{Number of bins (columns)}
 
 \item{bin_size}{Bin size. Length of bin in base pairs. The lower, the higher
 the resolution.}

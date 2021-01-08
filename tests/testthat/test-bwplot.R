@@ -348,10 +348,9 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, verbose = FALSE)
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
-
 
 
 test_that(
