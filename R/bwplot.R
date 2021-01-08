@@ -79,7 +79,7 @@ plot_bw_bins_scatter <- function(x, y,
       )
 
   plot <- plot_results$plot + ggtitle(paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")) +
-    xlab(x_label) + ylab(y_label) + default_theme()
+    xlab(x_label) + ylab(y_label) + theme_default()
 
   if (verbose) {
     # Show parameters and relevant values
@@ -190,7 +190,7 @@ plot_bw_bins_violin <- function(bwfiles,
 
   plot <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
     geom_violin(fill = "#cccccc") +
-    default_theme() +
+    theme_default() +
     xlab("") +
     ylab(y_label) +
     ggtitle(title) +
@@ -358,7 +358,7 @@ plot_bw_heatmap <- function(bwfile,
       size = 0.2
     ) +
     ggtitle("Heatmap plot") +
-    default_theme() +
+    theme_default() +
     theme(axis.line = element_blank(),
           panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
     labs(fill = make_norm_label(norm_mode, bg_bwfile))
@@ -472,7 +472,7 @@ plot_bw_loci_scatter <- function(x, y,
   }
 
   plot <- plot_results$plot + ggtitle(paste("Per-locus coverage (", loci_name, ")", sep = "")) +
-    xlab(x_label) + ylab(y_label) + default_theme()
+    xlab(x_label) + ylab(y_label) + theme_default()
 
   if (verbose) {
     relevant_params <- list(loci=loci_name,
@@ -636,7 +636,7 @@ plot_bw_profile <- function(bwfiles,
     xlab(x_title) +
     ylab(y_label) +
     ggtitle("Profile plot") +
-    default_theme() +
+    theme_default() +
     theme(
       legend.position = c(0.80, 0.90),
       legend.direction = "vertical",
@@ -833,7 +833,7 @@ calculate_profile_labels <- function(upstream, downstream, mode) {
 
 #' Set default theme as classic with larger font size
 #' @import ggplot2
-default_theme <- function() {
+theme_default <- function() {
   theme_classic(base_size = 18) + theme(plot.caption = element_text(size = 11))
 }
 
