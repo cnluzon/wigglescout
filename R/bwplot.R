@@ -404,6 +404,114 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 }
 
 
+#' Profile plot of a set of bigWig files
+#'
+#' Plots a profile of a set of bigWig files over a set of loci in a BED file.
+#'
+#' @param show_error Show standard error.
+#' @param colors Array of colors that will  be assigned to labels or files
+#'    (in that order)
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @inheritParams bw_profile
+#' @import ggplot2
+#' @return A ggplot object.
+#' @export
+plot_bw_profile <- function(bwfiles,
+                            bedfile,
+                            bg_bwfiles = NULL,
+                            mode = "stretch",
+                            bin_size = 100,
+                            upstream = 2500,
+                            downstream = 2500,
+                            middle = NULL,
+                            ignore_strand = FALSE,
+                            show_error = FALSE,
+                            norm_mode = "fc",
+                            labels = NULL,
+                            colors = NULL,
+                            remove_top = 0,
+                            verbose = TRUE) {
+
+  values <- bw_profile(bwfiles, bedfile,
+                       bg_bwfiles = bg_bwfiles,
+                       mode = mode,
+                       bin_size = bin_size,
+                       upstream = upstream,
+                       downstream = downstream,
+                       middle = middle,
+                       ignore_strand = ignore_strand,
+                       norm_mode = norm_mode,
+                       labels = labels,
+                       remove_top = remove_top
+  )
+
+  y_label <- make_norm_label(norm_mode, bg_bwfiles)
+
+  nrows <- max(values$index)
+
+  axis_breaks <- calculate_profile_breaks(nrows, upstream, downstream, bin_size, mode)
+  axis_labels <- calculate_profile_labels(upstream, downstream, mode)
+
+  lines <- axis_breaks[2]
+  if (mode == "stretch") {
+    lines <- axis_breaks[2:3]
+  }
+
+  loci <- length(import(bedfile, format = "BED"))
+  x_title <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
+
+
+  values$min_error <- values$mean - values$sderror
+  values$max_error <- values$mean + values$sderror
+
+  p <- ggplot(values,
+         aes_string(x = "index", y = "mean", color = "sample", fill = "sample")) +
+    geom_line(size = 0.8) +
+    geom_vline(xintercept = lines, linetype = "dashed", color = "#cccccc", alpha = 0.8) +
+    scale_x_continuous(breaks = axis_breaks,
+                       labels = axis_labels,
+                       limits = c(0.5, nrows + 0.5)) +
+    xlab(x_title) +
+    ylab(y_label) +
+    ggtitle("Profile plot") +
+    default_theme() +
+    theme(
+      legend.position = c(0.80, 0.90),
+      legend.direction = "vertical",
+      legend.title = element_blank()
+    )
+
+  if (!is.null(colors)) {
+    p <- p +
+      scale_color_manual(values = colors) +
+      scale_fill_manual(values = colors)
+  }
+
+  if (show_error) {
+    p <- p + geom_ribbon(aes_string(x = "index",
+                                    ymin = "min_error",
+                                    ymax = "max_error"),
+        color = NA, alpha = 0.3)
+  }
+
+
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(bin_size=bin_size,
+                            middle=middle,
+                            mode=mode,
+                            ignore_strand=ignore_strand,
+                            remove_top=remove_top)
+
+    verbose_tag <- make_caption(relevant_params, list())
+    p <- p + labs(caption=verbose_tag)
+  }
+
+  p
+}
+
+
+
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'
 #' Plots a scatter plot from two given GRanges objects and an optional set of
@@ -505,6 +613,40 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
                                    levels = labels)
 
   highlight_values
+}
+
+
+
+calculate_profile_breaks <- function(nrows, upstream, downstream, bin_size, mode) {
+  upstream_nbins <- floor(upstream / bin_size)
+  downstream_nbins <- floor(downstream / bin_size)
+
+  # index value starts at 1
+  axis_breaks <- c(1, upstream_nbins + 1, nrows + 1)
+
+  # Put ticks on the edges
+  axis_breaks <- axis_breaks - 0.5
+
+  if (mode == "stretch") {
+    axis_breaks <- c(1, upstream_nbins + 1, nrows - downstream_nbins + 1, nrows + 1)
+    # center ticks on the middle of the bins
+    axis_breaks <- axis_breaks - 0.5
+  }
+
+  axis_breaks
+}
+
+calculate_profile_labels <- function(upstream, downstream, mode) {
+  if (mode == "stretch") {
+    c(paste("-", upstream / 1000, "kb", sep = ""),
+      "start", "end",
+      paste("+", downstream / 1000, "kb", sep = ""))
+
+  } else {
+    c(paste("-", upstream / 1000, "kb", sep = ""),
+      mode,
+      paste("+", downstream / 1000, "kb", sep = ""))
+  }
 }
 
 
