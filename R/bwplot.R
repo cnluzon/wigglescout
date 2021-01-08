@@ -132,71 +132,32 @@ plot_bw_bins_violin <- function(bwfiles,
                                 remove_top = 0,
                                 verbose = TRUE) {
 
-  bins_values <- bw_bins(bwfiles,
-                         bg_bwfiles = bg_bwfiles,
-                         labels = labels,
-                         bin_size = bin_size,
-                         genome = genome,
-                         per_locus_stat = per_locus_stat,
-                         norm_mode = norm_mode,
-                         remove_top = 0)
+  bins_values <- bw_bins(
+    bwfiles,
+    bg_bwfiles = bg_bwfiles,
+    labels = labels,
+    bin_size = bin_size,
+    genome = genome,
+    per_locus_stat = per_locus_stat,
+    norm_mode = norm_mode,
+    remove_top = 0
+  )
 
-
+  columns <- labels
   if (is.null(labels)) {
-    labels <- make_label_from_filename(bwfiles)
+    columns <- make_label_from_filename(bwfiles)
   }
 
-  bins_filtered <- remove_top_by_mean(bins_values, remove_top, labels)
+  main_plot <- plot_ranges_violin(
+    bins_values[, columns],
+    highlight = highlight,
+    minoverlap = minoverlap,
+    highlight_label = highlight_label,
+    highlight_colors = highlight_colors,
+    remove_top = remove_top
+  )
 
-  df <- data.frame(bins_filtered$ranges)
-  bwnames <- colnames(mcols(bins_filtered$ranges))
-  bin_id <- c("seqnames", "start", "end")
-
-  melted_bins <- reshape2::melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
-  title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
-  extra_plot <- NULL
-  extra_colors <- NULL
-
-  n_highlighted_points <- 0
-
-  if (!is.null(highlight)) {
-    highlight_data <- process_highlight_loci(highlight, highlight_label)
-
-    highlight_values <- multi_ranges_overlap(bins_filtered$ranges,
-                          highlight_data$ranges,
-                          highlight_data$labels,
-                          minoverlap)
-
-    n_highlighted_points <- nrow(highlight_values)
-
-    melted_highlight <- reshape2::melt(highlight_values,
-      id.vars=c("seqnames", "start", "end", "width", "strand", "group"))
-
-    extra_plot <- geom_jitter(data = melted_highlight,
-                    aes_string(x = "variable", y = "value", color = "variable"),
-                    alpha = 0.7
-    )
-
-    if (!is.null(highlight_colors)) {
-      extra_colors <- scale_color_manual(values = highlight_colors)
-    }
-
-  }
-
-  y_label <- make_norm_label(norm_mode, bg_bwfiles)
-
-  plot <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
-    geom_violin(fill = "#cccccc") +
-    theme_default() +
-    xlab("") +
-    ylab(y_label) +
-    ggtitle(title) +
-    theme(legend.position = "none",
-          axis.text.x = element_text(angle = 45, hjust = 1)) +
-    extra_plot +
-    extra_colors
-
-
+  verbose_tag <- NULL
   if (verbose) {
     # Show parameters and relevant values
     relevant_params <- list(genome=genome,
@@ -204,23 +165,20 @@ plot_bw_bins_violin <- function(bwfiles,
                             minoverlap=minoverlap,
                             remove_top=remove_top)
 
-    cutoff <- bins_filtered$calculated$quantile
-    if (!is.null(cutoff)) {
-      cutoff <- round(cutoff, 3)
-    }
-
-    crop_values <- list(points=length(bins_values),
-                        highlighted=n_highlighted_points,
-                        removed=bins_filtered$calculated$filtered,
-                        NAs=bins_filtered$calculated$na,
-                        quantile_cutoff=cutoff
-                    )
-
-    verbose_tag <- make_caption(relevant_params, crop_values)
-    plot <- plot + labs(caption=verbose_tag)
+    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
   }
 
-  plot
+  title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
+  y_label <- make_norm_label(norm_mode, bg_bwfiles)
+
+  main_plot$plot + labs(
+    title = title,
+    x = "",
+    y = y_label,
+    caption = verbose_tag
+  ) + theme_default() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "none")
 }
 
 #' Plot a heatmap of a given bigWig file over a set of loci
@@ -689,13 +647,15 @@ plot_bw_profile <- function(bwfiles,
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
 #' @import ggplot2
-#' @return A ggplot object.
+#' @return A named list where plot is a ggplot object and calculated is a list
+#'   of calculated values (for verbose mode).
 plot_ranges_scatter <- function(x, y,
                                 highlight = NULL,
                                 minoverlap = 0L,
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0) {
+
 
   values <- granges_cbind(list(x, y), list("x", "y"))
   filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
@@ -735,6 +695,86 @@ plot_ranges_scatter <- function(x, y,
     points = length(values),
     removed = filtered_values$calculated$filtered,
     NAs = filtered_values$calculated$na,
+    quantile_cutoff = cutoff
+  )
+
+  list(plot = p, calculated = calculated)
+}
+
+
+#' Internal function to plot ranges in violin plot with a highlighted GRanges.
+#'
+#' @param gr GRanges object with as many columns as samples to plot.
+#' @inheritParams plot_ranges_scatter
+#'
+#' @importFrom reshape2 melt
+#' @import ggplot2
+#' @return A named list where plot is a ggplot object and calculated is a list
+#'   of calculated values (for verbose mode).
+plot_ranges_violin <- function(gr,
+                               highlight = NULL,
+                               minoverlap = 0L,
+                               highlight_label = NULL,
+                               highlight_colors = NULL,
+                               remove_top = 0) {
+  bwnames <- names(mcols(gr))
+  bins_filtered <- remove_top_by_mean(gr, remove_top, bwnames)
+
+  df <- data.frame(bins_filtered$ranges)
+  bin_id <- c("seqnames", "start", "end")
+
+  melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
+
+  extra_plot <- NULL
+  extra_colors <- NULL
+
+  n_highlighted_points <- 0
+
+  if (!is.null(highlight)) {
+    highlight_data <- process_highlight_loci(highlight, highlight_label)
+
+    highlight_values <- multi_ranges_overlap(
+      bins_filtered$ranges,
+      highlight_data$ranges,
+      highlight_data$labels,
+      minoverlap
+    )
+
+    n_highlighted_points <- nrow(highlight_values)
+    bin_id <-
+      c("seqnames", "start", "end", "width", "strand", "group")
+    melted_highlight <- melt(highlight_values, id.vars = bin_id)
+
+    extra_plot <- geom_jitter(
+      data = melted_highlight,
+      aes_string(x = "variable", y = "value", color = "variable"),
+      alpha = 0.7
+    )
+
+    if (!is.null(highlight_colors)) {
+      extra_colors <- scale_color_manual(values = highlight_colors)
+    }
+  }
+
+  p <-
+    ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
+    geom_violin(fill = "#cccccc") +
+    theme(legend.position = "none",
+          axis.text.x = element_text(angle = 45, hjust = 1)) +
+    extra_plot +
+    extra_colors
+
+
+  cutoff <- bins_filtered$calculated$quantile
+  if (!is.null(cutoff)) {
+    cutoff <- round(cutoff, 3)
+  }
+
+  calculated <- list(
+    points = length(gr),
+    highlighted = n_highlighted_points,
+    removed = bins_filtered$calculated$filtered,
+    NAs = bins_filtered$calculated$na,
     quantile_cutoff = cutoff
   )
 
