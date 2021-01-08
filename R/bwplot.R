@@ -280,6 +280,9 @@ plot_bw_heatmap <- function(bwfile,
 
   nvalues <- nrow(m) * ncol(m)
 
+  n_non_finite <- length(m[!is.finite(m)])
+  m[!is.finite(m)] <- NA
+
   zlim <- calculate_color_limits(m, zmin, zmax)
 
   zmin <- zlim[[1]]
@@ -291,6 +294,7 @@ plot_bw_heatmap <- function(bwfile,
 
   n_top_capped <- length(m[m > zmax])
   m[m > zmax] <- zmax
+
 
   df <- melt(m)
   colnames(df) <- c('x', 'y', 'value')
@@ -342,7 +346,8 @@ plot_bw_heatmap <- function(bwfile,
       colours = gcol(100),
       limits = c(zmin, zmax),
       breaks = c(zmin, zmax),
-      labels = format(c(zmin, zmax), digits = 2)
+      labels = format(c(zmin, zmax), digits = 2),
+      na.value = "#cccccc"
     ) +
     xlab(x_title) +
     ylab(y_label) +
@@ -373,7 +378,8 @@ plot_bw_heatmap <- function(bwfile,
       zmin = round(zmin, 3),
       zmax = round(zmax, 3),
       top_capped_vals = n_top_capped,
-      bottom_capped_vals = n_bottom_capped
+      bottom_capped_vals = n_bottom_capped,
+      non_finite = n_non_finite
     )
 
     verbose_tag <- make_caption(relevant_params, crop_values)
@@ -826,11 +832,12 @@ calculate_profile_labels <- function(upstream, downstream, mode) {
 
 
 #' Set default theme as classic with larger font size
+#' @import ggplot2
 default_theme <- function() {
-  ggplot2::theme_classic(base_size = 18)
+  theme_classic(base_size = 18) + theme(plot.caption = element_text(size = 11))
 }
 
-#' Make a string to put as capsion in verbose mode. Includes system date.
+#' Make a string to put as caption in verbose mode. Includes system date.
 #'
 #' @param params Named list with relevant parameters and their values
 #' @param outcome Named values with relevant outcomes and their values
