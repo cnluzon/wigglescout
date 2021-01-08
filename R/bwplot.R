@@ -64,11 +64,8 @@ plot_bw_bins_scatter <- function(x, y,
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
-  x_label <- paste(make_label_from_filename(x), "-",
-                   make_norm_label(norm_mode_x, bg_x))
-
-  y_label <- paste(make_label_from_filename(y), "-",
-                   make_norm_label(norm_mode_y, bg_y))
+  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
+  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
 
   plot_results <- plot_ranges_scatter(bins_values_x, bins_values_y,
          highlight = highlight_data$ranges,
@@ -451,11 +448,8 @@ plot_bw_loci_scatter <- function(x, y,
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
-  x_label <- paste(make_label_from_filename(x), "-",
-                   make_norm_label(norm_mode_x, bg_x))
-
-  y_label <- paste(make_label_from_filename(y), "-",
-                   make_norm_label(norm_mode_y, bg_y))
+  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
+  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
 
   plot_results <- plot_ranges_scatter(values_x, values_y,
                                       highlight = highlight_data$ranges,
@@ -868,7 +862,19 @@ make_norm_label <- function(f, bg) {
                    "log2fc" = paste("log2(", label, " / background", sep = "")
             )
   }
+
   label
+}
+
+#' Generate a human-readable normalization function string including
+#'
+#' @param f String representing normalization function.
+#' @param fg Foreground file
+#' @param bg Background file.
+#'
+#' @return A string describing normalization.
+make_norm_file_label <- function(f, fg, bg) {
+  paste(make_label_from_filename(fg), "-", make_norm_label(f, bg))
 }
 
 
