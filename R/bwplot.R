@@ -231,8 +231,51 @@ plot_bw_heatmap <- function(bwfile,
     norm_mode = norm_mode
   )
 
+  main_plot <-
+    plot_matrix_heatmap(values[[1]], zmin, zmax, cmap, max_rows_allowed)
+
+  verbose_tag <- NULL
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(
+      mode = mode,
+      bin_size = bin_size,
+      middle = middle,
+      ignore_strand = ignore_strand,
+      row_resolution = max_rows_allowed
+    )
+
+    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+  }
+
+  loci <- nrow(values)
+  y_label <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
+  x_title <- make_label_from_filename(bwfile)
+  title <- "Heatmap"
+
+  main_plot$plot + theme_default() +
+    theme(
+      axis.line = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 0.1)
+    ) +
+    matrix_heatmap_lines(values[[1]], bin_size, upstream, downstream, mode) +
+    labs(fill = make_norm_label(norm_mode, bg_bwfile),
+         title = title,
+         x = x_title,
+         y = y_label,
+         caption = verbose_tag)
+}
+
+
+#' Helper function for matrix heatmap plot
+#'
+#' @param values Matrix with values
+#' @inheritParams plot_bw_heatmap
+#'
+#' @return Named list plot and calculated values
+plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
   # Order matrix by mean and transpose it (image works flipped)
-  m <- t(values[[1]][order(rowMeans(values[[1]]), decreasing = F), ])
+  m <- t(values[order(rowMeans(values), decreasing = F), ])
 
   nvalues <- nrow(m) * ncol(m)
 
@@ -251,30 +294,67 @@ plot_bw_heatmap <- function(bwfile,
   n_top_capped <- length(m[m > zmax])
   m[m > zmax] <- zmax
 
-
   df <- melt(m)
   colnames(df) <- c("x", "y", "value")
 
   df2 <- df
 
+  downsample_factor <- NULL
   if (ncol(m) > max_rows_allowed) {
-    # Downsample rows only and downsample only enough to fit max_rows. So
-    # we make sure we do not extremely downsample a value that only slightly
-    # exceeds our max resolution.
-    warning(paste0("Large matrix of ", ncol(m), ". Downscaling to ", max_rows_allowed))
-    downsample_factor <- round(ncol(m) / max_rows_allowed)
+  # Downsample rows only and downsample only enough to fit max_rows. So
+  # we make sure we do not extremely downsample a value that only slightly
+  # exceeds our max resolution.
+  warning(paste0(
+    "Large matrix of ",
+    ncol(m),
+    ". Downscaling to ",
+    max_rows_allowed
+  ))
+  downsample_factor <- round(ncol(m) / max_rows_allowed)
 
-    # .data prevents R CMD Check note
-    df2 <- df %>%
-      dplyr::group_by(
-        x = .data$x,
-        y = downsample_factor * round(.data$y / downsample_factor)
-      ) %>%
-      dplyr::summarise(value = mean(.data$value))
+  # .data prevents R CMD Check note
+  df2 <- df %>%
+    dplyr::group_by(x = .data$x,
+                    y = downsample_factor * round(.data$y / downsample_factor)) %>%
+    dplyr::summarise(value = mean(.data$value))
   }
 
+  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
+
+  p <-
+    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
+    geom_raster() +
+    scale_fill_gradientn(
+      colours = gcol(100),
+      limits = c(zmin, zmax),
+      breaks = c(zmin, zmax),
+      labels = format(c(zmin, zmax), digits = 2),
+      na.value = "#cccccc"
+    )
+
+  calculated <- list(
+    ncells = nvalues,
+    zmin = round(zmin, 3),
+    zmax = round(zmax, 3),
+    top_capped_vals = n_top_capped,
+    bottom_capped_vals = n_bottom_capped,
+    non_finite = n_non_finite,
+    downsample_factor = downsample_factor
+  )
+
+  list(plot=p, calculated=calculated)
+}
+
+#' Helper function for calculating guide lines and labels in heatmap
+#'
+#' @param m Value matrix
+#' @inheritParams plot_bw_heatmap
+#' @return A list of ggproto objects to be plotted.
+matrix_heatmap_lines <- function(m, bin_size, upstream, downstream, mode) {
+  loci <- nrow(m)
+
   axis_breaks <-
-    calculate_profile_breaks(nrow(m), upstream, downstream, bin_size, mode)
+    calculate_profile_breaks(ncol(m), upstream, downstream, bin_size, mode)
   axis_labels <-
     calculate_profile_labels(upstream, downstream, mode)
 
@@ -283,73 +363,22 @@ plot_bw_heatmap <- function(bwfile,
     lines <- axis_breaks[2:3]
   }
 
-  loci <- ncol(m)
-  y_label <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
-  x_title <- make_label_from_filename(bwfile)
+  x <- scale_x_continuous(breaks = axis_breaks,
+                          labels = axis_labels,
+                          expand = c(0, 0))
 
-  p <-
-    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
-    geom_raster()
+  y <- scale_y_continuous(breaks = c(1, loci),
+                          labels = c(loci, "0"),
+                          expand = c(0, 0))
 
-  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
-  p <- p +
-    scale_x_continuous(
-      breaks = axis_breaks,
-      labels = axis_labels,
-      expand = c(0, 0)
-    ) +
-    scale_y_continuous(
-      breaks = c(1, loci),
-      labels = c(loci, "0"),
-      expand = c(0, 0)
-    ) +
-    scale_fill_gradientn(
-      colours = gcol(100),
-      limits = c(zmin, zmax),
-      breaks = c(zmin, zmax),
-      labels = format(c(zmin, zmax), digits = 2),
-      na.value = "#cccccc"
-    ) +
-    xlab(x_title) +
-    ylab(y_label) +
-    geom_vline(
-      xintercept = lines,
-      linetype = "dashed",
-      color = "#111111",
-      size = 0.2
-    ) +
-    ggtitle("Heatmap plot") +
-    theme_default() +
-    theme(
-      axis.line = element_blank(),
-      panel.border = element_rect(color = "black", fill = NA, size = 0.1)
-    ) +
-    labs(fill = make_norm_label(norm_mode, bg_bwfile))
+  gline <- geom_vline(
+    xintercept = lines,
+    linetype = "dashed",
+    color = "#111111",
+    size = 0.2
+  )
 
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      mode = mode,
-      bin_size = bin_size,
-      middle = middle,
-      ignore_strand = ignore_strand,
-      row_resolution = max_rows_allowed
-    )
-
-    crop_values <- list(
-      ncells = nvalues,
-      zmin = round(zmin, 3),
-      zmax = round(zmax, 3),
-      top_capped_vals = n_top_capped,
-      bottom_capped_vals = n_bottom_capped,
-      non_finite = n_non_finite
-    )
-
-    verbose_tag <- make_caption(relevant_params, crop_values)
-    p <- p + labs(caption = verbose_tag)
-  }
-
-  p
+  list(x, y, gline)
 }
 
 #' Locus-based scatterplot of a pair of bigWig files
@@ -900,63 +929,6 @@ calculate_profile_labels <- function(upstream, downstream, mode) {
       paste("+", downstream / 1000, "kb", sep = "")
     )
   }
-}
-
-
-#' Set default theme as classic with larger font size
-#' @import ggplot2
-theme_default <- function() {
-  theme_classic(base_size = 18) + theme(plot.caption = element_text(size = 11))
-}
-
-#' Make a string to put as caption in verbose mode. Includes system date.
-#'
-#' @param params Named list with relevant parameters and their values
-#' @param outcome Named values with relevant outcomes and their values
-#' @return A caption string
-make_caption <- function(params, outcome) {
-  verbose_params <- paste(names(params),
-    params,
-    sep = ":", collapse = ", "
-  )
-
-  verbose_crop <- paste(names(outcome),
-    outcome,
-    sep = ":", collapse = ", "
-  )
-
-  date <- format(Sys.time(), "%a %b %d %X %Y")
-  paste(verbose_params, verbose_crop, date, sep = "\n")
-}
-
-
-#' Generate a human-readable normalization function string
-#'
-#' @param f String representing normalization function.
-#' @param bg Background file.
-#'
-#' @return A string describing normalization.
-make_norm_label <- function(f, bg) {
-  label <- "RPGC"
-  if (!is.null(bg)) {
-    label <- switch(f,
-      "fc" = paste(label, " / background", sep = ""),
-      "log2fc" = paste("log2(", label, " / background", sep = "")
-    )
-  }
-
-  label
-}
-
-#' Generate a human-readable normalization function string including
-#'
-#' @param f String representing normalization function.
-#' @param fg Foreground file
-#' @param bg Background file.
-#'
-#' @return A string describing normalization.
-make_norm_file_label <- function(f, fg, bg) {
-  paste(make_label_from_filename(fg), "-", make_norm_label(f, bg))
 }
 
 
