@@ -421,7 +421,12 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     verbose_tag <- make_caption(relevant_params, list())
   }
 
-  plot + colorscale + labs(title = title, caption = verbose_tag)
+  plot + colorscale + labs(
+    title = title,
+    caption = verbose_tag,
+    x = "",
+    y = ""
+  )
 }
 
 
@@ -630,15 +635,16 @@ plot_bw_profile <- function(bwfiles,
 
   vals_long <- melt(values, id.vars = "type")
 
-  plot <- ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
-    geom_tile() +
-    geom_text(aes_string(label = "value", size = 3.5)) +
+  plot <-
+    ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
+    geom_tile(color = "white", size = 0.6) +
+    geom_text(aes_string(label = "value"), size = 4) +
     coord_fixed() +
     scale_y_discrete(position = "right") +
-    theme_minimal(base_size = 14) +
+    theme_minimal(base_size = 16) +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = c(1, 1.2),
+      legend.position = c(0.9, 1.2),
       legend.direction = "horizontal",
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank()
