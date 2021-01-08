@@ -85,7 +85,7 @@ test_that("plot_bw_bins_scatter with verbose set returns a plot with a caption",
   with_mock(bw_bins = m, {
     p <- plot_bw_bins_scatter(bw1, bw2, highlight = bed, verbose = TRUE)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 
@@ -94,7 +94,7 @@ test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption",
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 
@@ -103,7 +103,7 @@ test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
 
@@ -112,7 +112,7 @@ test_that("plot_bw_loci_scatter with remove_top returns a plot", {
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE, remove_top=0.01)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 
@@ -204,56 +204,62 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
 })
 
 
+
 test_that("plot_bw_bins_violin with defaults returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2))
+    p <- plot_bw_bins_violin(c(bw1, bw2), labels = c("x", "y"))
     expect_is(p, "ggplot")
   })
 })
 
 test_that("plot_bw_bins_violin with bg files returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), bg_bwfiles=c(bw1, bw2))
+    p <-
+      plot_bw_bins_violin(c(bw1, bw2),
+                          bg_bwfiles = c(bw1, bw2),
+                          labels = c("x", "y"))
     expect_is(p, "ggplot")
   })
 })
 
 
 test_that("plot_bw_bins_violin verbose returns a plot with a caption", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = TRUE)
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = TRUE, labels=c("x", "y"))
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
+
   })
 })
 
 test_that("plot_bw_bins_violin not verbose returns a plot with no caption", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE)
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, labels=c("x", "y"))
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
 
 test_that("plot_bw_bins_violin with highlight returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = bed)
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = bed, labels=c("x", "y"))
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
+
   })
 })
 
 test_that("plot_bw_bins_violin with highlight GRanges returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = import(bed), highlight_label="Bedfile")
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = import(bed), highlight_label="Bedfile", labels=c("x", "y"))
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
 
@@ -271,17 +277,18 @@ test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
                                   verbose = FALSE)
 
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
+
   })
 })
 
 
 test_that("plot_bw_bins_violin passes on parameters", {
-  m <- mock(reduced_bins, reduced_bins_2)
+  m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
     p <- plot_bw_bins_violin(c(bw1, bw2),
                              bg_bwfiles = c(bg_bw, bg_bw),
-                             labels = c("A", "B"),
+                             labels = c("x", "y"),
                              highlight = bed,
                              bin_size = 5000,
                              norm_mode = "log2fc",
@@ -306,7 +313,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
   expect_args(m, 1,
               bwfiles = c(bw1, bw2),
               bg_bwfiles = c(bg_bw, bg_bw),
-              labels = c("A", "B"),
+              labels = c("x", "y"),
               bin_size = 5000,
               genome = "hg38",
               per_locus_stat = "mean",
@@ -341,10 +348,9 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, verbose = FALSE)
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
-
 
 
 test_that(
@@ -409,7 +415,7 @@ test_that(
     with_mock(bw_profile = m, {
       p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = TRUE)
       expect_is(p, "ggplot")
-      expect_true("caption" %in% names(p$labels))
+      expect_false(is.null(p$labels$caption))
     })
   })
 
@@ -446,7 +452,7 @@ test_that(
     with_mock(bw_profile = m, {
       p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = FALSE)
       expect_is(p, "ggplot")
-      expect_false("caption" %in% names(p$labels))
+      expect_true(is.null(p$labels$caption))
     })
   })
 
