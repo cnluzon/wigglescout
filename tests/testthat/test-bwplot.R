@@ -502,3 +502,69 @@ test_that(
     )
   })
 
+test_that(
+  "plot_bw_heatmap with defaults returns a ggplot object", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_heatmap(bw1, bedfile = bed)
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_heatmap with verbose returns a ggplot object wit ha caption", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_heatmap(bw1, bedfile = bed)
+      expect_is(p, "ggplot")
+      expect_true("caption" %in% names(p$labels))
+    })
+  })
+
+
+test_that(
+  "plot_bw_heatmap passes on parameters to bw_heatmap call", {
+    m <- mock(heatmap_values)
+    with_mock(bw_heatmap = m, {
+      p <- plot_bw_heatmap(bw1,
+                           bedfile = bed,
+                           bg_bwfile = bg_bw,
+                           mode = "start",
+                           bin_size = 1000,
+                           upstream = 1500,
+                           downstream = 1500,
+                           middle = 1000,
+                           ignore_strand = TRUE,
+                           norm_mode = "log2fc",
+                           cmap = "Blues",
+                           max_rows_allowed = 2000,
+                           verbose = TRUE)
+    })
+
+    expect_call(m, 1,
+                bw_heatmap(bwfile, bedfile,
+                           bg_bwfiles = bg_bwfile,
+                           mode = mode,
+                           bin_size = bin_size,
+                           upstream = upstream,
+                           downstream = downstream,
+                           middle = middle,
+                           ignore_strand = ignore_strand,
+                           norm_mode = norm_mode
+                )
+    )
+
+    expect_args(m, 1,
+                bw1,
+                bedfile = bed,
+                bg_bwfile = bg_bw,
+                mode = "start",
+                bin_size = 1000,
+                upstream = 1500,
+                downstream = 1500,
+                middle = 1000,
+                ignore_strand = TRUE,
+                norm_mode = "log2fc"
+    )
+  })
+

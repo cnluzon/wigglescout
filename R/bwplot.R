@@ -226,6 +226,162 @@ plot_bw_bins_violin <- function(bwfiles,
   plot
 }
 
+#' Plot a heatmap of a given bigWig file over a set of loci
+#'
+#' @param bwfile BigWig file to plot
+#' @param bg_bwfile Background bw file. Use this with care. Depending on bin
+#'   size and actual values, this may result in a very noisy plot.
+#' @param zmin Minimum of the color scale. Majority of tools set
+#'   this to 0.01 percentile of the data distribution.
+#' @param zmax Maximum of the color scale. Majority of tools set
+#'   this to 0.99.
+#' @param cmap Color map. Any RColorBrewer palette name is accepted here.
+#' @param max_rows_allowed Maximum number of loci that will be allowed in the
+#'   plot. If the amount of loci exceeds this value, the plot will be binned
+#'   on the y axis until it fits max_rows_allowed. This speeds up plotting of
+#'   very large matrices, where higher resolution would not be perceivable by eye.
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @importFrom dplyr group_by summarise
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom grDevices colorRampPalette
+#' @inheritParams plot_bw_profile
+#' @export
+plot_bw_heatmap <- function(bwfile,
+                            bedfile,
+                            bg_bwfile = NULL,
+                            mode = "stretch",
+                            bin_size = 100,
+                            upstream = 2500,
+                            downstream = 2500,
+                            middle = NULL,
+                            ignore_strand = FALSE,
+                            norm_mode = "fc",
+                            cmap = "Reds",
+                            zmin = NULL,
+                            zmax = NULL,
+                            max_rows_allowed = 10000,
+                            verbose = TRUE) {
+
+  values <- bw_heatmap(
+    bwfile,
+    bedfile,
+    bg_bwfiles = bg_bwfile,
+    mode = mode,
+    bin_size = bin_size,
+    upstream = upstream,
+    downstream = downstream,
+    middle = middle,
+    ignore_strand = ignore_strand,
+    norm_mode = norm_mode
+  )
+
+  # Order matrix by mean and transpose it (image works flipped)
+  m <- t(values[[1]][order(rowMeans(values[[1]]), decreasing = F), ])
+
+  nvalues <- nrow(m) * ncol(m)
+
+  zlim <- calculate_color_limits(m, zmin, zmax)
+
+  zmin <- zlim[[1]]
+  zmax <- zlim[[2]]
+
+  # Cap values out of zlim
+  n_bottom_capped <- length(m[m < zmin])
+  m[m < zmin] <- zmin
+
+  n_top_capped <- length(m[m > zmax])
+  m[m > zmax] <- zmax
+
+  df <- melt(m)
+  colnames(df) <- c('x', 'y', 'value')
+
+  df2 <- df
+
+  if (ncol(m) > max_rows_allowed) {
+    # Downsample rows only and downsample only enough to fit max_rows. So
+    # we make sure we do not extremely downsample a value that only slightly
+    # exceeds our max resolution.
+    warning(paste0("Large matrix of ", ncol(m),". Downscaling to ", max_rows_allowed))
+    downsample_factor <- round(ncol(m) / max_rows_allowed)
+
+    # .data prevents R CMD Check note
+    df2 <- df %>%
+      dplyr::group_by(x = .data$x,
+                      y = downsample_factor * round(.data$y / downsample_factor)) %>%
+      dplyr::summarise(value = mean(.data$value))
+  }
+
+  axis_breaks <-
+    calculate_profile_breaks(nrow(m), upstream, downstream, bin_size, mode)
+  axis_labels <-
+    calculate_profile_labels(upstream, downstream, mode)
+
+  lines <- axis_breaks[2]
+  if (mode == "stretch") {
+    lines <- axis_breaks[2:3]
+  }
+
+  loci <- ncol(m)
+  y_label <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
+  x_title <- make_label_from_filename(bwfile)
+
+  p <-
+    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) + geom_raster()
+
+  gcol <- colorRampPalette(brewer.pal(n=8, name=cmap))
+  p <- p +
+    scale_x_continuous(breaks = axis_breaks,
+                       labels = axis_labels,
+                       expand = c(0, 0)) +
+    scale_y_continuous(
+      breaks = c(1, loci),
+      labels = c(loci, "0"),
+      expand = c(0, 0)
+    ) +
+    scale_fill_gradientn(
+      colours = gcol(100),
+      limits = c(zmin, zmax),
+      breaks = c(zmin, zmax),
+      labels = format(c(zmin, zmax), digits = 2)
+    ) +
+    xlab(x_title) +
+    ylab(y_label) +
+    geom_vline(
+      xintercept = lines,
+      linetype = "dashed",
+      color = "#111111",
+      size = 0.2
+    ) +
+    ggtitle("Heatmap plot") +
+    default_theme() +
+    theme(axis.line = element_blank(),
+          panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
+    labs(fill = make_norm_label(norm_mode, bg_bwfile))
+
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(
+      mode = mode,
+      bin_size = bin_size,
+      middle = middle,
+      ignore_strand = ignore_strand,
+      row_resolution = max_rows_allowed
+    )
+
+    crop_values <- list(
+      ncells = nvalues,
+      zmin = round(zmin, 3),
+      zmax = round(zmax, 3),
+      top_capped_vals = n_top_capped,
+      bottom_capped_vals = n_bottom_capped
+    )
+
+    verbose_tag <- make_caption(relevant_params, crop_values)
+    p <- p + labs(caption = verbose_tag)
+  }
+
+  p
+}
 
 #' Locus-based scatterplot of a pair of bigWig files
 #'
@@ -511,7 +667,6 @@ plot_bw_profile <- function(bwfiles,
 }
 
 
-
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'
 #' Plots a scatter plot from two given GRanges objects and an optional set of
@@ -616,6 +771,26 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
 }
 
 
+#' Calculate color limits from a value matrix and provided parameters
+#'
+#' @param m Value matrix.
+#' @param zmin Min value. Overrides percentile.
+#' @param zmax Max value. Overrides percentile.
+#'
+#' @return A pair of c(min, max)
+calculate_color_limits <- function(m, zmin, zmax) {
+  # colorscale limits percentiles: 0.01 - 0.99
+  zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm=TRUE)
+
+  if (!is.null(zmin)) {
+    zlim[[1]] <- zmin
+  }
+
+  if (!is.null(zmax)) {
+    zlim[[2]] <- zmax
+  }
+  zlim
+}
 
 calculate_profile_breaks <- function(nrows, upstream, downstream, bin_size, mode) {
   upstream_nbins <- floor(upstream / bin_size)
