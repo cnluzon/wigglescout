@@ -52,14 +52,14 @@ test_that("Setup files exist", {
   expect_true(file_test("-f", bw_special))
 })
 
-test_that("bw_ranges returns a GRanges object", {
-  bins <- bw_ranges(bw1, tiles, per_locus_stat = "mean")
+test_that(".bw_ranges returns a GRanges object", {
+  bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean")
   expect_is(bins, "GRanges")
 
 })
 
-test_that("bw_ranges returns correct values", {
-  bins <- bw_ranges(bw1, tiles, per_locus_stat = "mean")
+test_that(".bw_ranges returns correct values", {
+  bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean")
 
   expect_equal(bins[1]$score, 1)
   expect_equal(bins[2]$score, 2)
@@ -70,15 +70,15 @@ test_that("bw_ranges returns correct values on subset", {
   subset <- GRanges(seqnames = c("chr1"),
                     ranges = IRanges(c(10, 40)))
 
-  bins <- bw_ranges(bw1, tiles, per_locus_stat = "mean", selection = subset)
+  bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean", selection = subset)
 
   expect_equal(bins[1]$score, 1)
   expect_equal(bins[2]$score, 2)
   expect_equal(length(bins), 2)
 })
 
-test_that("multi_bw_ranges returns correct values", {
-  values <- multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
+test_that(".multi_bw_ranges returns correct values", {
+  values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
 
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
@@ -87,9 +87,9 @@ test_that("multi_bw_ranges returns correct values", {
   expect_equal(values[2]$bw2, 19)
 })
 
-test_that("multi_bw_ranges several processors returns correct values", {
+test_that(".multi_bw_ranges several processors returns correct values", {
   future::plan(multisession, workers=2)
-  values <- multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
+  values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
 
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
@@ -100,8 +100,8 @@ test_that("multi_bw_ranges several processors returns correct values", {
 })
 
 test_that(
-  "multi_bw_ranges_norm with bwfiles == background returns all 1 values", {
-    values <- multi_bw_ranges_norm(c(bw1, bw2),
+  ".multi_bw_ranges_norm with bwfiles == background returns all 1 values", {
+    values <- .multi_bw_ranges_norm(c(bw1, bw2),
                                    bg_bwfilelist = c(bw1, bw2),
                                    c("bw1", "bw2"),
                                    tiles,
@@ -115,8 +115,8 @@ test_that(
     expect_equal(values[2]$bw2, 1)
   })
 
-test_that("multi_bw_ranges_norm returns correct values", {
-  values <- multi_bw_ranges_norm(c(bw1, bw2),
+test_that(".multi_bw_ranges_norm returns correct values", {
+  values <- .multi_bw_ranges_norm(c(bw1, bw2),
                                  bg_bwfilelist = c(bg1, bg2),
                                  c("bw1", "bw2"),
                                  tiles,
@@ -131,9 +131,9 @@ test_that("multi_bw_ranges_norm returns correct values", {
 })
 
 test_that(
-  "multi_bw_ranges_norm fails on background length not matching bwlist", {
+  ".multi_bw_ranges_norm fails on background length not matching bwlist", {
     expect_error({
-      values <- multi_bw_ranges_norm(c(bw1, bw2),
+      values <- .multi_bw_ranges_norm(c(bw1, bw2),
                                      bg_bwfilelist = c(bg1),
                                      c("bw1", "bw2"),
                                      tiles,
@@ -143,18 +143,18 @@ test_that(
     "Background and signal bwfile lists must have the same length.")
   })
 
-test_that("multi_bw_ranges returns correct values for single bigWig", {
-  values <- multi_bw_ranges(bw1, "bw1", tiles)
+test_that(".multi_bw_ranges returns correct values for single bigWig", {
+  values <- .multi_bw_ranges(bw1, "bw1", tiles)
 
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[2]$bw1, 2)
 })
 
-test_that("multi_bw_ranges returns correct values on subset", {
+test_that(".multi_bw_ranges returns correct values on subset", {
   subset <- GRanges(seqnames = c("chr1"), ranges = IRanges(c(30, 50)))
 
-  values <- multi_bw_ranges(c(bw1, bw2),
+  values <- .multi_bw_ranges(c(bw1, bw2),
                             c("bw1", "bw2"),
                             tiles,
                             selection = subset
@@ -167,10 +167,10 @@ test_that("multi_bw_ranges returns correct values on subset", {
   expect_equal(values[2]$bw2, 18)
 })
 
-test_that("multi_bw_ranges removes value even if quantile very small, due to interpolation", {
+test_that(".multi_bw_ranges removes value even if quantile very small, due to interpolation", {
   # Note the use of bw1 twice. bw1 + bw2 means are always 10.5, so it would not
   # remove any rows.
-  values <- multi_bw_ranges(c(bw1, bw1),
+  values <- .multi_bw_ranges(c(bw1, bw1),
                             c("bw1", "bw2"),
                             tiles,
                             remove_top = 0.01
@@ -181,8 +181,8 @@ test_that("multi_bw_ranges removes value even if quantile very small, due to int
   expect_equal(max(values$bw2), 19)
 })
 
-test_that("multi_bw_ranges removes percentile", {
-  values <- multi_bw_ranges(c(bw1, bw1),
+test_that(".multi_bw_ranges removes percentile", {
+  values <- .multi_bw_ranges(c(bw1, bw1),
                             c("bw1", "bw2"),
                             tiles,
                             remove_top = 0.05
@@ -193,8 +193,8 @@ test_that("multi_bw_ranges removes percentile", {
   expect_equal(max(values$bw2), 19)
 })
 
-test_that("multi_bw_ranges removes percentile single column", {
-  values <- multi_bw_ranges(c(bw1),
+test_that(".multi_bw_ranges removes percentile single column", {
+  values <- .multi_bw_ranges(c(bw1),
                             c("bw1"),
                             tiles,
                             remove_top = 0.1
@@ -204,8 +204,8 @@ test_that("multi_bw_ranges removes percentile single column", {
   expect_equal(max(values$bw1), 18)
 })
 
-test_that("multi_bw_ranges_norm removes percentile", {
-  values <- multi_bw_ranges_norm(c(bw1, bw1),
+test_that(".multi_bw_ranges_norm removes percentile", {
+  values <- .multi_bw_ranges_norm(c(bw1, bw1),
                             c(bg1, bg1),
                             c("bw1", "bw2"),
                             tiles,
@@ -217,8 +217,8 @@ test_that("multi_bw_ranges_norm removes percentile", {
   expect_equal(max(values$bw2), 18)
 })
 
-test_that("multi_bw_ranges_norm removes percentile single column", {
-  values <- multi_bw_ranges_norm(c(bw1), c(bg1),
+test_that(".multi_bw_ranges_norm removes percentile single column", {
+  values <- .multi_bw_ranges_norm(c(bw1), c(bg1),
                             c("bw1"),
                             tiles,
                             remove_top = 0.1
@@ -449,7 +449,7 @@ test_that("bw_profile runs quiet on valid parameters, mode start", {
 
 
 test_that("calculate_matrix_norm removes percentile", {
-  values <- calculate_matrix_norm(bw1, import(bed_with_names), bin_size = 2,
+  values <- .calculate_matrix_norm(bw1, import(bed_with_names), bin_size = 2,
                                   upstream = 6, downstream = 6,
                                   remove_top = 0.05)
 
