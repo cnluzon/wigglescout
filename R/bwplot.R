@@ -46,7 +46,6 @@ plot_bw_bins_scatter <- function(x,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
-
   bins_x <- bw_bins(
     x,
     bg_bwfiles = bg_x,
@@ -131,7 +130,6 @@ plot_bw_bins_violin <- function(bwfiles,
                                 highlight_colors = NULL,
                                 remove_top = 0,
                                 verbose = TRUE) {
-
   bins_values <- bw_bins(
     bwfiles,
     bg_bwfiles = bg_bwfiles,
@@ -160,10 +158,12 @@ plot_bw_bins_violin <- function(bwfiles,
   verbose_tag <- NULL
   if (verbose) {
     # Show parameters and relevant values
-    relevant_params <- list(genome=genome,
-                            bin_size=bin_size,
-                            minoverlap=minoverlap,
-                            remove_top=remove_top)
+    relevant_params <- list(
+      genome = genome,
+      bin_size = bin_size,
+      minoverlap = minoverlap,
+      remove_top = remove_top
+    )
 
     verbose_tag <- make_caption(relevant_params, main_plot$calculated)
   }
@@ -177,8 +177,10 @@ plot_bw_bins_violin <- function(bwfiles,
     y = y_label,
     caption = verbose_tag
   ) + theme_default() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.position = "none")
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "none"
+    )
 }
 
 #' Plot a heatmap of a given bigWig file over a set of loci
@@ -216,7 +218,6 @@ plot_bw_heatmap <- function(bwfile,
                             zmax = NULL,
                             max_rows_allowed = 10000,
                             verbose = TRUE) {
-
   values <- bw_heatmap(
     bwfile,
     bedfile,
@@ -252,7 +253,7 @@ plot_bw_heatmap <- function(bwfile,
 
 
   df <- melt(m)
-  colnames(df) <- c('x', 'y', 'value')
+  colnames(df) <- c("x", "y", "value")
 
   df2 <- df
 
@@ -260,13 +261,15 @@ plot_bw_heatmap <- function(bwfile,
     # Downsample rows only and downsample only enough to fit max_rows. So
     # we make sure we do not extremely downsample a value that only slightly
     # exceeds our max resolution.
-    warning(paste0("Large matrix of ", ncol(m),". Downscaling to ", max_rows_allowed))
+    warning(paste0("Large matrix of ", ncol(m), ". Downscaling to ", max_rows_allowed))
     downsample_factor <- round(ncol(m) / max_rows_allowed)
 
     # .data prevents R CMD Check note
     df2 <- df %>%
-      dplyr::group_by(x = .data$x,
-                      y = downsample_factor * round(.data$y / downsample_factor)) %>%
+      dplyr::group_by(
+        x = .data$x,
+        y = downsample_factor * round(.data$y / downsample_factor)
+      ) %>%
       dplyr::summarise(value = mean(.data$value))
   }
 
@@ -285,13 +288,16 @@ plot_bw_heatmap <- function(bwfile,
   x_title <- make_label_from_filename(bwfile)
 
   p <-
-    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) + geom_raster()
+    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
+    geom_raster()
 
-  gcol <- colorRampPalette(brewer.pal(n=8, name=cmap))
+  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
   p <- p +
-    scale_x_continuous(breaks = axis_breaks,
-                       labels = axis_labels,
-                       expand = c(0, 0)) +
+    scale_x_continuous(
+      breaks = axis_breaks,
+      labels = axis_labels,
+      expand = c(0, 0)
+    ) +
     scale_y_continuous(
       breaks = c(1, loci),
       labels = c(loci, "0"),
@@ -314,8 +320,10 @@ plot_bw_heatmap <- function(bwfile,
     ) +
     ggtitle("Heatmap plot") +
     theme_default() +
-    theme(axis.line = element_blank(),
-          panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
+    theme(
+      axis.line = element_blank(),
+      panel.border = element_rect(color = "black", fill = NA, size = 0.1)
+    ) +
     labs(fill = make_norm_label(norm_mode, bg_bwfile))
 
   if (verbose) {
@@ -395,8 +403,6 @@ plot_bw_loci_scatter <- function(x,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
-
-
   values_x <- bw_bed(
     x,
     bg_bwfiles = bg_x,
@@ -416,11 +422,11 @@ plot_bw_loci_scatter <- function(x,
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
   main_plot <- plot_ranges_scatter(values_x, values_y,
-                                      highlight = highlight_data$ranges,
-                                      minoverlap = minoverlap,
-                                      highlight_label = highlight_data$labels,
-                                      highlight_colors = highlight_colors,
-                                      remove_top = remove_top
+    highlight = highlight_data$ranges,
+    minoverlap = minoverlap,
+    highlight_label = highlight_data$labels,
+    highlight_colors = highlight_colors,
+    remove_top = remove_top
   )
 
   # Show parameters and relevant values
@@ -431,9 +437,11 @@ plot_bw_loci_scatter <- function(x,
 
   verbose_tag <- NULL
   if (verbose) {
-    relevant_params <- list(loci=loci_name,
-                            minoverlap=minoverlap,
-                            remove_top=remove_top)
+    relevant_params <- list(
+      loci = loci_name,
+      minoverlap = minoverlap,
+      remove_top = remove_top
+    )
 
     verbose_tag <- make_caption(relevant_params, main_plot$calculated)
   }
@@ -471,13 +479,12 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          norm_mode = "fc",
                                          remove_top = 0,
                                          verbose = TRUE) {
-
   summary_values <- bw_bed(bwfiles, loci,
-                           bg_bwfiles = bg_bwfiles,
-                           aggregate_by = aggregate_by,
-                           norm_mode = norm_mode,
-                           labels = labels,
-                           remove_top = remove_top
+    bg_bwfiles = bg_bwfiles,
+    aggregate_by = aggregate_by,
+    norm_mode = norm_mode,
+    labels = labels,
+    remove_top = remove_top
   )
 
 
@@ -485,35 +492,44 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     warning("All zero-values matrix. Using same background as bw input?")
   }
 
-  legend_label = make_norm_label(norm_mode, bg_bwfiles)
-  colorscale <- scale_fill_gradient(name=legend_label, low = "white", high="#B22222")
+  legend_label <- make_norm_label(norm_mode, bg_bwfiles)
+  colorscale <- scale_fill_gradient(name = legend_label, low = "white", high = "#B22222")
   if (!is.null(bg_bwfiles)) {
-    colorscale <- scale_fill_gradient2(name=legend_label, low = "#2e6694", mid="white", high="#B22222")
+    colorscale <- scale_fill_gradient2(name = legend_label, low = "#2e6694", mid = "white", high = "#B22222")
   }
 
   summary_values$type <- rownames(summary_values)
-  vals_melted <- reshape2::melt(summary_values, id.vars="type")
+  vals_melted <- reshape2::melt(summary_values, id.vars = "type")
 
   title <- paste("Coverage per region (", aggregate_by, ") - ", legend_label)
 
-  plot <- ggplot(vals_melted, aes_string("type", "variable", fill="value")) +
-    geom_tile() + geom_text(aes(label=round(value, 2)), size=3.5) +
-    coord_fixed() + colorscale +
-    scale_y_discrete(position="right") + theme_minimal(base_size = 14) +
-    theme(axis.text.x = element_text(angle=45, hjust=1),
-          legend.position=c(1,1.2),
-          legend.direction="horizontal",
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()) + xlab("") + ylab("") +
+  plot <- ggplot(vals_melted, aes_string("type", "variable", fill = "value")) +
+    geom_tile() +
+    geom_text(aes(label = round(value, 2)), size = 3.5) +
+    coord_fixed() +
+    colorscale +
+    scale_y_discrete(position = "right") +
+    theme_minimal(base_size = 14) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = c(1, 1.2),
+      legend.direction = "horizontal",
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    xlab("") +
+    ylab("") +
     ggtitle(title)
 
   if (verbose) {
     # Show parameters and relevant values
-    relevant_params <- list(aggregate_by=aggregate_by,
-                            remove_top=remove_top)
+    relevant_params <- list(
+      aggregate_by = aggregate_by,
+      remove_top = remove_top
+    )
 
     verbose_tag <- make_caption(relevant_params, list())
-    plot <- plot + labs(caption=verbose_tag)
+    plot <- plot + labs(caption = verbose_tag)
   }
 
   plot
@@ -547,18 +563,17 @@ plot_bw_profile <- function(bwfiles,
                             colors = NULL,
                             remove_top = 0,
                             verbose = TRUE) {
-
   values <- bw_profile(bwfiles, bedfile,
-                       bg_bwfiles = bg_bwfiles,
-                       mode = mode,
-                       bin_size = bin_size,
-                       upstream = upstream,
-                       downstream = downstream,
-                       middle = middle,
-                       ignore_strand = ignore_strand,
-                       norm_mode = norm_mode,
-                       labels = labels,
-                       remove_top = remove_top
+    bg_bwfiles = bg_bwfiles,
+    mode = mode,
+    bin_size = bin_size,
+    upstream = upstream,
+    downstream = downstream,
+    middle = middle,
+    ignore_strand = ignore_strand,
+    norm_mode = norm_mode,
+    labels = labels,
+    remove_top = remove_top
   )
 
   y_label <- make_norm_label(norm_mode, bg_bwfiles)
@@ -580,13 +595,17 @@ plot_bw_profile <- function(bwfiles,
   values$min_error <- values$mean - values$sderror
   values$max_error <- values$mean + values$sderror
 
-  p <- ggplot(values,
-         aes_string(x = "index", y = "mean", color = "sample", fill = "sample")) +
+  p <- ggplot(
+    values,
+    aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
+  ) +
     geom_line(size = 0.8) +
     geom_vline(xintercept = lines, linetype = "dashed", color = "#cccccc", alpha = 0.8) +
-    scale_x_continuous(breaks = axis_breaks,
-                       labels = axis_labels,
-                       limits = c(0.5, nrows + 0.5)) +
+    scale_x_continuous(
+      breaks = axis_breaks,
+      labels = axis_labels,
+      limits = c(0.5, nrows + 0.5)
+    ) +
     xlab(x_title) +
     ylab(y_label) +
     ggtitle("Profile plot") +
@@ -604,23 +623,28 @@ plot_bw_profile <- function(bwfiles,
   }
 
   if (show_error) {
-    p <- p + geom_ribbon(aes_string(x = "index",
-                                    ymin = "min_error",
-                                    ymax = "max_error"),
-        color = NA, alpha = 0.3)
+    p <- p + geom_ribbon(aes_string(
+      x = "index",
+      ymin = "min_error",
+      ymax = "max_error"
+    ),
+    color = NA, alpha = 0.3
+    )
   }
 
 
   if (verbose) {
     # Show parameters and relevant values
-    relevant_params <- list(bin_size=bin_size,
-                            middle=middle,
-                            mode=mode,
-                            ignore_strand=ignore_strand,
-                            remove_top=remove_top)
+    relevant_params <- list(
+      bin_size = bin_size,
+      middle = middle,
+      mode = mode,
+      ignore_strand = ignore_strand,
+      remove_top = remove_top
+    )
 
     verbose_tag <- make_caption(relevant_params, list())
-    p <- p + labs(caption=verbose_tag)
+    p <- p + labs(caption = verbose_tag)
   }
 
   p
@@ -655,8 +679,6 @@ plot_ranges_scatter <- function(x, y,
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0) {
-
-
   values <- granges_cbind(list(x, y), list("x", "y"))
   filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
 
@@ -664,14 +686,18 @@ plot_ranges_scatter <- function(x, y,
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
-    highlight_values <- multi_ranges_overlap(filtered_values$ranges,
-                                             highlight,
-                                             highlight_label,
-                                             minoverlap)
+    highlight_values <- multi_ranges_overlap(
+      filtered_values$ranges,
+      highlight,
+      highlight_label,
+      minoverlap
+    )
 
-    extra_plot <- geom_point(data = highlight_values,
-                             aes_string(x = "x", y = "y", color = "group"),
-                             alpha = 0.8)
+    extra_plot <- geom_point(
+      data = highlight_values,
+      aes_string(x = "x", y = "y", color = "group"),
+      alpha = 0.8
+    )
 
     if (!is.null(highlight_colors)) {
       extra_colors <- scale_color_manual(values = highlight_colors)
@@ -759,8 +785,10 @@ plot_ranges_violin <- function(gr,
   p <-
     ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
     geom_violin(fill = "#cccccc") +
-    theme(legend.position = "none",
-          axis.text.x = element_text(angle = 45, hjust = 1)) +
+    theme(
+      legend.position = "none",
+      axis.text.x = element_text(angle = 45, hjust = 1)
+    ) +
     extra_plot +
     extra_colors
 
@@ -811,7 +839,8 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
 
   # Order of factors need to match to assign properly colors to points
   highlight_values$group <- factor(highlight_values$group,
-                                   levels = labels)
+    levels = labels
+  )
 
   highlight_values
 }
@@ -826,7 +855,7 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
 #' @return A pair of c(min, max)
 calculate_color_limits <- function(m, zmin, zmax) {
   # colorscale limits percentiles: 0.01 - 0.99
-  zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm=TRUE)
+  zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm = TRUE)
 
   if (!is.null(zmin)) {
     zlim[[1]] <- zmin
@@ -859,14 +888,17 @@ calculate_profile_breaks <- function(nrows, upstream, downstream, bin_size, mode
 
 calculate_profile_labels <- function(upstream, downstream, mode) {
   if (mode == "stretch") {
-    c(paste("-", upstream / 1000, "kb", sep = ""),
+    c(
+      paste("-", upstream / 1000, "kb", sep = ""),
       "start", "end",
-      paste("+", downstream / 1000, "kb", sep = ""))
-
+      paste("+", downstream / 1000, "kb", sep = "")
+    )
   } else {
-    c(paste("-", upstream / 1000, "kb", sep = ""),
+    c(
+      paste("-", upstream / 1000, "kb", sep = ""),
       mode,
-      paste("+", downstream / 1000, "kb", sep = ""))
+      paste("+", downstream / 1000, "kb", sep = "")
+    )
   }
 }
 
@@ -884,13 +916,17 @@ theme_default <- function() {
 #' @return A caption string
 make_caption <- function(params, outcome) {
   verbose_params <- paste(names(params),
-                          params, sep = ":", collapse = ", ")
+    params,
+    sep = ":", collapse = ", "
+  )
 
   verbose_crop <- paste(names(outcome),
-                        outcome, sep = ":", collapse = ", ")
+    outcome,
+    sep = ":", collapse = ", "
+  )
 
   date <- format(Sys.time(), "%a %b %d %X %Y")
-  paste(verbose_params, verbose_crop, date, sep="\n")
+  paste(verbose_params, verbose_crop, date, sep = "\n")
 }
 
 
@@ -903,10 +939,10 @@ make_caption <- function(params, outcome) {
 make_norm_label <- function(f, bg) {
   label <- "RPGC"
   if (!is.null(bg)) {
-    label = switch(f,
-                   "fc" = paste(label, " / background", sep = ""),
-                   "log2fc" = paste("log2(", label, " / background", sep = "")
-            )
+    label <- switch(f,
+      "fc" = paste(label, " / background", sep = ""),
+      "log2fc" = paste("log2(", label, " / background", sep = "")
+    )
   }
 
   label
@@ -961,5 +997,5 @@ process_highlight_loci <- function(loci_sets, labels) {
     stop("Highlight loci sets don't match the number of labels provided")
   }
 
-  list(ranges=gr_list, labels=lab_list)
+  list(ranges = gr_list, labels = lab_list)
 }
