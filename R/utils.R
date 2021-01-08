@@ -107,7 +107,7 @@ make_norm_label <- function(f, bg) {
   if (!is.null(bg)) {
     label <- switch(f,
       "fc" = paste(label, " / background", sep = ""),
-      "log2fc" = paste("log2(", label, " / background", sep = "")
+      "log2fc" = paste("log2(", label, " / background)", sep = "")
     )
   }
 
