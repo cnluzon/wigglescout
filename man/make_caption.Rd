@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwplot.R
 \name{make_caption}
 \alias{make_caption}
-\title{Make a string to put as capsion in verbose mode. Includes system date.}
+\title{Make a string to put as caption in verbose mode. Includes system date.}
 \usage{
 make_caption(params, outcome)
 }
@@ -15,5 +15,5 @@ make_caption(params, outcome)
 A caption string
 }
 \description{
-Make a string to put as capsion in verbose mode. Includes system date.
+Make a string to put as caption in verbose mode. Includes system date.
 }
