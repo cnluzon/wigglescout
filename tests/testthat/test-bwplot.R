@@ -416,7 +416,7 @@ test_that(
     with_mock(bw_profile = m, {
       p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = TRUE)
       expect_is(p, "ggplot")
-      expect_true("caption" %in% names(p$labels))
+      expect_false(is.null(p$labels$caption))
     })
   })
 
@@ -453,7 +453,7 @@ test_that(
     with_mock(bw_profile = m, {
       p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = FALSE)
       expect_is(p, "ggplot")
-      expect_false("caption" %in% names(p$labels))
+      expect_true(is.null(p$labels$caption))
     })
   })
 

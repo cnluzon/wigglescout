@@ -1,3 +1,5 @@
+# Main plot functions -----------------------------------------------------
+
 #' Bin-based scatterplot of a pair of bigWig files
 #'
 #' Plots a scatter plot from two given bigWig files and an optional set of BED
@@ -258,7 +260,7 @@ plot_bw_heatmap <- function(bwfile,
       axis.line = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 0.1)
     ) +
-    matrix_heatmap_lines(values[[1]], bin_size, upstream, downstream, mode) +
+    matrix_heatmap_lines(nrow(values[[1]]), ncol(values[[1]]), bin_size, upstream, downstream, mode) +
     labs(fill = make_norm_label(norm_mode, bg_bwfile),
          title = title,
          x = x_title,
@@ -267,119 +269,6 @@ plot_bw_heatmap <- function(bwfile,
 }
 
 
-#' Helper function for matrix heatmap plot
-#'
-#' @param values Matrix with values
-#' @inheritParams plot_bw_heatmap
-#'
-#' @return Named list plot and calculated values
-plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
-  # Order matrix by mean and transpose it (image works flipped)
-  m <- t(values[order(rowMeans(values), decreasing = F), ])
-
-  nvalues <- nrow(m) * ncol(m)
-
-  n_non_finite <- length(m[!is.finite(m)])
-  m[!is.finite(m)] <- NA
-
-  zlim <- calculate_color_limits(m, zmin, zmax)
-
-  zmin <- zlim[[1]]
-  zmax <- zlim[[2]]
-
-  # Cap values out of zlim
-  n_bottom_capped <- length(m[m < zmin])
-  m[m < zmin] <- zmin
-
-  n_top_capped <- length(m[m > zmax])
-  m[m > zmax] <- zmax
-
-  df <- melt(m)
-  colnames(df) <- c("x", "y", "value")
-
-  df2 <- df
-
-  downsample_factor <- NULL
-  if (ncol(m) > max_rows_allowed) {
-  # Downsample rows only and downsample only enough to fit max_rows. So
-  # we make sure we do not extremely downsample a value that only slightly
-  # exceeds our max resolution.
-  warning(paste0(
-    "Large matrix of ",
-    ncol(m),
-    ". Downscaling to ",
-    max_rows_allowed
-  ))
-  downsample_factor <- round(ncol(m) / max_rows_allowed)
-
-  # .data prevents R CMD Check note
-  df2 <- df %>%
-    dplyr::group_by(x = .data$x,
-                    y = downsample_factor * round(.data$y / downsample_factor)) %>%
-    dplyr::summarise(value = mean(.data$value))
-  }
-
-  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
-
-  p <-
-    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
-    geom_raster() +
-    scale_fill_gradientn(
-      colours = gcol(100),
-      limits = c(zmin, zmax),
-      breaks = c(zmin, zmax),
-      labels = format(c(zmin, zmax), digits = 2),
-      na.value = "#cccccc"
-    )
-
-  calculated <- list(
-    ncells = nvalues,
-    zmin = round(zmin, 3),
-    zmax = round(zmax, 3),
-    top_capped_vals = n_top_capped,
-    bottom_capped_vals = n_bottom_capped,
-    non_finite = n_non_finite,
-    downsample_factor = downsample_factor
-  )
-
-  list(plot=p, calculated=calculated)
-}
-
-#' Helper function for calculating guide lines and labels in heatmap
-#'
-#' @param m Value matrix
-#' @inheritParams plot_bw_heatmap
-#' @return A list of ggproto objects to be plotted.
-matrix_heatmap_lines <- function(m, bin_size, upstream, downstream, mode) {
-  loci <- nrow(m)
-
-  axis_breaks <-
-    calculate_profile_breaks(ncol(m), upstream, downstream, bin_size, mode)
-  axis_labels <-
-    calculate_profile_labels(upstream, downstream, mode)
-
-  lines <- axis_breaks[2]
-  if (mode == "stretch") {
-    lines <- axis_breaks[2:3]
-  }
-
-  x <- scale_x_continuous(breaks = axis_breaks,
-                          labels = axis_labels,
-                          expand = c(0, 0))
-
-  y <- scale_y_continuous(breaks = c(1, loci),
-                          labels = c(loci, "0"),
-                          expand = c(0, 0))
-
-  gline <- geom_vline(
-    xintercept = lines,
-    linetype = "dashed",
-    color = "#111111",
-    size = 0.2
-  )
-
-  list(x, y, gline)
-}
 
 #' Locus-based scatterplot of a pair of bigWig files
 #'
@@ -592,6 +481,7 @@ plot_bw_profile <- function(bwfiles,
                             colors = NULL,
                             remove_top = 0,
                             verbose = TRUE) {
+
   values <- bw_profile(bwfiles, bedfile,
     bg_bwfiles = bg_bwfiles,
     mode = mode,
@@ -605,21 +495,116 @@ plot_bw_profile <- function(bwfiles,
     remove_top = remove_top
   )
 
-  y_label <- make_norm_label(norm_mode, bg_bwfiles)
-
-  nrows <- max(values$index)
-
-  axis_breaks <- calculate_profile_breaks(nrows, upstream, downstream, bin_size, mode)
-  axis_labels <- calculate_profile_labels(upstream, downstream, mode)
-
-  lines <- axis_breaks[2]
-  if (mode == "stretch") {
-    lines <- axis_breaks[2:3]
-  }
 
   loci <- length(import(bedfile, format = "BED"))
+  y_label <- make_norm_label(norm_mode, bg_bwfiles)
   x_title <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
 
+  verbose_tag <- NULL
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(
+      bin_size = bin_size,
+      middle = middle,
+      mode = mode,
+      ignore_strand = ignore_strand,
+      remove_top = remove_top
+    )
+
+    verbose_tag <- make_caption(relevant_params, list())
+  }
+
+  p <- plot_matrix_profile(values, show_error) +
+    matrix_heatmap_lines(loci, max(values$index), bin_size, upstream, downstream, mode) +
+    labs(title = title,
+         x = x_title,
+         y = y_label,
+         caption = verbose_tag)
+
+  p
+}
+
+# Helper plot functions ---------------------------------------------------
+
+#' Helper function for matrix heatmap plot
+#'
+#' @param values Matrix with values
+#' @inheritParams plot_bw_heatmap
+#'
+#' @return Named list plot and calculated values
+plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
+  # Order matrix by mean and transpose it (image works flipped)
+  m <- t(values[order(rowMeans(values), decreasing = F), ])
+
+  nvalues <- nrow(m) * ncol(m)
+
+  n_non_finite <- length(m[!is.finite(m)])
+  m[!is.finite(m)] <- NA
+
+  zlim <- calculate_color_limits(m, zmin, zmax)
+
+  zmin <- zlim[[1]]
+  zmax <- zlim[[2]]
+
+  # Cap values out of zlim
+  n_bottom_capped <- length(m[m < zmin])
+  m[m < zmin] <- zmin
+
+  n_top_capped <- length(m[m > zmax])
+  m[m > zmax] <- zmax
+
+  df <- melt(m)
+  colnames(df) <- c("x", "y", "value")
+
+  df2 <- df
+
+  downsample_factor <- NULL
+  if (ncol(m) > max_rows_allowed) {
+    # Downsample rows only and downsample only enough to fit max_rows. So
+    # we make sure we do not extremely downsample a value that only slightly
+    # exceeds our max resolution.
+    warning(paste0(
+      "Large matrix of ",
+      ncol(m),
+      ". Downscaling to ",
+      max_rows_allowed
+    ))
+    downsample_factor <- round(ncol(m) / max_rows_allowed)
+
+    # .data prevents R CMD Check note
+    df2 <- df %>%
+      dplyr::group_by(x = .data$x,
+                      y = downsample_factor * round(.data$y / downsample_factor)) %>%
+      dplyr::summarise(value = mean(.data$value))
+  }
+
+  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
+
+  p <-
+    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
+    geom_raster() +
+    scale_fill_gradientn(
+      colours = gcol(100),
+      limits = c(zmin, zmax),
+      breaks = c(zmin, zmax),
+      labels = format(c(zmin, zmax), digits = 2),
+      na.value = "#cccccc"
+    )
+
+  calculated <- list(
+    ncells = nvalues,
+    zmin = round(zmin, 3),
+    zmax = round(zmax, 3),
+    top_capped_vals = n_top_capped,
+    bottom_capped_vals = n_bottom_capped,
+    non_finite = n_non_finite,
+    downsample_factor = downsample_factor
+  )
+
+  list(plot=p, calculated=calculated)
+}
+
+plot_matrix_profile <- function(values, show_error) {
 
   values$min_error <- values$mean - values$sderror
   values$max_error <- values$mean + values$sderror
@@ -628,17 +613,6 @@ plot_bw_profile <- function(bwfiles,
     values,
     aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
   ) +
-    geom_line(size = 0.8) +
-    geom_vline(xintercept = lines, linetype = "dashed", color = "#cccccc", alpha = 0.8) +
-    scale_x_continuous(
-      breaks = axis_breaks,
-      labels = axis_labels,
-      limits = c(0.5, nrows + 0.5)
-    ) +
-    xlab(x_title) +
-    ylab(y_label) +
-    ggtitle("Profile plot") +
-    theme_default() +
     theme(
       legend.position = c(0.80, 0.90),
       legend.direction = "vertical",
@@ -661,24 +635,8 @@ plot_bw_profile <- function(bwfiles,
     )
   }
 
-
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      bin_size = bin_size,
-      middle = middle,
-      mode = mode,
-      ignore_strand = ignore_strand,
-      remove_top = remove_top
-    )
-
-    verbose_tag <- make_caption(relevant_params, list())
-    p <- p + labs(caption = verbose_tag)
-  }
-
   p
 }
-
 
 #' Scatterplot of values in GRanges objects. Loci must match.
 #'
@@ -836,6 +794,42 @@ plot_ranges_violin <- function(gr,
   )
 
   list(plot = p, calculated = calculated)
+}
+
+
+#' Helper function for calculating guide lines and labels in heatmap
+#'
+#' @param m Value matrix
+#' @inheritParams plot_bw_heatmap
+#' @return A list of ggproto objects to be plotted.
+matrix_heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode) {
+
+  axis_breaks <-
+    calculate_profile_breaks(nbins, upstream, downstream, bin_size, mode)
+  axis_labels <-
+    calculate_profile_labels(upstream, downstream, mode)
+
+  lines <- axis_breaks[2]
+  if (mode == "stretch") {
+    lines <- axis_breaks[2:3]
+  }
+
+  x <- scale_x_continuous(breaks = axis_breaks,
+                          labels = axis_labels,
+                          expand = c(0, 0))
+
+  y <- scale_y_continuous(breaks = c(1, loci),
+                          labels = c(loci, "0"),
+                          expand = c(0, 0))
+
+  gline <- geom_vline(
+    xintercept = lines,
+    linetype = "dashed",
+    color = "#111111",
+    size = 0.2
+  )
+
+  list(x, y, gline)
 }
 
 
