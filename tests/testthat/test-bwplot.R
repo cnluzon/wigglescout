@@ -85,7 +85,7 @@ test_that("plot_bw_bins_scatter with verbose set returns a plot with a caption",
   with_mock(bw_bins = m, {
     p <- plot_bw_bins_scatter(bw1, bw2, highlight = bed, verbose = TRUE)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 
@@ -94,7 +94,7 @@ test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption",
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 
@@ -103,7 +103,7 @@ test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
     expect_is(p, "ggplot")
-    expect_false("caption" %in% names(p$labels))
+    expect_true(is.null(p$labels$caption))
   })
 })
 
@@ -112,7 +112,7 @@ test_that("plot_bw_loci_scatter with remove_top returns a plot", {
   with_mock(bw_bins = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE, remove_top=0.01)
     expect_is(p, "ggplot")
-    expect_true("caption" %in% names(p$labels))
+    expect_false(is.null(p$labels$caption))
   })
 })
 

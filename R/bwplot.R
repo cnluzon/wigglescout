@@ -32,8 +32,10 @@
 #' @inheritParams bw_bins
 #' @return A ggplot object.
 #' @export
-plot_bw_bins_scatter <- function(x, y,
-                                 bg_x = NULL, bg_y = NULL,
+plot_bw_bins_scatter <- function(x,
+                                 y,
+                                 bg_x = NULL,
+                                 bg_y = NULL,
                                  norm_mode_x = "fc",
                                  norm_mode_y = "fc",
                                  bin_size = 10000,
@@ -45,61 +47,59 @@ plot_bw_bins_scatter <- function(x, y,
                                  remove_top = 0,
                                  verbose = TRUE) {
 
-
-  bins_values_x <- bw_bins(x,
-                           bg_bwfiles = bg_x,
-                           bin_size = bin_size,
-                           genome = genome,
-                           norm_mode = norm_mode_x,
-                           labels = "score"
+  bins_x <- bw_bins(
+    x,
+    bg_bwfiles = bg_x,
+    bin_size = bin_size,
+    genome = genome,
+    norm_mode = norm_mode_x,
+    labels = "score"
   )
 
-  bins_values_y <- bw_bins(y,
-                           bg_bwfiles = bg_y,
-                           bin_size = bin_size,
-                           genome = genome,
-                           norm_mode = norm_mode_y,
-                           labels = "score"
+  bins_y <- bw_bins(
+    y,
+    bg_bwfiles = bg_y,
+    bin_size = bin_size,
+    genome = genome,
+    norm_mode = norm_mode_y,
+    labels = "score"
   )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
+  main_plot <- plot_ranges_scatter(
+    bins_x,
+    bins_y,
+    highlight = highlight_data$ranges,
+    minoverlap = minoverlap,
+    highlight_label = highlight_data$labels,
+    highlight_colors = highlight_colors,
+    remove_top = remove_top
+  )
+
+  verbose_tag <- NULL
+  if (verbose) {
+    # Show parameters and relevant values
+    relevant_params <- list(
+      genome = genome,
+      bin_size = bin_size,
+      minoverlap = minoverlap,
+      remove_top = remove_top
+    )
+
+    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+  }
+
+  title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
   x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
   y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
 
-  plot_results <- plot_ranges_scatter(bins_values_x, bins_values_y,
-         highlight = highlight_data$ranges,
-         minoverlap = minoverlap,
-         highlight_label = highlight_data$labels,
-         highlight_colors = highlight_colors,
-         remove_top = remove_top
-      )
-
-  plot <- plot_results$plot + ggtitle(paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")) +
-    xlab(x_label) + ylab(y_label) + theme_default()
-
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(genome=genome,
-                            bin_size=bin_size,
-                            minoverlap=minoverlap,
-                            remove_top=remove_top)
-
-    cutoff <- plot_results$calculated$quantile
-    if (!is.null(cutoff)) {
-      cutoff <- round(cutoff, 3)
-    }
-
-    crop_values <- list(points=length(bins_values_x),
-                        removed=plot_results$calculated$filtered,
-                        NAs=plot_results$calculated$na,
-                        quantile_cutoff=cutoff)
-
-    verbose_tag <- make_caption(relevant_params, crop_values)
-    plot <- plot + labs(caption=verbose_tag)
-  }
-
-  plot
+  main_plot$plot + labs(
+    title = title,
+    x = x_label,
+    y = y_label,
+    caption = verbose_tag
+  ) + theme_default()
 }
 
 #' Bin-based violin plot of a set of bigWig files
@@ -424,9 +424,11 @@ plot_bw_heatmap <- function(bwfile,
 #' @import ggplot2
 #' @return A ggplot object.
 #' @export
-plot_bw_loci_scatter <- function(x, y,
+plot_bw_loci_scatter <- function(x,
+                                 y,
                                  loci,
-                                 bg_x = NULL, bg_y = NULL,
+                                 bg_x = NULL,
+                                 bg_y = NULL,
                                  norm_mode_x = "fc",
                                  norm_mode_y = "fc",
                                  highlight = NULL,
@@ -436,22 +438,26 @@ plot_bw_loci_scatter <- function(x, y,
                                  remove_top = 0,
                                  verbose = TRUE) {
 
-  values_x <- bw_bed(x, bg_bwfiles = bg_x, bedfile = loci,
-                     norm_mode = norm_mode_x,
-                     labels = "score"
-              )
 
-  values_y <- bw_bed(y, bg_bwfiles = bg_y, bedfile = loci,
-                     norm_mode = norm_mode_y,
-                     labels = "score"
-              )
+  values_x <- bw_bed(
+    x,
+    bg_bwfiles = bg_x,
+    bedfile = loci,
+    norm_mode = norm_mode_x,
+    labels = "score"
+  )
+
+  values_y <- bw_bed(
+    y,
+    bg_bwfiles = bg_y,
+    bedfile = loci,
+    norm_mode = norm_mode_y,
+    labels = "score"
+  )
 
   highlight_data <- process_highlight_loci(highlight, highlight_label)
 
-  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
-  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
-
-  plot_results <- plot_ranges_scatter(values_x, values_y,
+  main_plot <- plot_ranges_scatter(values_x, values_y,
                                       highlight = highlight_data$ranges,
                                       minoverlap = minoverlap,
                                       highlight_label = highlight_data$labels,
@@ -465,29 +471,25 @@ plot_bw_loci_scatter <- function(x, y,
     loci_name <- basename(loci)
   }
 
-  plot <- plot_results$plot + ggtitle(paste("Per-locus coverage (", loci_name, ")", sep = "")) +
-    xlab(x_label) + ylab(y_label) + theme_default()
-
+  verbose_tag <- NULL
   if (verbose) {
     relevant_params <- list(loci=loci_name,
                             minoverlap=minoverlap,
                             remove_top=remove_top)
 
-    cutoff <- plot_results$calculated$quantile
-    if (!is.null(cutoff)) {
-      cutoff <- round(cutoff, 3)
-    }
-
-    crop_values <- list(points=length(values_x),
-                        removed=plot_results$calculated$filtered,
-                        NAs=plot_results$calculated$na,
-                        quantile_cutoff=cutoff)
-
-    verbose_tag <- make_caption(relevant_params, crop_values)
-    plot <- plot + labs(caption=verbose_tag)
+    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
   }
 
-  plot
+  title <- paste("Per-locus coverage (", loci_name, ")", sep = "")
+  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
+  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
+
+  main_plot$plot + theme_default() + labs(
+    title = title,
+    x = x_label,
+    y = y_label,
+    caption = verbose_tag
+  )
 }
 
 #' Summary heatmap of a categorized BED or GRanges object
@@ -702,37 +704,41 @@ plot_ranges_scatter <- function(x, y,
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
-    highlight_values <- multi_ranges_overlap(
-                          filtered_values$ranges,
-                          highlight,
-                          highlight_label,
-                          minoverlap
-                        )
+    highlight_values <- multi_ranges_overlap(filtered_values$ranges,
+                                             highlight,
+                                             highlight_label,
+                                             minoverlap)
 
-    extra_plot <- geom_point(
-      data = highlight_values,
-      aes_string(x = "x", y = "y", color = "group"),
-      alpha = 0.8
-    )
+    extra_plot <- geom_point(data = highlight_values,
+                             aes_string(x = "x", y = "y", color = "group"),
+                             alpha = 0.8)
 
     if (!is.null(highlight_colors)) {
-      extra_colors <- scale_color_manual(values=highlight_colors)
+      extra_colors <- scale_color_manual(values = highlight_colors)
     }
   }
 
-  x_label <- "x"
-  y_label <- "y"
 
   df <- data.frame(filtered_values$ranges)
 
   p <- ggplot(df, aes_string(x = "x", y = "y")) +
     geom_point(color = "#bbbbbb", alpha = 0.8) +
-    xlab(x_label) +
-    ylab(y_label) +
     extra_plot +
     extra_colors
 
-  list(plot=p, calculated=filtered_values$calculated)
+  cutoff <- filtered_values$calculated$quantile
+  if (!is.null(cutoff)) {
+    cutoff <- round(cutoff, 3)
+  }
+
+  calculated <- list(
+    points = length(values),
+    removed = filtered_values$calculated$filtered,
+    NAs = filtered_values$calculated$na,
+    quantile_cutoff = cutoff
+  )
+
+  list(plot = p, calculated = calculated)
 }
 
 
