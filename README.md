@@ -3,7 +3,8 @@
 ![r-cmd-check](https://github.com/cnluzon/wigglescout/workflows/r-cmd-check/badge.svg)
 
 R package to explore and visualize genomics wig and bigWig data based on robust
-and broadly used R packages such as `rtracklayer` and `GenomicRanges`. 
+and broadly used BioConductor R packages such as `rtracklayer`, `GenomicRanges`,
+among many other great packages (see dependencies in the `DESCRIPTION` file :) ).
 
 ## Installation
 
@@ -28,7 +29,7 @@ before running the installation:
 Then you can install directly from this GitHub repository:
 
     library(remotes)
-    install_github('wigglescout', build_vignettes=TRUE)
+    install_github('cnluzon/wigglescout', build_vignettes=TRUE)
 
 ## Getting started
 
@@ -39,7 +40,10 @@ available in the package. You can check the vignettes with
 These are the groups of functions that are included in `wigglescout`:
 
 - `bwtools`. Functionality to handle `bigWig` files. Importing, binning
-    and intersecting, aggregating `BED` files.
+    and intersecting, aggregating `BED` files. This relies heavily on 
+    `rtracklayer` calculations.
+    
+- `bwplot`. Make plots out of `bwtools` calculations.
     
 ## Troubleshooting
 
@@ -50,7 +54,7 @@ These are the groups of functions that are included in `wigglescout`:
     Error: package ‘GenomeInfoDb’ could not be loaded
     Execution halted
     
-**A**: This seems to be a problem that comes from installing `Bioconductor`
+**A**: This seemed to be a problem that came from installing `Bioconductor`
 dependencies. A workaround is installing the `BioConductor` packages manually: 
 
     if (!requireNamespace('BiocManager', quietly = TRUE))
