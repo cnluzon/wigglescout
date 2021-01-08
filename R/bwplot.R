@@ -66,9 +66,9 @@ plot_bw_bins_scatter <- function(x,
     labels = "score"
   )
 
-  highlight_data <- process_highlight_loci(highlight, highlight_label)
+  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-  main_plot <- plot_ranges_scatter(
+  main_plot <- .scatterplot_body(
     bins_x,
     bins_y,
     highlight = highlight_data$ranges,
@@ -148,7 +148,7 @@ plot_bw_bins_violin <- function(bwfiles,
     columns <- make_label_from_filename(bwfiles)
   }
 
-  main_plot <- plot_ranges_violin(
+  main_plot <- .violin_body(
     bins_values[, columns],
     highlight = highlight,
     minoverlap = minoverlap,
@@ -234,7 +234,7 @@ plot_bw_heatmap <- function(bwfile,
   )
 
   main_plot <-
-    plot_matrix_heatmap(values[[1]], zmin, zmax, cmap, max_rows_allowed)
+    .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed)
 
   verbose_tag <- NULL
   if (verbose) {
@@ -260,7 +260,7 @@ plot_bw_heatmap <- function(bwfile,
       axis.line = element_blank(),
       panel.border = element_rect(color = "black", fill = NA, size = 0.1)
     ) +
-    matrix_heatmap_lines(nrow(values[[1]]), ncol(values[[1]]), bin_size, upstream, downstream, mode) +
+    .heatmap_lines(nrow(values[[1]]), ncol(values[[1]]), bin_size, upstream, downstream, mode) +
     labs(fill = make_norm_label(norm_mode, bg_bwfile),
          title = title,
          x = x_title,
@@ -337,9 +337,9 @@ plot_bw_loci_scatter <- function(x,
     labels = "score"
   )
 
-  highlight_data <- process_highlight_loci(highlight, highlight_label)
+  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-  main_plot <- plot_ranges_scatter(values_x, values_y,
+  main_plot <- .scatterplot_body(values_x, values_y,
     highlight = highlight_data$ranges,
     minoverlap = minoverlap,
     highlight_label = highlight_data$labels,
@@ -405,8 +405,8 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     remove_top = remove_top
   )
 
-  colorscale <- calculate_colorscale(norm_mode, bg_bwfiles)
-  plot <- plot_matrix_summary(summary_values)
+  colorscale <- .colorscale(norm_mode, bg_bwfiles)
+  plot <- .summary_body(summary_values)
 
   title <- paste("Coverage per region (", aggregate_by, ")")
 
@@ -466,7 +466,6 @@ plot_bw_profile <- function(bwfiles,
     remove_top = remove_top
   )
 
-
   loci <- length(import(bedfile, format = "BED"))
   y_label <- make_norm_label(norm_mode, bg_bwfiles)
   x_title <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
@@ -485,8 +484,8 @@ plot_bw_profile <- function(bwfiles,
     verbose_tag <- make_caption(relevant_params, list())
   }
 
-  plot_matrix_profile(values, show_error, colors) +
-    matrix_heatmap_lines(loci, max(values$index), bin_size,
+  .profile_body(values, show_error, colors) +
+    .heatmap_lines(loci, max(values$index), bin_size,
                          upstream, downstream, mode) +
     labs(
       title = "Profile plot",
@@ -504,7 +503,7 @@ plot_bw_profile <- function(bwfiles,
 #' @inheritParams plot_bw_heatmap
 #'
 #' @return Named list plot and calculated values
-plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
+.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed) {
   # Order matrix by mean and transpose it (image works flipped)
   m <- t(values[order(rowMeans(values), decreasing = F), ])
 
@@ -513,7 +512,7 @@ plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
   n_non_finite <- length(m[!is.finite(m)])
   m[!is.finite(m)] <- NA
 
-  zlim <- calculate_color_limits(m, zmin, zmax)
+  zlim <- .color_limits(m, zmin, zmax)
 
   zmin <- zlim[[1]]
   zmax <- zlim[[2]]
@@ -573,7 +572,7 @@ plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
     downsample_factor = downsample_factor
   )
 
-  list(plot=p, calculated=calculated)
+  list(plot = p, calculated = calculated)
 }
 
 #' Helper function plots a profile from a dataframe
@@ -583,7 +582,7 @@ plot_matrix_heatmap <- function(values, zmin, zmax, cmap, max_rows_allowed) {
 #' @param show_error Boolean wheter tho show error.
 #'
 #' @return A ggplot object
-plot_matrix_profile <- function(values, show_error, colors) {
+.profile_body <- function(values, show_error, colors) {
 
   values$min_error <- values$mean - values$sderror
   values$max_error <- values$mean + values$sderror
@@ -622,7 +621,7 @@ plot_matrix_profile <- function(values, show_error, colors) {
 #' @param values Summary matrix
 #'
 #' @importFrom reshape2 melt
-plot_matrix_summary <- function(values) {
+.summary_body <- function(values) {
   if (sum(values) == 0) {
     warning("All zero-values matrix. Using same background as bw input?")
   }
@@ -671,12 +670,14 @@ plot_matrix_summary <- function(values) {
 #' @import ggplot2
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
-plot_ranges_scatter <- function(x, y,
-                                highlight = NULL,
-                                minoverlap = 0L,
-                                highlight_label = NULL,
-                                highlight_colors = NULL,
-                                remove_top = 0) {
+.scatterplot_body <- function(x,
+                              y,
+                              highlight = NULL,
+                              minoverlap = 0L,
+                              highlight_label = NULL,
+                              highlight_colors = NULL,
+                              remove_top = 0) {
+
   values <- granges_cbind(list(x, y), list("x", "y"))
   filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
 
@@ -684,7 +685,7 @@ plot_ranges_scatter <- function(x, y,
   extra_colors <- NULL
 
   if (!is.null(highlight)) {
-    highlight_values <- multi_ranges_overlap(
+    highlight_values <- .multi_ranges_overlap(
       filtered_values$ranges,
       highlight,
       highlight_label,
@@ -729,13 +730,13 @@ plot_ranges_scatter <- function(x, y,
 #' Internal function to plot ranges in violin plot with a highlighted GRanges.
 #'
 #' @param gr GRanges object with as many columns as samples to plot.
-#' @inheritParams plot_ranges_scatter
+#' @inheritParams .scatterplot_body
 #'
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
-plot_ranges_violin <- function(gr,
+.violin_body <- function(gr,
                                highlight = NULL,
                                minoverlap = 0L,
                                highlight_label = NULL,
@@ -755,9 +756,9 @@ plot_ranges_violin <- function(gr,
   n_highlighted_points <- 0
 
   if (!is.null(highlight)) {
-    highlight_data <- process_highlight_loci(highlight, highlight_label)
+    highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-    highlight_values <- multi_ranges_overlap(
+    highlight_values <- .multi_ranges_overlap(
       bins_filtered$ranges,
       highlight_data$ranges,
       highlight_data$labels,
@@ -814,12 +815,10 @@ plot_ranges_violin <- function(gr,
 #' @param nbins Number of bins (columns)
 #' @inheritParams plot_bw_heatmap
 #' @return A list of ggproto objects to be plotted.
-matrix_heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode) {
+.heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode) {
 
-  axis_breaks <-
-    calculate_profile_breaks(nbins, upstream, downstream, bin_size, mode)
-  axis_labels <-
-    calculate_profile_labels(upstream, downstream, mode)
+  axis_breaks <- .profile_breaks(nbins, upstream, downstream, bin_size, mode)
+  axis_labels <- .profile_labels(upstream, downstream, mode)
 
   lines <- axis_breaks[2]
   if (mode == "stretch") {
@@ -852,15 +851,16 @@ matrix_heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mo
 #' @param labels Labels to each of the other_ranges.
 #' @param minoverlap Minimum overlap to consider an overlap.
 #'
+#' @importFrom purrr partial map2
 #' @return A data.frame in tall format with the values of the overlapping loci.
 #'    Loci returned belong to other_ranges, NOT main_ranges. A group field
 #'    is added as factor.
-multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) {
-  label_df <- function(df, name) {
+.multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) {
+  .label_df <- function(df, name) {
     data.frame(df, group = name)
   }
 
-  subset_func <- purrr::partial(
+  subset_func <- partial(
     IRanges::subsetByOverlaps,
     x = main_ranges,
     minoverlap = minoverlap
@@ -869,7 +869,7 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
   ranges_subset <- lapply(other_ranges, subset_func)
   subset_df <- lapply(ranges_subset, data.frame)
 
-  df_values_labeled <- purrr::map2(subset_df, labels, label_df)
+  df_values_labeled <- map2(subset_df, labels, .label_df)
   highlight_values <- do.call(rbind, df_values_labeled)
 
   # Order of factors need to match to assign properly colors to points
@@ -881,7 +881,13 @@ multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) 
 }
 
 
-calculate_colorscale <- function(norm_mode, bg_bwfiles) {
+#' Summary heatmap colorscale.
+#'
+#' @param norm_mode Type of normalization.
+#' @param bg_bwfiles Background files.
+#'
+#' @return a ggproto object
+.colorscale <- function(norm_mode, bg_bwfiles) {
   legend_label <- make_norm_label(norm_mode, bg_bwfiles)
   colorscale <-
     scale_fill_gradient(name = legend_label, low = "white", high = "#B22222")
@@ -904,7 +910,7 @@ calculate_colorscale <- function(norm_mode, bg_bwfiles) {
 #' @param zmax Max value. Overrides percentile.
 #'
 #' @return A pair of c(min, max)
-calculate_color_limits <- function(m, zmin, zmax) {
+.color_limits <- function(m, zmin, zmax) {
   # colorscale limits percentiles: 0.01 - 0.99
   zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm = TRUE)
 
@@ -918,7 +924,13 @@ calculate_color_limits <- function(m, zmin, zmax) {
   zlim
 }
 
-calculate_profile_breaks <- function(nrows, upstream, downstream, bin_size, mode) {
+#' Compute where the break ticks go in heatmap and profile
+#'
+#' @param nrows Number of bins
+#' @inheritParams plot_bw_profile
+#'
+#' @return Array of numeric
+.profile_breaks <- function(nrows, upstream, downstream, bin_size, mode) {
   upstream_nbins <- floor(upstream / bin_size)
   downstream_nbins <- floor(downstream / bin_size)
 
@@ -937,7 +949,14 @@ calculate_profile_breaks <- function(nrows, upstream, downstream, bin_size, mode
   axis_breaks
 }
 
-calculate_profile_labels <- function(upstream, downstream, mode) {
+#' Make profile labels
+#'
+#' @param upstream Basepairs upstream
+#' @param downstream Basepairs downstream
+#' @param mode Plot mode (stretch, start, end, center)
+#'
+#' @return Array of strings
+.profile_labels <- function(upstream, downstream, mode) {
   if (mode == "stretch") {
     c(
       paste("-", upstream / 1000, "kb", sep = ""),
@@ -953,7 +972,6 @@ calculate_profile_labels <- function(upstream, downstream, mode) {
   }
 }
 
-
 #' Internal processing of loci sets and labels.
 #'
 #' This allows to process equally lists of GRanges objects or BED files. Note
@@ -966,7 +984,7 @@ calculate_profile_labels <- function(upstream, downstream, mode) {
 #'   in which case loci_sets are assumed to be BED files.
 
 #' @return a named list with ranges and labels.
-process_highlight_loci <- function(loci_sets, labels) {
+.convert_and_label_loci <- function(loci_sets, labels) {
   gr_list <- loci_sets
   lab_list <- labels
   if (!is.null(gr_list)) {
