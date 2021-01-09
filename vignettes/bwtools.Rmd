@@ -97,7 +97,8 @@ plot_bw_bins_violin(
   c(h33_chip, h3k9me3_chip),
   bin_size = 50000,
   labels = c("H3.3", "H3K9me3"),
-  remove_top = 0.001
+  remove_top = 0.001,
+  selection = locus # Plot can be subset to a certain GRanges.
 )
 ```
 
@@ -106,10 +107,6 @@ default, such as parameters used and calculated values: how many `NA` values wer
 found, if any, how many points were excluded from the plot due to quantile
 cutoff, and so on. Note also that in this case the quantile cutoff seems low,
 but it is because top elements are removed according to mean in all samples.
-
-In this example, since the bundled data only has signal in a very small subset
-of the bins, you only plot a few of those 54531 points, the rest are `NA` 
-values.
 
 You could also be interested in checking out how are certain *loci*  behaving
 in comparison with the global distribution. You can do so providing a `highlight`
@@ -121,7 +118,8 @@ plot_bw_bins_violin(
   bin_size = 50000,
   labels = c("H3.3", "H3K9me3"),
   remove_top = 0.001,
-  highlight = genes
+  highlight = genes,
+  selection = locus # Plot can be subset to a certain GRanges.
 )
 ```
 
@@ -136,7 +134,9 @@ plot_bw_bins_scatter(
   h3k9me3_chip,
   bin_size = 50000,
   remove_top = 0.001,
-  highlight = genes
+  highlight = genes,
+  highlight_label = "Genes",
+  selection = locus # Plot can be subset to a certain GRanges.
 )
 ```
 
@@ -392,6 +392,7 @@ not recommended to change it.
 # Plotting functions
 
 Plots can be made with functions:
+
 - `plot_bw_bins_scatter`. A genome-wide bin-based scatterplot. Needs `genome`
 and `bin_size` parameters. 
 - `plot_bw_loci_scatter`. A locus-based scatterplot. Needs a `loci` file or `GRanges` object.
@@ -427,7 +428,7 @@ For a set of bigWig files, it is possible to visualize the genome-wide signal
 distribution. For example:
 
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=7}
-plot_bw_bins_violin(h33_chip, bin_size = 50000)
+plot_bw_bins_violin(h33_chip, bin_size = 50000, selection = locus)
 ```
 
 Note that `bin_size` parameter influences the time any of these functions take
@@ -436,7 +437,7 @@ to run. Reasonable resolution for this is 5000 or 10000.
 It is possible to plot several bigWig files at a time:
 
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=7}
-plot_bw_bins_violin(c(h33_chip, input_chip), bin_size = 50000)
+plot_bw_bins_violin(c(h33_chip, input_chip), bin_size = 50000, selection = locus)
 ```
 
 Additionally, one can highlight bins that overlap with a certain set of interest
@@ -447,7 +448,8 @@ plot_bw_bins_violin(
   c(h33_chip, input_chip),
   bin_size = 50000,
   highlight = genes,
-  highlight_color = c("red", "red") # It is possible to provide different colors
+  highlight_color = c("red", "red"), # It is possible to provide different colors
+  selection = locus
 )
 ```
 
@@ -462,7 +464,8 @@ plot_bw_bins_violin(
   bg_bwfiles = input_chip,
   bin_size = 50000,
   highlight = genes,
-  highlight_color = c("red")
+  highlight_color = c("red"),
+  selection = locus
 )
 ```
 
@@ -477,7 +480,8 @@ plot_bw_bins_violin(
   bin_size = 50000,
   highlight = genes,
   highlight_color = c("#000088"), # Colors can be also HTML codes
-  norm_mode = "log2fc"
+  norm_mode = "log2fc",
+  selection = locus
 )
 ```
 
@@ -496,7 +500,8 @@ One example would be looking at H3.3 versus H3K9me3 in this sample data:
 plot_bw_bins_scatter(
   x = h33_chip,
   y = h3k9me3_chip,
-  bin_size = 50000
+  bin_size = 50000,
+  selection = locus
 )
 ```
 
@@ -516,7 +521,8 @@ plot_bw_bins_scatter(
   highlight = genes,
   highlight_colors = "red",
   highlight_label = "genes", # It is also possible to label the groups
-  norm_mode_x = "log2fc" # Each norm mode is provided separately
+  norm_mode_x = "log2fc", # Each norm mode is provided separately
+  selection = locus
 )
 ```
 
