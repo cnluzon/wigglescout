@@ -19,7 +19,8 @@ plot_bw_bins_scatter(
   highlight_colors = NULL,
   remove_top = 0,
   verbose = TRUE,
-  density = FALSE
+  density = FALSE,
+  selection = NULL
 )
 }
 \arguments{
@@ -54,6 +55,10 @@ whole distribution (remove_top == 0).}
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 
 \item{density}{Plot density tiles for global distribution instead of points.}
+
+\item{selection}{A GRanges object to restrict binning to a certain set of
+intervals. This is useful for debugging and improving performance of
+locus specific analyses.}
 }
 \value{
 A ggplot object.
