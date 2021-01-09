@@ -58,6 +58,11 @@ test_that("plot_bw_bins_scatter with defaults returns a plot", {
   })
 })
 
+test_that("plot_bw_bins_scatter with selection returns a plot", {
+  p <- plot_bw_bins_scatter(bw1, bw2, selection = bw_limits)
+  expect_is(p, "ggplot")
+})
+
 test_that("plot_bw_bins_scatter with highlight set returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
   with_mock(bw_bins = m, {
@@ -156,7 +161,8 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
                 bin_size = bin_size,
                 genome = genome,
                 norm_mode = norm_mode_x,
-                labels = "score"
+                labels = "score",
+                selection = selection
               )
   )
 
@@ -166,7 +172,8 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bin_size = 10000,
               genome = "mm9",
               norm_mode = "fc",
-              labels = "score"
+              labels = "score",
+              selection = NULL
   )
 
   expect_args(m, 2,
@@ -175,7 +182,8 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
               bin_size = 10000,
               genome = "mm9",
               norm_mode = "fc",
-              labels = "score"
+              labels = "score",
+              selection = NULL
   )
 })
 
@@ -314,7 +322,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
                              bin_size = 5000,
                              norm_mode = "log2fc",
                              genome = "hg38",
-                             remove_top = 0
+                             remove_top = 0,
     )
   })
 
@@ -327,7 +335,8 @@ test_that("plot_bw_bins_violin passes on parameters", {
                       per_locus_stat = per_locus_stat,
                       norm_mode = norm_mode,
                       # FIXME: Remove top is done outside this function
-                      remove_top = 0
+                      remove_top = 0,
+                      selection = selection
               )
   )
 
@@ -339,7 +348,8 @@ test_that("plot_bw_bins_violin passes on parameters", {
               genome = "hg38",
               per_locus_stat = "mean",
               norm_mode = "log2fc",
-              remove_top = 0
+              remove_top = 0,
+              selection = NULL
   )
 
 })

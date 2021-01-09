@@ -49,14 +49,16 @@ plot_bw_bins_scatter <- function(x,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE,
-                                 density = FALSE) {
+                                 density = FALSE,
+                                 selection = NULL) {
   bins_x <- bw_bins(
     x,
     bg_bwfiles = bg_x,
     bin_size = bin_size,
     genome = genome,
     norm_mode = norm_mode_x,
-    labels = "score"
+    labels = "score",
+    selection = selection
   )
 
   bins_y <- bw_bins(
@@ -65,7 +67,8 @@ plot_bw_bins_scatter <- function(x,
     bin_size = bin_size,
     genome = genome,
     norm_mode = norm_mode_y,
-    labels = "score"
+    labels = "score",
+    selection = selection
   )
 
   highlight_data <- .convert_and_label_loci(highlight, highlight_label)
@@ -134,7 +137,8 @@ plot_bw_bins_violin <- function(bwfiles,
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0,
-                                verbose = TRUE) {
+                                verbose = TRUE,
+                                selection = NULL) {
   bins_values <- bw_bins(
     bwfiles,
     bg_bwfiles = bg_bwfiles,
@@ -143,7 +147,8 @@ plot_bw_bins_violin <- function(bwfiles,
     genome = genome,
     per_locus_stat = per_locus_stat,
     norm_mode = norm_mode,
-    remove_top = 0
+    remove_top = 0,
+    selection = selection
   )
 
   columns <- labels
