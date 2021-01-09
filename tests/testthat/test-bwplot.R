@@ -420,6 +420,16 @@ test_that(
   })
 
 test_that(
+  "plot_bw_profile with defaults has a line layer", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed)
+      expect_is(p, "ggplot")
+      expect_true("GeomLine" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    })
+  })
+
+test_that(
   "plot_bw_profile with show_error has a ribbon layer", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
