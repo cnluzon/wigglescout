@@ -17,7 +17,8 @@ plot_bw_bins_violin(
   highlight_label = NULL,
   highlight_colors = NULL,
   remove_top = 0,
-  verbose = TRUE
+  verbose = TRUE,
+  selection = NULL
 )
 }
 \arguments{
@@ -51,6 +52,10 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 whole distribution (remove_top == 0).}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
+
+\item{selection}{A GRanges object to restrict binning to a certain set of
+intervals. This is useful for debugging and improving performance of
+locus specific analyses.}
 }
 \value{
 A ggplot object.
