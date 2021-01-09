@@ -203,6 +203,10 @@ plot_bw_bins_violin <- function(bwfiles,
 #'   on the y axis until it fits max_rows_allowed. This speeds up plotting of
 #'   very large matrices, where higher resolution would not be perceivable by eye.
 #' @param verbose Put a caption with relevant parameters on the plot.
+#' @param order_by Specific order to display rows. By default rows are sorted
+#'   decreasingly by mean. Order should be an array of integers of the same
+#'   length as number of rows. These can be obtained as a result of order()
+#'   function, if one would want to sort one heatmap by values on another one.
 #' @importFrom dplyr group_by summarise
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
@@ -222,6 +226,7 @@ plot_bw_heatmap <- function(bwfile,
                             zmin = NULL,
                             zmax = NULL,
                             max_rows_allowed = 10000,
+                            order_by = NULL,
                             verbose = TRUE) {
   values <- bw_heatmap(
     bwfile,
@@ -237,7 +242,7 @@ plot_bw_heatmap <- function(bwfile,
   )
 
   main_plot <-
-    .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed)
+    .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed, order_by)
 
   verbose_tag <- NULL
   if (verbose) {
@@ -511,9 +516,12 @@ plot_bw_profile <- function(bwfiles,
 #' @inheritParams plot_bw_heatmap
 #'
 #' @return Named list plot and calculated values
-.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed) {
+.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed, order_by) {
   # Order matrix by mean and transpose it (image works flipped)
-  m <- t(values[order(rowMeans(values), decreasing = F), ])
+  if (is.null(order_by)) {
+    order_by <- order(rowMeans(values), decreasing = F)
+  }
+  m <- t(values[order_by, ])
 
   nvalues <- nrow(m) * ncol(m)
 

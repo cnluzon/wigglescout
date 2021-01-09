@@ -19,6 +19,7 @@ plot_bw_heatmap(
   zmin = NULL,
   zmax = NULL,
   max_rows_allowed = 10000,
+  order_by = NULL,
   verbose = TRUE
 )
 }
@@ -67,6 +68,11 @@ this to 0.99.}
 plot. If the amount of loci exceeds this value, the plot will be binned
 on the y axis until it fits max_rows_allowed. This speeds up plotting of
 very large matrices, where higher resolution would not be perceivable by eye.}
+
+\item{order_by}{Specific order to display rows. By default rows are sorted
+decreasingly by mean. Order should be an array of integers of the same
+length as number of rows. These can be obtained as a result of order()
+function, if one would want to sort one heatmap by values on another one.}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 }

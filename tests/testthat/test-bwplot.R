@@ -4,6 +4,8 @@ library(testthat)
 library(mockery)
 
 
+# Setup -------------------------------------------------------------------
+
 get_file_path <- function(filename) {
   system.file("extdata", filename, package = "wigglescout")
 }
@@ -46,6 +48,8 @@ test_that("Setup files exist", {
 })
 
 
+# Bins scatter tests ----------------------------------------------
+
 test_that("plot_bw_bins_scatter with defaults returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
   with_mock(bw_bins = m, {
@@ -53,15 +57,6 @@ test_that("plot_bw_bins_scatter with defaults returns a plot", {
     expect_is(p, "ggplot")
   })
 })
-
-test_that("plot_bw_loci_scatter with defaults returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_loci_scatter(bw1, bw2, bed)
-    expect_is(p, "ggplot")
-  })
-})
-
 
 test_that("plot_bw_bins_scatter with highlight set returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
@@ -71,46 +66,10 @@ test_that("plot_bw_bins_scatter with highlight set returns a plot", {
   })
 })
 
-test_that("plot_bw_loci_scatter with highlight set returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_loci_scatter(bw1, bw2, bed, highlight = bed)
-    expect_is(p, "ggplot")
-  })
-})
-
-
 test_that("plot_bw_bins_scatter with verbose set returns a plot with a caption", {
   m <- mock(reduced_bins, reduced_bins_2)
   with_mock(bw_bins = m, {
     p <- plot_bw_bins_scatter(bw1, bw2, highlight = bed, verbose = TRUE)
-    expect_is(p, "ggplot")
-    expect_false(is.null(p$labels$caption))
-  })
-})
-
-test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE)
-    expect_is(p, "ggplot")
-    expect_false(is.null(p$labels$caption))
-  })
-})
-
-test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
-    expect_is(p, "ggplot")
-    expect_true(is.null(p$labels$caption))
-  })
-})
-
-test_that("plot_bw_loci_scatter with remove_top returns a plot", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE, remove_top=0.01)
     expect_is(p, "ggplot")
     expect_false(is.null(p$labels$caption))
   })
@@ -155,7 +114,6 @@ test_that("plot_bw_bins_scatter crashes with unmatched labels/highlight", {
     )
   })
 })
-
 
 test_that("plot_bw_bins_scatter with GRanges and no label crashes", {
   m <- mock(reduced_bins, reduced_bins_2)
@@ -222,6 +180,52 @@ test_that("plot_bw_bins_scatter with bg files passes on parameters", {
 })
 
 
+# Loci scatter tests ----------------------------------------------
+
+test_that("plot_bw_loci_scatter with defaults returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, bed)
+    expect_is(p, "ggplot")
+  })
+})
+
+test_that("plot_bw_loci_scatter with highlight set returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, bed, highlight = bed)
+    expect_is(p, "ggplot")
+  })
+})
+
+test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE)
+    expect_is(p, "ggplot")
+    expect_false(is.null(p$labels$caption))
+  })
+})
+
+test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
+    expect_is(p, "ggplot")
+    expect_true(is.null(p$labels$caption))
+  })
+})
+
+test_that("plot_bw_loci_scatter with remove_top returns a plot", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE, remove_top=0.01)
+    expect_is(p, "ggplot")
+    expect_false(is.null(p$labels$caption))
+  })
+})
+
+# Bins violin tests ----------------------------------------------
 
 test_that("plot_bw_bins_violin with defaults returns a plot", {
   m <- mock(reduced_bins_all)
@@ -300,7 +304,6 @@ test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
   })
 })
 
-
 test_that("plot_bw_bins_violin passes on parameters", {
   m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
@@ -341,7 +344,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
 
 })
 
-
+# Summary heatmap tests -------------------------------------------
 
 test_that(
   "plot_bw_loci_summary_heatmap with defaults returns a ggplot object", {
@@ -369,7 +372,6 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
     expect_true(is.null(p$labels$caption))
   })
 })
-
 
 test_that(
   "plot_bw_loci_summary_heatmap passes parameters on", {
@@ -406,6 +408,7 @@ test_that(
     )
   })
 
+# Profile tests ----------------------------------------------
 
 test_that(
   "plot_bw_profile with defaults returns a ggplot object", {
@@ -425,7 +428,6 @@ test_that(
       expect_true("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))
     })
   })
-
 
 test_that(
   "plot_bw_profile verbose returns a plot with a caption", {
@@ -473,7 +475,6 @@ test_that(
       expect_true(is.null(p$labels$caption))
     })
   })
-
 
 test_that(
   "plot_bw_profile passes on parameters to bw_profile call", {
@@ -526,25 +527,62 @@ test_that(
     )
   })
 
+# Heatmap tests ----------------------------------------------
+
 test_that(
   "plot_bw_heatmap with defaults returns a ggplot object", {
-    m <- mock(profile_values)
-    with_mock(bw_profile = m, {
+    m <- mock(heatmap_values)
+    with_mock(bw_heatmap = m, {
       p <- plot_bw_heatmap(bw1, bedfile = bed)
       expect_is(p, "ggplot")
     })
   })
 
 test_that(
-  "plot_bw_heatmap with verbose returns a ggplot object wit ha caption", {
-    m <- mock(profile_values)
-    with_mock(bw_profile = m, {
+  "plot_bw_heatmap sorts decreasingly by mean", {
+    m <- mock(heatmap_values, heatmap_values)
+    # y axis works reversed here
+    other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = F)
+    with_mock(bw_heatmap = m, {
+      p <- plot_bw_heatmap(bw1, bedfile = bed)
+      p2 <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
+      expect_is(p, "ggplot")
+      expect_identical(p$data, p2$data)
+    })
+  })
+
+test_that(
+  "plot_bw_heatmap with order returns a ggplot object", {
+    m <- mock(heatmap_values)
+    other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = T)
+    with_mock(bw_heatmap = m, {
+      p <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_heatmap with different order returns a different ggplot", {
+    m <- mock(heatmap_values, heatmap_values)
+    other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = T)
+    with_mock(bw_heatmap = m, {
+      p <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
+      p2 <- plot_bw_heatmap(bw1, bedfile = bed)
+
+      expect_is(p, "ggplot")
+      expect_false(p$data[1, "value"] == p2$data[1, "value"])
+    })
+  })
+
+test_that(
+  "plot_bw_heatmap with verbose returns a ggplot object with a caption", {
+    m <- mock(heatmap_values)
+    with_mock(bw_heatmap = m, {
       p <- plot_bw_heatmap(bw1, bedfile = bed)
       expect_is(p, "ggplot")
       expect_true("caption" %in% names(p$labels))
     })
   })
-
 
 test_that(
   "plot_bw_heatmap passes on parameters to bw_heatmap call", {
