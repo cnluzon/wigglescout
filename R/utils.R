@@ -162,7 +162,7 @@ remove_top_by_mean <- function(granges, quantile, columns) {
   if (quantile > 0) {
     if (ncol(mcols(granges)) > 1) {
       valid_columns <- data.frame(mcols(granges))
-      valid_columns <- valid_columns[, columns]
+      valid_columns <- valid_columns[, columns, drop = FALSE]
       means <- rowMeans(valid_columns)
       top_quantile <- quantile(means, probs = c(1 - quantile), na.rm = TRUE)
       granges$means <- means
@@ -182,7 +182,7 @@ remove_top_by_mean <- function(granges, quantile, columns) {
       n_na <- sum(is.na(mcols(granges)[, 1]))
       granges <- granges[!is.na(mcols(granges)[, 1]), ]
 
-      n_filtered <- length(granges[mcols(granges)[, 1] <= top_quantile, ])
+      n_filtered <- length(granges[mcols(granges)[, 1] > top_quantile, ])
       granges <- granges[mcols(granges)[, 1] <= top_quantile, ]
     }
   }
@@ -195,6 +195,19 @@ remove_top_by_mean <- function(granges, quantile, columns) {
   )
 }
 
+#' Round a value. If it's NULL, returns NULL.
+#'
+#' @param v Value
+#' @param digits How many digits round
+#'
+#' @return Rounded value, or NULL
+round_ignore_null <- function(v, digits=3) {
+  rounded <- v
+  if (!is.null(v)) {
+    rounded <- round(v, digits)
+  }
+  rounded
+}
 
 #' Set default theme as classic with larger font size
 #' @import ggplot2
