@@ -166,6 +166,24 @@ test_that("plot_bw_bins_scatter with GRanges and no label crashes", {
     }), "GRanges used as highlight loci but no labels provided")
 })
 
+test_that("plot_bw_bins_scatter with density has a tile layer", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_scatter(bw1, bw2, bg_x = bg_bw, bg_y = bg_bw, density = TRUE)
+  })
+  expect_is(p, "ggplot")
+  expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+})
+
+test_that("plot_bw_bins_scatter with no density has no tile layer", {
+  m <- mock(reduced_bins, reduced_bins_2)
+  with_mock(bw_bins = m, {
+    p <- plot_bw_bins_scatter(bw1, bw2, bg_x = bg_bw, bg_y = bg_bw, density = FALSE)
+  })
+  expect_is(p, "ggplot")
+  expect_false("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+  expect_true("GeomPoint" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+})
 
 test_that("plot_bw_bins_scatter with bg files passes on parameters", {
   m <- mock(reduced_bins, reduced_bins_2)

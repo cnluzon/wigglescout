@@ -30,6 +30,7 @@
 #'  If not provided, filenames are used.
 #' @param highlight_colors Array of color values for the highlighting groups
 #' @param verbose Put a caption with relevant parameters on the plot.
+#' @param density Plot density tiles for global distribution instead of points.
 #' @import ggplot2
 #' @inheritParams bw_bins
 #' @return A ggplot object.
@@ -47,7 +48,8 @@ plot_bw_bins_scatter <- function(x,
                                  highlight_label = NULL,
                                  highlight_colors = NULL,
                                  remove_top = 0,
-                                 verbose = TRUE) {
+                                 verbose = TRUE,
+                                 density = FALSE) {
   bins_x <- bw_bins(
     x,
     bg_bwfiles = bg_x,
@@ -75,7 +77,8 @@ plot_bw_bins_scatter <- function(x,
     minoverlap = minoverlap,
     highlight_label = highlight_data$labels,
     highlight_colors = highlight_colors,
-    remove_top = remove_top
+    remove_top = remove_top,
+    density = density
   )
 
   verbose_tag <- NULL
@@ -673,6 +676,7 @@ plot_bw_profile <- function(bwfiles,
 #' @param highlight_colors Array of color values for the highlighting groups
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
+#' @param density Plot density tiles for global distribution instead of points.
 #' @import ggplot2
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
@@ -682,7 +686,8 @@ plot_bw_profile <- function(bwfiles,
                               minoverlap = 0L,
                               highlight_label = NULL,
                               highlight_colors = NULL,
-                              remove_top = 0) {
+                              remove_top = 0,
+                              density = FALSE) {
 
   values <- granges_cbind(list(x, y), list("x", "y"))
   filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
@@ -712,8 +717,14 @@ plot_bw_profile <- function(bwfiles,
 
   df <- data.frame(filtered_values$ranges)
 
+  points <- geom_point(color = "#bbbbbb", alpha = 0.7)
+  if (density) {
+    points <- list(geom_bin2d(binwidth=0.05),
+                   scale_fill_gradient(low="#dddddd", high="#B22222"))
+  }
+
   p <- ggplot(df, aes_string(x = "x", y = "y")) +
-    geom_point(color = "#bbbbbb", alpha = 0.8) +
+    points +
     extra_plot +
     extra_colors
 

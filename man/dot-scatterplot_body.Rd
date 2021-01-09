@@ -11,7 +11,8 @@
   minoverlap = 0L,
   highlight_label = NULL,
   highlight_colors = NULL,
-  remove_top = 0
+  remove_top = 0,
+  density = FALSE
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ If not provided, column names are used.}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{density}{Plot density tiles for global distribution instead of points.}
 }
 \value{
 A named list where plot is a ggplot object and calculated is a list

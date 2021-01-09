@@ -18,7 +18,8 @@ plot_bw_bins_scatter(
   highlight_label = NULL,
   highlight_colors = NULL,
   remove_top = 0,
-  verbose = TRUE
+  verbose = TRUE,
+  density = FALSE
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ If not provided, filenames are used.}
 whole distribution (remove_top == 0).}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
+
+\item{density}{Plot density tiles for global distribution instead of points.}
 }
 \value{
 A ggplot object.
