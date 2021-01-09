@@ -1,5 +1,5 @@
 ---
-title: "Calculating summary values over bigWig files"
+title: "Wigglescout documentation"
 author: "Carmen Navarro"
 date: "`r Sys.Date()`"
 output:
@@ -24,7 +24,8 @@ knitr::opts_chunk$set(
 
 # Summary
 
-`wigglescout` allows you to summarize bigWig files in two main ways:
+`wigglescout` allows you to summarize and visualize the contents of 
+bigWig files in two main ways:
 
 - **Genome-wide**. Genome is partitioned on equally-sized bins and
 their aggregated value is calculated. Useful to get a general idea of the
@@ -37,11 +38,8 @@ calculate values over bigWig files start with `bw_`. These return `GRanges`
 objects when possible, `data.frame` objects otherwise (i.e. when values are
 summarized over some category, genomic location is lost in this process).
 
-# Available functions
-
-bigWig data can be summarized genome-wide using `bw_bins` function or across
-a set of *loci* using either: `bw_bed`, `bw_heatmap` or `bw_profile`.
-
+On the other hand, functions that plot such values and that usually make
+internal use of `bw_` functions, start with `plot_`.
 
 # About bundled data
 
@@ -69,6 +67,106 @@ locus <- GRanges(seqnames = "chr15", IRanges(102600000, 103100000))
 ```
 
 All these values are paths to bigWig and BED files.
+
+# Quick start
+
+Here is a small example of what you can do with `wigglescout`. Imagine you want
+to take a look at how values are distributed overall in your bigwig files,
+genome-wide:
+
+```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
+plot_bw_bins_violin(
+  c(h33_chip, h3k9me3_chip),
+  bin_size = 50000,
+  labels = c("H3.3", "H3K9me3"),
+  remove_top = 0.001
+)
+```
+
+For transparency and reproducibility, plots show relevant underlying values by
+default, such as parameters used and calculated values: how many `NA` values were
+found, if any, how many points were excluded from the plot due to quantile
+cutoff, and so on. Note also that in this case the quantile cutoff seems low,
+but it is because top elements are removed according to mean in all samples.
+
+In this example, since the bundled data only has signal in a very small subset
+of the bins, you only plot a few of those 54531 points, the rest are `NA` 
+values.
+
+You could also be interested in checking out how are certain *loci*  behaving
+in comparison with the global distribution. You can do so providing a `highlight`
+parameter:
+
+```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
+plot_bw_bins_violin(
+  c(h33_chip, h3k9me3_chip),
+  bin_size = 50000,
+  labels = c("H3.3", "H3K9me3"),
+  remove_top = 0.001,
+  highlight = genes
+)
+```
+
+Here you see 5 bins that overlap with the loci in the `genes` file. 
+
+You could also want to pairwise compare the bins. You can do so by plotting
+a scatterplot:
+
+```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
+plot_bw_bins_scatter(
+  h33_chip,
+  h3k9me3_chip,
+  bin_size = 50000,
+  remove_top = 0.001,
+  highlight = genes
+)
+```
+
+In fact, you may be interested in looking at the signal just at the genes instead:
+
+```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
+plot_bw_loci_scatter(
+  h33_chip,
+  h3k9me3_chip,
+  loci = genes
+)
+
+```
+
+You can also check how these two signal behave globally in a more meaningful
+way, i.e. in relation with genomic annotations. You can do this with 
+`bw_loci_summary_heatmap`:
+
+```{r, warning = FALSE, message = FALSE, fig.width = 11, fig.height = 5}
+# ChromHMM is a genome-wide annotation according to epigenetics marks. Each
+# locus is tagged by a category. And the amount of categories must be limited.
+# In this case, it is fifteen. 
+chrom_values <- import(chromhmm, format = "BED")
+head(chrom_values)
+
+plot_bw_loci_summary_heatmap(
+  c(h33_chip, h3k9me3_chip),
+  loci = chromhmm,
+)
+```
+
+In a more detailed way, you can look at the signal profile at the given genes,
+using `plot_bw_profile`:
+
+```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
+plot_bw_profile(
+  c(h33_chip, h3k9me3_chip, input_chip),
+  bedfile = genes,
+  labels = c("H3.3", "H3K9me3", "Input")
+)
+```
+
+
+# Available functions
+
+bigWig data can be summarized genome-wide using `bw_bins` function or across
+a set of *loci* using either: `bw_bed`, `bw_heatmap` or `bw_profile`.
+
 
 # Genome-wide analysis
 
