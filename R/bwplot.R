@@ -572,8 +572,8 @@ plot_bw_profile <- function(bwfiles,
 
   calculated <- list(
     ncells = nvalues,
-    zmin = round(zmin, 3),
-    zmax = round(zmax, 3),
+    zmin = round_ignore_null(zmin, 3),
+    zmax = round_ignore_null(zmax, 3),
     top_capped_vals = n_top_capped,
     bottom_capped_vals = n_bottom_capped,
     non_finite = n_non_finite,
@@ -689,8 +689,32 @@ plot_bw_profile <- function(bwfiles,
                               remove_top = 0,
                               density = FALSE) {
 
-  values <- granges_cbind(list(x, y), list("x", "y"))
-  filtered_values <- remove_top_by_mean(values, remove_top, c("x", "y"))
+  filtered_values_x <- remove_top_by_mean(x, remove_top, c("score"))
+  filtered_values_y <- remove_top_by_mean(y, remove_top, c("score"))
+
+  # merge both
+  df_x <- data.frame(filtered_values_x$ranges)
+  df_y <- data.frame(filtered_values_y$ranges)
+
+  bin_id <- c("seqnames", "start", "end", "strand", "width")
+  df <- merge(df_x, df_y, by = bin_id)
+  df <- df[, c(bin_id, "score.x", "score.y")]
+  colnames(df) <- c(bin_id, "x", "y")
+
+  filtered_values <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
+
+  calculated <-
+    list(
+      points = nrow(df),
+      NA.x = filtered_values_x$calculated$na,
+      filtered.x = filtered_values_x$calculated$filtered,
+      quant.x = round_ignore_null(filtered_values_x$calculated$quantile),
+      NA.y = filtered_values_y$calculated$na,
+      filtered.y = filtered_values_y$calculated$filtered,
+      quant.y = round_ignore_null(filtered_values_y$calculated$quantile)
+    )
+
+  filtered_values <- list(ranges=filtered_values, calculated=calculated)
 
   extra_plot <- NULL
   extra_colors <- NULL
@@ -714,7 +738,6 @@ plot_bw_profile <- function(bwfiles,
     }
   }
 
-
   df <- data.frame(filtered_values$ranges)
 
   points <- geom_point(color = "#bbbbbb", alpha = 0.7)
@@ -727,18 +750,6 @@ plot_bw_profile <- function(bwfiles,
     points +
     extra_plot +
     extra_colors
-
-  cutoff <- filtered_values$calculated$quantile
-  if (!is.null(cutoff)) {
-    cutoff <- round(cutoff, 3)
-  }
-
-  calculated <- list(
-    points = length(values),
-    removed = filtered_values$calculated$filtered,
-    NAs = filtered_values$calculated$na,
-    quantile_cutoff = cutoff
-  )
 
   list(plot = p, calculated = calculated)
 }
@@ -808,18 +819,12 @@ plot_bw_profile <- function(bwfiles,
     extra_plot +
     extra_colors
 
-
-  cutoff <- bins_filtered$calculated$quantile
-  if (!is.null(cutoff)) {
-    cutoff <- round(cutoff, 3)
-  }
-
   calculated <- list(
     points = length(gr),
     highlighted = n_highlighted_points,
     removed = bins_filtered$calculated$filtered,
     NAs = bins_filtered$calculated$na,
-    quantile_cutoff = cutoff
+    quantile_cutoff = round_ignore_null(bins_filtered$calculated$quantile)
   )
 
   list(plot = p, calculated = calculated)
