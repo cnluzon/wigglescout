@@ -154,20 +154,18 @@ natural_sort_by_field <- function(df, col) {
 #'   values: quantile_value, filtered, na_values.
 #' @export
 remove_top_by_mean <- function(granges, quantile, columns) {
-  # !names(valid_columns) %in% c("name")
-  n_na <- 0
   n_filtered <- 0
   top_quantile <- NULL
 
+  valid_columns <- data.frame(mcols(granges))
+  valid_columns <- valid_columns[, columns, drop = FALSE]
+  n_na <- sum(is.na(valid_columns))
+
   if (quantile > 0) {
     if (ncol(mcols(granges)) > 1) {
-      valid_columns <- data.frame(mcols(granges))
-      valid_columns <- valid_columns[, columns, drop = FALSE]
       means <- rowMeans(valid_columns)
       top_quantile <- quantile(means, probs = c(1 - quantile), na.rm = TRUE)
       granges$means <- means
-
-      n_na <- sum(is.na(granges$means))
       granges <- granges[!is.na(granges$means), ]
 
       n_filtered <- length(granges[granges$means > top_quantile, ])
@@ -178,10 +176,7 @@ remove_top_by_mean <- function(granges, quantile, columns) {
       top_quantile <- quantile(mcols(granges)[, 1],
         probs = c(1 - quantile), na.rm = TRUE
       )
-
-      n_na <- sum(is.na(mcols(granges)[, 1]))
       granges <- granges[!is.na(mcols(granges)[, 1]), ]
-
       n_filtered <- length(granges[mcols(granges)[, 1] > top_quantile, ])
       granges <- granges[mcols(granges)[, 1] <= top_quantile, ]
     }
