@@ -660,6 +660,10 @@ plot_bw_profile <- function(bwfiles,
   values <- round(values, 2)
   values$type <- rownames(values)
 
+  # Natural sort
+  ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
+  values$type <- factor(values$type, levels=ordered_levels)
+
   vals_long <- melt(values, id.vars = "type")
 
   plot <-
@@ -670,7 +674,7 @@ plot_bw_profile <- function(bwfiles,
     scale_y_discrete(position = "right") +
     theme_minimal(base_size = 16) +
     theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
       legend.position = c(0.9, 1.2),
       legend.direction = "horizontal",
       panel.grid.major = element_blank(),
