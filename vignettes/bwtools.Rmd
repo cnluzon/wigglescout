@@ -95,7 +95,7 @@ genome-wide:
 ```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
 plot_bw_bins_violin(
   c(h33_chip, h3k9me3_chip),
-  bin_size = 50000,
+  bin_size = 2000,
   labels = c("H3.3", "H3K9me3"),
   remove_top = 0.001,
   selection = locus # Plot can be subset to a certain GRanges.
@@ -108,6 +108,12 @@ found, if any, how many points were excluded from the plot due to quantile
 cutoff, and so on. Note also that in this case the quantile cutoff seems low,
 but it is because top elements are removed according to mean in all samples.
 
+Note also that the bin size chosen, `2000` is somewhat small for genome-wide
+analyses (it will take long runtime, see the "Performance and runtime" section
+at the end of the document for more details), but it can be done in this case
+due to the use of `selection` parameter, which restricts the bin analysis to
+a certain locus.
+
 You could also be interested in checking out how are certain *loci*  behaving
 in comparison with the global distribution. You can do so providing a `highlight`
 parameter:
@@ -115,7 +121,7 @@ parameter:
 ```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
 plot_bw_bins_violin(
   c(h33_chip, h3k9me3_chip),
-  bin_size = 50000,
+  bin_size = 2000,
   labels = c("H3.3", "H3K9me3"),
   remove_top = 0.001,
   highlight = genes,
@@ -123,7 +129,8 @@ plot_bw_bins_violin(
 )
 ```
 
-Here you see 5 bins that overlap with the loci in the `genes` file. 
+Here you see highlighted the bins that overlap with the loci in the
+`genes` file. 
 
 You could also want to pairwise compare the bins. You can do so by plotting
 a scatterplot:
@@ -131,8 +138,8 @@ a scatterplot:
 ```{r, warning = FALSE, message = FALSE, fig.height=7, fig.width=8}
 plot_bw_bins_scatter(
   h33_chip,
-  h3k9me3_chip,
-  bin_size = 50000,
+  h3k9me3_chip, 
+  bin_size = 2000,
   remove_top = 0.001,
   highlight = genes,
   highlight_label = "Genes",
@@ -214,7 +221,7 @@ length `bin_size` and its score is the mean coverage.
 ```{r, warning = FALSE, message = FALSE}
 # Several bwfiles can be provided at once
 bw_bins(c(h33_chip, input_chip),
-        bin_size = 50000,
+        bin_size = 2000,
         genome = "mm9",
         selection = locus)
 ```
@@ -225,7 +232,7 @@ want to use the input values to normalize the H3.3 ChIP data:
 
 ```{r, warning = FALSE, message = FALSE}
 bw_bins(h33_chip, bg_bwfiles = input_chip,
-        bin_size = 50000,
+        bin_size = 2000,
         genome = "mm9",
         selection = locus)
 ```
@@ -233,7 +240,7 @@ If you want to get the log2 ratio sample / input, select `norm_mode = "log2fc"`:
 
 ```{r, warning = FALSE, message = FALSE}
 bw_bins(h33_chip, bg_bwfiles = input_chip,
-        bin_size = 50000,
+        bin_size = 2000,
         genome = "mm9",
         selection = locus,
         norm_mode = "log2fc")
@@ -428,7 +435,7 @@ For a set of bigWig files, it is possible to visualize the genome-wide signal
 distribution. For example:
 
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=7}
-plot_bw_bins_violin(h33_chip, bin_size = 50000, selection = locus)
+plot_bw_bins_violin(h33_chip, bin_size = 2000, selection = locus)
 ```
 
 Note that `bin_size` parameter influences the time any of these functions take
@@ -437,7 +444,7 @@ to run. Reasonable resolution for this is 5000 or 10000.
 It is possible to plot several bigWig files at a time:
 
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=7}
-plot_bw_bins_violin(c(h33_chip, input_chip), bin_size = 50000, selection = locus)
+plot_bw_bins_violin(c(h33_chip, input_chip), bin_size = 2000, selection = locus)
 ```
 
 Additionally, one can highlight bins that overlap with a certain set of interest
@@ -446,7 +453,7 @@ loci. This is done via the `highlight` parameter:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=7}
 plot_bw_bins_violin(
   c(h33_chip, input_chip),
-  bin_size = 50000,
+  bin_size = 2000,
   highlight = genes,
   highlight_color = c("red", "red"), # It is possible to provide different colors
   selection = locus
@@ -462,7 +469,7 @@ want to use the input values to normalize the H3.3 ChIP data:
 plot_bw_bins_violin(
   h33_chip, 
   bg_bwfiles = input_chip,
-  bin_size = 50000,
+  bin_size = 2000,
   highlight = genes,
   highlight_color = c("red"),
   selection = locus
@@ -477,7 +484,7 @@ well:
 plot_bw_bins_violin(
   h33_chip, 
   bg_bwfiles = input_chip,
-  bin_size = 50000,
+  bin_size = 2000,
   highlight = genes,
   highlight_color = c("#000088"), # Colors can be also HTML codes
   norm_mode = "log2fc",
@@ -500,7 +507,7 @@ One example would be looking at H3.3 versus H3K9me3 in this sample data:
 plot_bw_bins_scatter(
   x = h33_chip,
   y = h3k9me3_chip,
-  bin_size = 50000,
+  bin_size = 2000,
   selection = locus
 )
 ```
@@ -517,7 +524,7 @@ plot_bw_bins_scatter(
   bg_x = input_chip,
   y = h3k9me3_chip,
   bg_y = input_chip,
-  bin_size = 50000,
+  bin_size = 2000,
   highlight = genes,
   highlight_colors = "red",
   highlight_label = "genes", # It is also possible to label the groups
