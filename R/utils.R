@@ -70,20 +70,31 @@ loci_to_granges <- function(loci) {
 #' @param outcome Named values with relevant outcomes and their values
 #' @return A caption string
 make_caption <- function(params, outcome) {
-  verbose_params <- paste(names(params),
-    params,
-    sep = ":", collapse = ", "
-  )
-
-  verbose_crop <- paste(names(outcome),
-    outcome,
-    sep = ":", collapse = ", "
-  )
+  verbose_params <- limited_size_caption_line(params)
+  verbose_crop <- limited_size_caption_line(outcome)
 
   date <- format(Sys.time(), "%a %b %d %X %Y")
-  paste(verbose_params, verbose_crop, date, sep = "\n")
+  paste(verbose_params, verbose_crop, date, sep = "\n\n")
 }
 
+#' Make a string out of a named list. Split into lines if too wide.
+#'
+#' @param named_list A named list
+#'
+#' @return A string
+limited_size_caption_line <- function(named_list) {
+  size_limit <- 3
+  chunks <- split(named_list, ceiling(seq_along(named_list)/size_limit))
+  paste(sapply(chunks, key_value_string), collapse="\n")
+}
+
+#' Make a string out of a named list.
+#'
+#' @param named_list A named list
+#' @return A string
+key_value_string <- function(named_list) {
+  paste(names(named_list), named_list, sep = ":", collapse = ", ")
+}
 
 #' Get a valid label from a filename
 #'
