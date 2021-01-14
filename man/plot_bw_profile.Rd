@@ -6,7 +6,7 @@
 \usage{
 plot_bw_profile(
   bwfiles,
-  bedfile,
+  loci,
   bg_bwfiles = NULL,
   mode = "stretch",
   bin_size = 100,
@@ -25,7 +25,7 @@ plot_bw_profile(
 \arguments{
 \item{bwfiles}{Path or array of paths to the bigWig files to be summarized.}
 
-\item{bedfile}{BED file to summarize}
+\item{loci}{BED file or GRanges to summarize}
 
 \item{bg_bwfiles}{Path or array of paths to the bigWig files to be used as
 background.}

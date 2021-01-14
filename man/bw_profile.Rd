@@ -7,7 +7,7 @@
 bw_profile(
   bwfiles,
   bg_bwfiles = NULL,
-  bedfile = NULL,
+  loci = NULL,
   labels = NULL,
   mode = "stretch",
   bin_size = 100,
@@ -25,7 +25,7 @@ bw_profile(
 \item{bg_bwfiles}{Path or array of paths to the bigWig files to be used as
 background.}
 
-\item{bedfile}{BED file to summarize}
+\item{loci}{BED file or GRanges to summarize}
 
 \item{labels}{List of names to give to the mcols of the returned GRanges
 object. If NULL, file names are used.}

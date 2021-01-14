@@ -6,7 +6,7 @@
 \usage{
 plot_bw_heatmap(
   bwfile,
-  bedfile,
+  loci,
   bg_bwfile = NULL,
   mode = "stretch",
   bin_size = 100,
@@ -26,7 +26,7 @@ plot_bw_heatmap(
 \arguments{
 \item{bwfile}{BigWig file to plot}
 
-\item{bedfile}{BED file to summarize}
+\item{loci}{BED file or GRanges to summarize}
 
 \item{bg_bwfile}{Background bw file. Use this with care. Depending on bin
 size and actual values, this may result in a very noisy plot.}
