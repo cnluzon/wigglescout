@@ -52,7 +52,7 @@ bw_loci <- function(bwfiles,
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_filename(bwfiles)
+    labels <- make_label_from_object(bwfiles)
   }
 
   bed <- loci_to_granges(loci)
@@ -156,7 +156,7 @@ bw_bins <- function(bwfiles,
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_filename(bwfiles)
+    labels <- make_label_from_object(bwfiles)
   }
 
   tiles <- build_bins(bin_size = bin_size, genome = genome)
@@ -294,7 +294,7 @@ bw_profile <- function(bwfiles,
   validate_profile_parameters(bin_size, upstream, downstream)
 
   if (is.null(labels)) {
-    labels <- make_label_from_filename(bwfiles)
+    labels <- make_label_from_object(bwfiles)
   }
 
   if (length(bwfiles) != length(labels)) {
