@@ -43,6 +43,40 @@ granges_cbind <- function(grlist, labels) {
   result
 }
 
+#' Make a string out of a named list.
+#'
+#' @param named_list A named list
+#' @return A string
+key_value_string <- function(named_list) {
+  paste(names(named_list), named_list, sep = ":", collapse = ", ")
+}
+
+
+#' Make a string out of a named list. Split into lines if too wide.
+#'
+#' @param named_list A named list
+#'
+#' @return A string
+limited_size_caption_line <- function(named_list) {
+  size_limit <- 3
+  chunks <- split(named_list, ceiling(seq_along(named_list)/size_limit))
+  paste(sapply(chunks, key_value_string), collapse="\n")
+}
+
+
+#' Checks how many loci
+#'
+#' @param loci GRanges or BED
+#'
+#' @return An integer
+loci_length <- function(loci) {
+  if (is.character(loci)) {
+    length(rtracklayer::import(loci, format="BED"))
+  } else {
+    length(loci)
+  }
+}
+
 
 #' Processes a loci and returns a GRanges object, sorted and with its seqlevels
 #' also sorted.
@@ -63,7 +97,6 @@ loci_to_granges <- function(loci) {
 }
 
 
-
 #' Make a string to put as caption in verbose mode. Includes system date.
 #'
 #' @param params Named list with relevant parameters and their values
@@ -77,33 +110,20 @@ make_caption <- function(params, outcome) {
   paste(verbose_params, verbose_crop, date, sep = "\n\n")
 }
 
-#' Make a string out of a named list. Split into lines if too wide.
-#'
-#' @param named_list A named list
-#'
-#' @return A string
-limited_size_caption_line <- function(named_list) {
-  size_limit <- 3
-  chunks <- split(named_list, ceiling(seq_along(named_list)/size_limit))
-  paste(sapply(chunks, key_value_string), collapse="\n")
-}
 
-#' Make a string out of a named list.
+#' Get a valid label
 #'
-#' @param named_list A named list
-#' @return A string
-key_value_string <- function(named_list) {
-  paste(names(named_list), named_list, sep = ":", collapse = ", ")
-}
-
-#' Get a valid label from a filename
-#'
-#' @param filename File to convert to label
+#' @param obj Something to convert to label
 #'
 #' @return A valid label name
-make_label_from_filename <- function(filename) {
-  filename_clean <- basename(tools::file_path_sans_ext(filename))
-  make.names(filename_clean)
+make_label_from_object <- function(obj) {
+  if (is.character(obj)) {
+    filename_clean <- basename(tools::file_path_sans_ext(obj))
+    make.names(filename_clean)
+  } else {
+    make.names(class(obj))
+  }
+
 }
 
 
@@ -133,7 +153,7 @@ make_norm_label <- function(f, bg) {
 #'
 #' @return A string describing normalization.
 make_norm_file_label <- function(f, fg, bg) {
-  paste(make_label_from_filename(fg), "-", make_norm_label(f, bg))
+  paste(make_label_from_object(fg), "-", make_norm_label(f, bg))
 }
 
 

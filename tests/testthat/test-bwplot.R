@@ -430,6 +430,16 @@ test_that(
   })
 
 test_that(
+  "plot_bw_profile with GRanges returns a ggplot object", {
+    m <- mock(profile_values)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(c(bw1, bw2), loci = import(bed))
+      expect_is(p, "ggplot")
+    })
+  })
+
+
+test_that(
   "plot_bw_profile with defaults has a line layer", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
@@ -554,6 +564,15 @@ test_that(
     m <- mock(heatmap_values)
     with_mock(bw_heatmap = m, {
       p <- plot_bw_heatmap(bw1, loci = bed)
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_heatmap with GRanges returns a ggplot object", {
+    m <- mock(heatmap_values)
+    with_mock(bw_heatmap = m, {
+      p <- plot_bw_heatmap(bw1, loci = import(bed))
       expect_is(p, "ggplot")
     })
   })

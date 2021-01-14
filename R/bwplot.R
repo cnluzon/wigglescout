@@ -168,7 +168,7 @@ plot_bw_bins_violin <- function(bwfiles,
 
   columns <- labels
   if (is.null(labels)) {
-    columns <- make_label_from_filename(bwfiles)
+    columns <- make_label_from_object(bwfiles)
   }
 
   main_plot <- .violin_body(
@@ -279,8 +279,8 @@ plot_bw_heatmap <- function(bwfile,
   }
 
   nloci <- nrow(values[[1]])
-  y_label <- paste(basename(loci), "-", loci, "loci", sep = " ")
-  x_title <- make_label_from_filename(bwfile)
+  y_label <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+  x_title <- make_label_from_object(bwfile)
   title <- "Heatmap"
 
 
@@ -295,7 +295,7 @@ plot_bw_heatmap <- function(bwfile,
                    mode) +
     scale_y_continuous(
       breaks = c(1, nloci),
-      labels = c(loci, "0"),
+      labels = c(nloci, "0"),
       expand = c(0, 0)
     ) +
     labs(
@@ -510,9 +510,9 @@ plot_bw_profile <- function(bwfiles,
     remove_top = remove_top
   )
 
-  nloci <- length(import(loci, format = "BED"))
+  nloci <- loci_length(loci)
   y_label <- make_norm_label(norm_mode, bg_bwfiles)
-  x_title <- paste(basename(loci), "-", loci, "loci", sep = " ")
+  x_title <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
 
   verbose_tag <- NULL
   if (verbose) {
