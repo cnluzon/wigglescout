@@ -673,13 +673,19 @@ plot_bw_profile <- function(bwfiles,
     warning("All zero-values matrix. Using same background as bw input?")
   }
   values <- round(values, 2)
+
+  # y axis goes from bottom to top!
+  sample_names <- rev(colnames(values))
   values$type <- rownames(values)
 
   # Natural sort
   ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
   values$type <- factor(values$type, levels=ordered_levels)
 
+
   vals_long <- melt(values, id.vars = "type")
+  vals_long$variable <- factor(vals_long$variable, levels=sample_names)
+
 
   plot <-
     ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
