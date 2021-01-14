@@ -230,15 +230,15 @@ test_that(".multi_bw_ranges_norm removes percentile single column", {
 
 
 
-test_that("bw_bed returns correct per locus values", {
-  values <- bw_bed(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
+test_that("bw_loci returns correct per locus values", {
+  values <- bw_loci(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
 })
 
-test_that("bw_bed accepts GRanges objects", {
-  values <- bw_bed(bw1, granges, labels = "bw1", per_locus_stat = "mean")
+test_that("bw_loci accepts GRanges objects", {
+  values <- bw_loci(bw1, granges, labels = "bw1", per_locus_stat = "mean")
   expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
@@ -269,8 +269,8 @@ test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
   expect_equal(values[2]$bw1, 1)
 })
 
-test_that("bw_bed returns correct per locus values on multiple files", {
-  values <- bw_bed(c(bw1, bw2),
+test_that("bw_loci returns correct per locus values on multiple files", {
+  values <- bw_loci(c(bw1, bw2),
                    bed_with_names,
                    labels = c("bw1", "bw2"),
                    per_locus_stat = "mean"
@@ -284,8 +284,8 @@ test_that("bw_bed returns correct per locus values on multiple files", {
 })
 
 test_that(
-  "bw_bed returns correct per locus values on multiple files, with bg", {
-    values <- bw_bed(c(bw1, bw2),
+  "bw_loci returns correct per locus values on multiple files, with bg", {
+    values <- bw_loci(c(bw1, bw2),
                      bg_bwfiles = c(bg1, bg2),
                      bed_with_names,
                      labels = c("bw1", "bw2"),
@@ -298,8 +298,8 @@ test_that(
   })
 
 
-test_that("bw_bed handles default names with special characters", {
-  values <- bw_bed(bw_special,
+test_that("bw_loci handles default names with special characters", {
+  values <- bw_loci(bw_special,
                    bed_with_names,
                    aggregate_by = "true_mean"
   )
@@ -307,9 +307,9 @@ test_that("bw_bed handles default names with special characters", {
   expect_is(values, "data.frame")
 })
 
-test_that("bw_bed crashes on wrong number of labels for multiple files", {
+test_that("bw_loci crashes on wrong number of labels for multiple files", {
   expect_error({
-    values <- bw_bed(c(bw1, bw2), bed_with_names,
+    values <- bw_loci(c(bw1, bw2), bed_with_names,
                      labels = "bw1",
                      per_locus_stat = "mean"
     )
@@ -318,8 +318,8 @@ test_that("bw_bed crashes on wrong number of labels for multiple files", {
 
 })
 
-test_that("bw_bed returns correct mean-of-means aggregated values", {
-  values <- bw_bed(bw1,
+test_that("bw_loci returns correct mean-of-means aggregated values", {
+  values <- bw_loci(bw1,
                    bed_with_names,
                    labels = "bw1",
                    per_locus_stat = "mean",
@@ -331,8 +331,8 @@ test_that("bw_bed returns correct mean-of-means aggregated values", {
   expect_equal(values["typeB", "bw1"], 13.3333333333)
 })
 
-test_that("bw_bed returns correct true_mean aggregated values", {
-  values <- bw_bed(bw1, bed_with_names,
+test_that("bw_loci returns correct true_mean aggregated values", {
+  values <- bw_loci(bw1, bed_with_names,
                    labels = "bw1",
                    per_locus_stat = "mean",
                    aggregate_by = "true_mean"
@@ -343,9 +343,9 @@ test_that("bw_bed returns correct true_mean aggregated values", {
   expect_equal(values["typeB", "bw1"], 11.125)
 })
 
-test_that("bw_bed on an empty list throws an error", {
+test_that("bw_loci on an empty list throws an error", {
   expect_error({
-    values <- bw_bed(c(), bed_with_names,
+    values <- bw_loci(c(), bed_with_names,
                      per_locus_stat = "mean",
                      aggregate_by = "true_mean"
     )
@@ -365,9 +365,9 @@ test_that("bw_profile on an empty list throws an error", {
 
 })
 
-test_that("bw_bed on non-existing bed file throws an error", {
+test_that("bw_loci on non-existing bed file throws an error", {
   expect_error({
-    values <- bw_bed(bw1,
+    values <- bw_loci(bw1,
                      "invalidname.bed",
                      per_locus_stat = "mean",
                      aggregate_by = "true_mean"
@@ -387,9 +387,9 @@ test_that("bw_profile on non-existing bed file throws an error", {
 })
 
 
-test_that("bw_bed errors on non existing files on bwlist", {
+test_that("bw_loci errors on non existing files on bwlist", {
   expect_error({
-    values <- bw_bed(c(bw1, "invalidname.bw"),
+    values <- bw_loci(c(bw1, "invalidname.bw"),
                      bed_with_names,
                      per_locus_stat = "mean",
                      aggregate_by = "true_mean"
@@ -599,8 +599,8 @@ test_that("bw_profile throws error on negative downstream value", {
 
 })
 
-test_that("bw_bed returns correct median-of-means aggregated values", {
-  values <- bw_bed(bw1, bed_with_names,
+test_that("bw_loci returns correct median-of-means aggregated values", {
+  values <- bw_loci(bw1, bed_with_names,
                    labels = "bw1",
                    per_locus_stat = "mean",
                    aggregate_by = "median"
@@ -633,9 +633,9 @@ test_that("build_bins runs for hg38", {
   expect_is(values, "GRanges")
 })
 
-test_that("bw_bed throws error on not implemented aggregate_by", {
+test_that("bw_loci throws error on not implemented aggregate_by", {
   expect_error(
-    values <- bw_bed(bw1, bed_with_names,
+    values <- bw_loci(bw1, bed_with_names,
                      labels = "bw1",
                      per_locus_stat = "mean",
                      aggregate_by = "max"
@@ -643,8 +643,8 @@ test_that("bw_bed throws error on not implemented aggregate_by", {
   )
 })
 
-test_that("bw_bed runs with background and aggregate_by parameter", {
-  values <- bw_bed(bw1, bed_with_names, bg_bwfiles = bw2,
+test_that("bw_loci runs with background and aggregate_by parameter", {
+  values <- bw_loci(bw1, bed_with_names, bg_bwfiles = bw2,
                    labels = "bw1",
                    per_locus_stat = "mean",
                    aggregate_by = "mean"
@@ -653,9 +653,9 @@ test_that("bw_bed runs with background and aggregate_by parameter", {
   expect_is(values, "data.frame")
 })
 
-test_that("bw_bed fails if aggregate_by in an unnamed bed file", {
+test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
   expect_error({
-    values <- bw_bed(bw1, unnamed_bed, bg_bwfiles = bw2,
+    values <- bw_loci(bw1, unnamed_bed, bg_bwfiles = bw2,
                      labels = "bw1",
                      per_locus_stat = "mean",
                      aggregate_by = "mean"

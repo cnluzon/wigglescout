@@ -207,7 +207,7 @@ function, you can still use this library for that.
 # Calculating functions
 
 bigWig data can be summarized genome-wide using calculation functions: `bw_bins`
-`bw_bed`, `bw_heatmap` or `bw_profile`.
+`bw_loci`, `bw_heatmap` or `bw_profile`.
 
 
 
@@ -264,18 +264,18 @@ look at, rather than general genome-wide trends.
 
 ### Individual loci
 
-To calculate values on a *locus* specific manner you can use `bw_bed` function.
+To calculate values on a *locus* specific manner you can use `bw_loci` function.
 For instance, we can look at the genes at this region:
 
 ```{r, warning = FALSE, message = FALSE}
-bw_bed(c(h33_chip, input_chip), bedfile = genes)
+bw_loci(c(h33_chip, input_chip), loci = genes)
 ```
 
-Many of the options available for `bw_bins` are shared with `bw_bed`, so you can
+Many of the options available for `bw_bins` are shared with `bw_loci`, so you can
 also use background bigWig files:
 
 ```{r, warning = FALSE, message = FALSE}
-bw_bed(h33_chip, bg_bwfiles = input_chip, bedfile = genes)
+bw_loci(h33_chip, bg_bwfiles = input_chip, loci = genes)
 ```
 
 A name column is provided if the given `BED` file includes *loci* IDs.
@@ -285,7 +285,7 @@ You can also provide `GRanges` objects instead of `BED` files:
 ```{r, warning = FALSE, message = FALSE}
 genes_granges <- rtracklayer::import(genes, format = "BED")
 
-bw_bed(h33_chip, bg_bwfiles = input_chip, bedfile = genes_granges)
+bw_loci(h33_chip, bg_bwfiles = input_chip, loci = genes_granges)
 ```
 
 
@@ -305,10 +305,10 @@ It is possible to get a single value per category using `aggregate_by` parameter
 
 ```{r, warning = FALSE, message = FALSE}
 # If aggregate_by is not provided, you get a non-aggregated GRanges
-bw_bed(h33_chip,
-       bg_bwfiles = input_chip,
-       bedfile = chrom_ranges,
-       aggregate_by = "mean") 
+bw_loci(h33_chip,
+        bg_bwfiles = input_chip,
+        loci = chrom_ranges,
+        aggregate_by = "mean") 
 ```
 
 **Note:** In this case you will not get a `GRanges` object but a `data.frame`.

@@ -28,7 +28,7 @@ reduced_bg_2 <-  bw_bins(bg_bw, selection = bw_limits, labels = "x_bg2")
 reduced_bins_all <- bw_bins(c(bw1, bw2), bg_bwfiles=c(bg_bw, bg_bw),
                             selection = bw_limits, labels = c("x", "y"))
 
-summary_values <- bw_bed(c(bw1, bw2), bed_summary, aggregate_by = "mean")
+summary_values <- bw_loci(c(bw1, bw2), bed_summary, aggregate_by = "mean")
 profile_values <- bw_profile(bw1,
                              bedfile = bed,
                              upstream = 1000,
@@ -359,7 +359,7 @@ test_that("plot_bw_bins_violin passes on parameters", {
 test_that(
   "plot_bw_loci_summary_heatmap with defaults returns a ggplot object", {
     m <- mock(summary_values)
-    with_mock(bw_bed = m, {
+    with_mock(bw_loci = m, {
       p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed)
       expect_is(p, "ggplot")
     })
@@ -386,7 +386,7 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
 test_that(
   "plot_bw_loci_summary_heatmap passes parameters on", {
     m <- mock(summary_values)
-    with_mock(bw_bed = m, {
+    with_mock(bw_loci = m, {
       p <- plot_bw_loci_summary_heatmap(c(bw1, bw2),
                                        loci = bed,
                                        bg_bwfiles <- c(bg_bw, bg_bw),
@@ -397,13 +397,13 @@ test_that(
     })
 
     expect_call(m, 1,
-                bw_bed(bwfiles,
-                       loci,
-                       bg_bwfiles = bg_bwfiles,
-                       aggregate_by = aggregate_by,
-                       norm_mode = norm_mode,
-                       labels = labels,
-                       remove_top = remove_top
+                bw_loci(bwfiles,
+                        loci,
+                        bg_bwfiles = bg_bwfiles,
+                        aggregate_by = aggregate_by,
+                        norm_mode = norm_mode,
+                        labels = labels,
+                        remove_top = remove_top
                 )
     )
 

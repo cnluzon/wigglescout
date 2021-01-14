@@ -360,18 +360,18 @@ plot_bw_loci_scatter <- function(x,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
-  values_x <- bw_bed(
+  values_x <- bw_loci(
     x,
     bg_bwfiles = bg_x,
-    bedfile = loci,
+    loci = loci,
     norm_mode = norm_mode_x,
     labels = "score"
   )
 
-  values_y <- bw_bed(
+  values_y <- bw_loci(
     y,
     bg_bwfiles = bg_y,
-    bedfile = loci,
+    loci = loci,
     norm_mode = norm_mode_y,
     labels = "score"
   )
@@ -425,7 +425,7 @@ plot_bw_loci_scatter <- function(x,
 #' @param labels Labels to use for in the plot for the bw files.
 #' @param loci BED file or GRanges object.
 #' @param verbose Put a caption with relevant parameters on the plot.
-#' @inheritParams bw_bed
+#' @inheritParams bw_loci
 #' @return A ggplot object
 #' @export
 plot_bw_loci_summary_heatmap <- function(bwfiles,
@@ -436,7 +436,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          norm_mode = "fc",
                                          remove_top = 0,
                                          verbose = TRUE) {
-  summary_values <- bw_bed(bwfiles, loci,
+  summary_values <- bw_loci(bwfiles, loci,
     bg_bwfiles = bg_bwfiles,
     aggregate_by = aggregate_by,
     norm_mode = norm_mode,
