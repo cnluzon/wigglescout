@@ -188,7 +188,7 @@ bw_bins <- function(bwfiles,
 #' @export
 bw_heatmap <- function(bwfiles,
                        bg_bwfiles = NULL,
-                       bedfile = NULL,
+                       loci = NULL,
                        labels = NULL,
                        mode = "stretch",
                        bin_size = 100,
@@ -199,8 +199,8 @@ bw_heatmap <- function(bwfiles,
                        norm_mode = "fc") {
 
   validate_filelist(bwfiles)
-  validate_locus_parameter(bedfile)
-  granges <- loci_to_granges(bedfile)
+  validate_locus_parameter(loci)
+  granges <- loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
   validate_profile_parameters(bin_size, upstream, downstream)
@@ -252,7 +252,7 @@ bw_heatmap <- function(bwfiles,
 #'
 #' - center. All loci are aligned by center.
 #'
-#' @param bedfile BED file to summarize
+#' @param loci BED file or GRanges to summarize
 #' @param mode How to handle differences in lengths across loci:
 #'
 #'   stretch: Anchor each locus on both sides.
@@ -275,7 +275,7 @@ bw_heatmap <- function(bwfiles,
 #' @export
 bw_profile <- function(bwfiles,
                        bg_bwfiles = NULL,
-                       bedfile = NULL,
+                       loci = NULL,
                        labels = NULL,
                        mode = "stretch",
                        bin_size = 100,
@@ -287,8 +287,8 @@ bw_profile <- function(bwfiles,
                        remove_top = 0) {
 
   validate_filelist(bwfiles)
-  validate_locus_parameter(bedfile)
-  granges <- loci_to_granges(bedfile)
+  validate_locus_parameter(loci)
+  granges <- loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
   validate_profile_parameters(bin_size, upstream, downstream)

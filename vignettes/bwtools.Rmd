@@ -181,7 +181,7 @@ using `plot_bw_profile`:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes,
+  loci = genes,
   labels = c("H3.3", "H3K9me3", "Input")
 )
 ```
@@ -192,7 +192,7 @@ looking at the individual profiles, which you can do with a heatmap view:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes
+  loci = genes
 )
 ```
 
@@ -334,7 +334,7 @@ by `bin_size` parameter). Each bin is aggregated together across loci.
 
 
 ```{r, warning = FALSE, message = FALSE}
-profile <- bw_profile(h33_chip, bedfile = genes, bin_size = 100)
+profile <- bw_profile(h33_chip, loci = genes, bin_size = 100)
 
 head(profile)
 ```
@@ -347,7 +347,7 @@ You can also provide `upstream` and `downstream` base pairs values to include
 in this calculation.
 
 ```{r, warning = FALSE, message = FALSE}
-profile <- bw_profile(h33_chip, bedfile = genes, bin_size = 100,
+profile <- bw_profile(h33_chip, loci = genes, bin_size = 100,
                       upstream = 500, downstream = 500)
 
 head(profile)
@@ -366,7 +366,7 @@ interested on a per-locus profile value. This is what you get with `bw_heatmap`.
 a bin. The rest of parameters are analogous to `bw_profile`:
 
 ```{r, warning = FALSE, message = FALSE}
-mat <- bw_heatmap(h33_chip, bedfile = genes, bin_size = 1000,
+mat <- bw_heatmap(h33_chip, loci = genes, bin_size = 1000,
                   upstream = 5000, downstream = 5000)
 
 # Note that bw_heatmap returns a list of matrices, so it supports arrays of 
@@ -606,7 +606,7 @@ a set of *loci*. In order to do that you can use the `plot_bw_profile` function:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes,
+  loci = genes,
   labels = c("H3.3", "H3K9me3", "Input")
 )
 ```
@@ -623,7 +623,7 @@ what formatting text alignment would do:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes,
+  loci = genes,
   labels = c("H3.3", "H3K9me3", "Input"),
   mode = "start"
 )
@@ -634,7 +634,7 @@ It is also possible to specify the upstream and downstream lengths:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes,
+  loci = genes,
   labels = c("H3.3", "H3K9me3", "Input"),
   mode = "center",
   upstream = 3000,
@@ -645,7 +645,7 @@ plot_bw_profile(
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes,
+  loci = genes,
   labels = c("H3.3", "H3K9me3", "Input"),
   mode = "end",
   upstream = 7000,
@@ -663,7 +663,7 @@ per-*locus* way by looking at heatmaps.
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes
+  loci = genes
 )
 ```
 
@@ -677,7 +677,7 @@ possible to align them in different ways:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes,
+  loci = genes,
   mode = "start",
   upstream = 2500,
   downstream = 2500
@@ -690,7 +690,7 @@ can also be done on profile plots):
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes,
+  loci = genes,
   mode = "start",
   upstream = 2500,
   downstream = 2500,
@@ -708,7 +708,7 @@ plot together several heatmaps with the same color scale. For example:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes,
+  loci = genes,
   mode = "start",
   upstream = 2500,
   downstream = 2500,
@@ -724,7 +724,7 @@ available palette:
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 plot_bw_heatmap(
   h33_chip,
-  bedfile = genes,
+  loci = genes,
   bin_size = 100,
   cmap = "RdYlBu"
 )
@@ -748,7 +748,7 @@ you can overlay any other data you want or further customize the results. For ex
 ```{r, warning = FALSE, message = FALSE, fig.width=9, fig.height=5}
 profile_plot <- plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
-  bedfile = genes
+  loci = genes
 )
 
 profile_plot + 

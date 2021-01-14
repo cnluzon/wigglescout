@@ -30,13 +30,13 @@ reduced_bins_all <- bw_bins(c(bw1, bw2), bg_bwfiles=c(bg_bw, bg_bw),
 
 summary_values <- bw_loci(c(bw1, bw2), bed_summary, aggregate_by = "mean")
 profile_values <- bw_profile(bw1,
-                             bedfile = bed,
+                             loci = bed,
                              upstream = 1000,
                              downstream = 1000
 )
 
 heatmap_values <- bw_heatmap(bw1,
-                             bedfile = bed,
+                             loci = bed,
                              upstream = 1000,
                              downstream = 1000)
 
@@ -287,7 +287,7 @@ test_that("plot_bw_bins_violin with highlight returns a plot", {
 test_that("plot_bw_bins_violin with highlight GRanges returns a plot", {
   m <- mock(reduced_bins_all)
   with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = import(bed), highlight_label="Bedfile", labels=c("x", "y"))
+    p <- plot_bw_bins_violin(c(bw1, bw2), verbose = FALSE, highlight = import(bed), highlight_label="loci", labels=c("x", "y"))
     expect_is(p, "ggplot")
     expect_true(is.null(p$labels$caption))
   })
@@ -424,7 +424,7 @@ test_that(
   "plot_bw_profile with defaults returns a ggplot object", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed)
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed)
       expect_is(p, "ggplot")
     })
   })
@@ -433,7 +433,7 @@ test_that(
   "plot_bw_profile with defaults has a line layer", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed)
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed)
       expect_is(p, "ggplot")
       expect_true("GeomLine" %in% sapply(p$layers, function(x) class(x$geom)[1]))
     })
@@ -443,7 +443,7 @@ test_that(
   "plot_bw_profile with show_error has a ribbon layer", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, show_error=TRUE)
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, show_error=TRUE)
       expect_is(p, "ggplot")
       expect_true("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))
     })
@@ -453,7 +453,7 @@ test_that(
   "plot_bw_profile verbose returns a plot with a caption", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = TRUE)
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, verbose = TRUE)
       expect_is(p, "ggplot")
       expect_false(is.null(p$labels$caption))
     })
@@ -463,7 +463,7 @@ test_that(
   "plot_bw_profile mode start valid parameters returns a plot", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "start")
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, mode = "start")
       expect_is(p, "ggplot")
     })
   })
@@ -472,7 +472,7 @@ test_that(
   "plot_bw_profile mode end valid parameters returns a plot", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "end")
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, mode = "end")
       expect_is(p, "ggplot")
     })
   })
@@ -481,7 +481,7 @@ test_that(
   "plot_bw_profile mode center valid parameters returns a plot", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, mode = "center")
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, mode = "center")
       expect_is(p, "ggplot")
     })
   })
@@ -490,7 +490,7 @@ test_that(
   "plot_bw_profile not verbose returns a plot without a caption", {
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2), bedfile = bed, verbose = FALSE)
+      p <- plot_bw_profile(c(bw1, bw2), loci = bed, verbose = FALSE)
       expect_is(p, "ggplot")
       expect_true(is.null(p$labels$caption))
     })
@@ -501,7 +501,7 @@ test_that(
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
       p <- plot_bw_profile(c(bw1, bw2),
-                           bedfile = bed,
+                           loci = bed,
                            bg_bwfiles = c(bg_bw, bg_bw),
                            mode = "start",
                            bin_size = 1000,
@@ -517,7 +517,7 @@ test_that(
     })
 
     expect_call(m, 1,
-                bw_profile(bwfiles, bedfile,
+                bw_profile(bwfiles, loci,
                            bg_bwfiles = bg_bwfiles,
                            mode = mode,
                            bin_size = bin_size,
@@ -533,7 +533,7 @@ test_that(
 
     expect_args(m, 1,
                 c(bw1, bw2),
-                bedfile = bed,
+                loci = bed,
                 bg_bwfiles = c(bg_bw, bg_bw),
                 mode = "start",
                 bin_size = 1000,
@@ -553,7 +553,7 @@ test_that(
   "plot_bw_heatmap with defaults returns a ggplot object", {
     m <- mock(heatmap_values)
     with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1, bedfile = bed)
+      p <- plot_bw_heatmap(bw1, loci = bed)
       expect_is(p, "ggplot")
     })
   })
@@ -564,8 +564,8 @@ test_that(
     # y axis works reversed here
     other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = F)
     with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1, bedfile = bed)
-      p2 <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
+      p <- plot_bw_heatmap(bw1, loci = bed)
+      p2 <- plot_bw_heatmap(bw1, loci = bed, order_by = other_order)
       expect_is(p, "ggplot")
       expect_identical(p$data, p2$data)
     })
@@ -576,7 +576,7 @@ test_that(
     m <- mock(heatmap_values)
     other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = T)
     with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
+      p <- plot_bw_heatmap(bw1, loci = bed, order_by = other_order)
       expect_is(p, "ggplot")
     })
   })
@@ -586,8 +586,8 @@ test_that(
     m <- mock(heatmap_values, heatmap_values)
     other_order <- order(rowMeans(heatmap_values[[1]]), decreasing = T)
     with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1, bedfile = bed, order_by = other_order)
-      p2 <- plot_bw_heatmap(bw1, bedfile = bed)
+      p <- plot_bw_heatmap(bw1, loci = bed, order_by = other_order)
+      p2 <- plot_bw_heatmap(bw1, loci = bed)
 
       expect_is(p, "ggplot")
       expect_false(p$data[1, "value"] == p2$data[1, "value"])
@@ -598,7 +598,7 @@ test_that(
   "plot_bw_heatmap with verbose returns a ggplot object with a caption", {
     m <- mock(heatmap_values)
     with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1, bedfile = bed)
+      p <- plot_bw_heatmap(bw1, loci = bed)
       expect_is(p, "ggplot")
       expect_true("caption" %in% names(p$labels))
     })
@@ -609,7 +609,7 @@ test_that(
     m <- mock(heatmap_values)
     with_mock(bw_heatmap = m, {
       p <- plot_bw_heatmap(bw1,
-                           bedfile = bed,
+                           loci = bed,
                            bg_bwfile = bg_bw,
                            mode = "start",
                            bin_size = 1000,
@@ -624,7 +624,7 @@ test_that(
     })
 
     expect_call(m, 1,
-                bw_heatmap(bwfile, bedfile,
+                bw_heatmap(bwfile, loci,
                            bg_bwfiles = bg_bwfile,
                            mode = mode,
                            bin_size = bin_size,
@@ -638,7 +638,7 @@ test_that(
 
     expect_args(m, 1,
                 bw1,
-                bedfile = bed,
+                loci = bed,
                 bg_bwfile = bg_bw,
                 mode = "start",
                 bin_size = 1000,

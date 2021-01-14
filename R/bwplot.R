@@ -233,7 +233,7 @@ plot_bw_bins_violin <- function(bwfiles,
 #' @inheritParams plot_bw_profile
 #' @export
 plot_bw_heatmap <- function(bwfile,
-                            bedfile,
+                            loci,
                             bg_bwfile = NULL,
                             mode = "stretch",
                             bin_size = 100,
@@ -250,7 +250,7 @@ plot_bw_heatmap <- function(bwfile,
                             verbose = TRUE) {
   values <- bw_heatmap(
     bwfile,
-    bedfile,
+    loci,
     bg_bwfiles = bg_bwfile,
     mode = mode,
     bin_size = bin_size,
@@ -278,8 +278,8 @@ plot_bw_heatmap <- function(bwfile,
     verbose_tag <- make_caption(relevant_params, main_plot$calculated)
   }
 
-  loci <- nrow(values[[1]])
-  y_label <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
+  nloci <- nrow(values[[1]])
+  y_label <- paste(basename(loci), "-", loci, "loci", sep = " ")
   x_title <- make_label_from_filename(bwfile)
   title <- "Heatmap"
 
@@ -287,14 +287,14 @@ plot_bw_heatmap <- function(bwfile,
   main_plot$plot + theme_default() +
     theme(axis.line = element_blank(),
           panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
-    .heatmap_lines(nrow(values[[1]]),
+    .heatmap_lines(nloci,
                    ncol(values[[1]]),
                    bin_size,
                    upstream,
                    downstream,
                    mode) +
     scale_y_continuous(
-      breaks = c(1, loci),
+      breaks = c(1, nloci),
       labels = c(loci, "0"),
       expand = c(0, 0)
     ) +
@@ -482,7 +482,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 #' @return A ggplot object.
 #' @export
 plot_bw_profile <- function(bwfiles,
-                            bedfile,
+                            loci,
                             bg_bwfiles = NULL,
                             mode = "stretch",
                             bin_size = 100,
@@ -497,7 +497,7 @@ plot_bw_profile <- function(bwfiles,
                             remove_top = 0,
                             verbose = TRUE) {
 
-  values <- bw_profile(bwfiles, bedfile,
+  values <- bw_profile(bwfiles, loci,
     bg_bwfiles = bg_bwfiles,
     mode = mode,
     bin_size = bin_size,
@@ -510,9 +510,9 @@ plot_bw_profile <- function(bwfiles,
     remove_top = remove_top
   )
 
-  loci <- length(import(bedfile, format = "BED"))
+  nloci <- length(import(loci, format = "BED"))
   y_label <- make_norm_label(norm_mode, bg_bwfiles)
-  x_title <- paste(basename(bedfile), "-", loci, "loci", sep = " ")
+  x_title <- paste(basename(loci), "-", loci, "loci", sep = " ")
 
   verbose_tag <- NULL
   if (verbose) {
@@ -529,7 +529,7 @@ plot_bw_profile <- function(bwfiles,
   }
 
   .profile_body(values, show_error, colors) +
-    .heatmap_lines(loci, max(values$index), bin_size,
+    .heatmap_lines(nloci, max(values$index), bin_size,
                          upstream, downstream, mode) +
     labs(
       title = "Profile plot",

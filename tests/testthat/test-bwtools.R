@@ -379,7 +379,7 @@ test_that("bw_loci on non-existing bed file throws an error", {
 test_that("bw_profile on non-existing bed file throws an error", {
   expect_error({
     values <- bw_profile(bw1,
-                         bedfile = "invalidname.bed",
+                         loci = "invalidname.bed",
                          labels = NULL
     )
   },
@@ -402,7 +402,7 @@ test_that("bw_loci errors on non existing files on bwlist", {
 test_that("bw_profile errors on non existing files on bwlist", {
   expect_error({
     values <- bw_profile(c(bw1, "invalidname.bw"),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          labels = NULL
     )
   },
@@ -413,7 +413,7 @@ test_that("bw_profile errors on non existing files on bwlist", {
 test_that("bw_profile runs quiet on valid parameters", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1
@@ -425,7 +425,7 @@ test_that("bw_profile runs quiet on valid parameters", {
 test_that("bw_profile runs on GRanges object", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = granges,
+                         loci = granges,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1
@@ -437,7 +437,7 @@ test_that("bw_profile runs on GRanges object", {
 test_that("bw_profile runs quiet on valid parameters, mode start", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1,
@@ -466,7 +466,7 @@ test_that(
     expect_silent({
       values <- bw_profile(c(bw1, bw2),
                            bg_bwfiles = c(bg1, bg2),
-                           bedfile = bed_with_names,
+                           loci = bed_with_names,
                            upstream = 1,
                            downstream = 1,
                            bin_size = 1,
@@ -479,7 +479,7 @@ test_that(
 test_that("bw_profile normalized returns 1 when fg == bg", {
   values <- bw_profile(c(bw1, bw2),
                        bg_bwfiles = c(bw1, bw2),
-                       bedfile = bed_with_names,
+                       loci = bed_with_names,
                        upstream = 1,
                        downstream = 1,
                        bin_size = 1,
@@ -495,7 +495,7 @@ test_that("bw_profile normalized returns 1 when fg == bg", {
 test_that("bw_profile fails if labels and bwfiles have different length", {
   expect_error({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          labels = c("bw1"),
                          upstream = 1,
                          downstream = 1,
@@ -510,7 +510,7 @@ test_that("bw_profile fails if labels and bwfiles have different length", {
 test_that("bw_profile runs quiet on valid parameters, mode end", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1,
@@ -523,7 +523,7 @@ test_that("bw_profile runs quiet on valid parameters, mode end", {
 test_that("bw_profile runs quiet on valid parameters, middle parameter", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          middle = 1,
@@ -538,7 +538,7 @@ test_that("bw_profile runs quiet on valid parameters with background", {
   expect_silent({
     values <- bw_profile(c(bw1, bw2),
                          bg_bwfiles = c(bg1, bg2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 1
@@ -550,7 +550,7 @@ test_that("bw_profile runs quiet on valid parameters with background", {
 test_that("bw_profile throws error on flanking region smaller than bin size", {
   expect_error({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = 10
@@ -563,7 +563,7 @@ test_that("bw_profile throws error on flanking region smaller than bin size", {
 test_that("bw_profile throws error on negative bin size", {
   expect_error({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 1,
                          downstream = 1,
                          bin_size = -10
@@ -576,7 +576,7 @@ test_that("bw_profile throws error on negative bin size", {
 test_that("bw_profile throws error on negative upstream value", {
   expect_error({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = -10,
                          downstream = 10,
                          bin_size = 10
@@ -589,7 +589,7 @@ test_that("bw_profile throws error on negative upstream value", {
 test_that("bw_profile throws error on negative downstream value", {
   expect_error({
     values <- bw_profile(c(bw1, bw2),
-                         bedfile = bed_with_names,
+                         loci = bed_with_names,
                          upstream = 10,
                          downstream = -10,
                          bin_size = 10
@@ -669,7 +669,7 @@ test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
 test_that("bw_heatmap returns correct values odd bin size", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = NULL,
-                       bedfile = bed_with_names,
+                       loci = bed_with_names,
                        upstream = 5,
                        downstream = 5,
                        bin_size = 2,
@@ -691,7 +691,7 @@ test_that("bw_heatmap returns correct values odd bin size", {
 test_that("bw_heatmap returns correct values odd bin size stretch", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = NULL,
-                       bedfile = bed_with_names,
+                       loci = bed_with_names,
                        upstream = 5,
                        downstream = 5,
                        middle = 4,
@@ -714,7 +714,7 @@ test_that("bw_heatmap returns correct values odd bin size stretch", {
 test_that("bw_heatmap returns correct values", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = NULL,
-                       bedfile = bed_with_names,
+                       loci = bed_with_names,
                        upstream = 5,
                        downstream = 5,
                        bin_size = 1,
@@ -736,7 +736,7 @@ test_that("bw_heatmap returns correct values", {
 test_that("bw_heatmap returns correct values on GRanges object", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = NULL,
-                       bedfile = granges,
+                       loci = granges,
                        upstream = 5,
                        downstream = 5,
                        bin_size = 1,
@@ -758,7 +758,7 @@ test_that("bw_heatmap returns correct values on GRanges object", {
 test_that("bw_heatmap with bg returns 1 when fg == bg", {
   values <- bw_heatmap(bw1,
                        bg_bwfiles = bw1,
-                       bedfile = bed_with_names,
+                       loci = bed_with_names,
                        upstream = 5,
                        downstream = 5,
                        bin_size = 1,
