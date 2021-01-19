@@ -619,8 +619,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
     label <- basename(bw)
   }
 
-  full <- .calculate_matrix_norm(bw, granges,
-    bg_bw = bg_bw,
+  fg <- .calculate_matrix_norm(bw, granges,
     mode = mode,
     bin_size = bin_size,
     upstream = upstream,
@@ -631,7 +630,33 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
     remove_top = remove_top
   )
 
-  .summarize_matrix(full, label)
+  fg_sum <- .summarize_matrix(fg, label)
+  full <- fg_sum
+
+  if (! is.null(bg_bw)) {
+    bg <- .calculate_matrix_norm(
+      bg_bw,
+      granges,
+      mode = mode,
+      bin_size = bin_size,
+      upstream = upstream,
+      downstream = downstream,
+      middle = middle,
+      ignore_strand = ignore_strand,
+      norm_func = identity,
+      remove_top = remove_top
+    )
+
+    bg_sum <- .summarize_matrix(bg, "bg")
+
+    # FIXME: median and sderror? Does sderror even make sense here?
+    full <- data.frame(index = fg_sum$index, sample = fg_sum$sample,
+                       mean = norm_func(fg_sum$mean / bg_sum$mean),
+                       sderror = norm_func(fg_sum$mean / bg_sum$mean),
+                       median = norm_func(fg_sum$median / bg_sum$median))
+  }
+
+  full
 }
 
 #' Calculate a normalized heatmap matrix for a bigWig file over a BED file
