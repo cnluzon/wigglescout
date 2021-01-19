@@ -528,6 +528,11 @@ plot_bw_profile <- function(bwfiles,
     verbose_tag <- make_caption(relevant_params, list())
   }
 
+  if (!is.null(bg_bwfiles) && show_error == TRUE) {
+    warning("Error estimate not available when normalizing by input")
+    show_error <- FALSE
+  }
+
   .profile_body(values, show_error, colors) +
     .heatmap_lines(nloci, max(values$index), bin_size,
                          upstream, downstream, mode) +
