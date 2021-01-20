@@ -53,6 +53,9 @@ bw_loci <- function(bwfiles,
 
   if (is.null(labels)) {
     labels <- make_label_from_object(bwfiles)
+  } else {
+    # Ensures later on we only try to access valid labels
+    labels <- make.names(labels)
   }
 
   bed <- loci_to_granges(loci)
