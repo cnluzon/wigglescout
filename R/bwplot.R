@@ -646,7 +646,8 @@ plot_bw_profile <- function(bwfiles,
     theme(
       legend.position = c(0.80, 0.90),
       legend.direction = "vertical",
-      legend.title = element_blank()
+      legend.title = element_blank(),
+      legend.background = element_rect(fill = alpha("white", 0.3))
     )
 
   if (!is.null(colors)) {
