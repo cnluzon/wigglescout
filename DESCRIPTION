@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore And Visualize Genomics BigWig Data
-Version: 0.12.4
+Version: 0.12.5
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",

@@ -365,6 +365,24 @@ test_that(
     })
   })
 
+test_that(
+  "plot_bw_loci_summary_heatmap with labels returns a ggplot object", {
+    m <- mock(summary_values)
+    with_mock(bw_loci = m, {
+      p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, labels = c("A", "B"))
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_loci_summary_heatmap with labels including invalid chars returns a ggplot object", {
+    m <- mock(summary_values)
+    with_mock(bw_loci = m, {
+      p <- plot_bw_loci_summary_heatmap(c(bw1, bw2), loci = bed, labels = c("A-1", "B-2"))
+      expect_is(p, "ggplot")
+    })
+  })
+
 test_that("plot_bw_loci_summary_heatmap with verbose set returns a plot with a caption", {
   m <- mock(reduced_bins, reduced_bins_2)
   with_mock(bw_bins = m, {
