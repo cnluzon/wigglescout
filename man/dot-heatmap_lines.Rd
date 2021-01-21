@@ -4,7 +4,15 @@
 \alias{.heatmap_lines}
 \title{Helper function for calculating guide lines and labels in heatmap}
 \usage{
-.heatmap_lines(loci, nbins, bin_size, upstream, downstream, mode)
+.heatmap_lines(
+  loci,
+  nbins,
+  bin_size,
+  upstream,
+  downstream,
+  mode,
+  expand = TRUE
+)
 }
 \arguments{
 \item{loci}{Number of loci (rows)}
@@ -27,6 +35,9 @@ start: Anchor all loci on start.
 end: Anchor all loci on end.
 
 center: Center all loci.}
+
+\item{expand}{Whether to apply padding to the ticks.
+Otherwise a strange box shows on heatmap.}
 }
 \value{
 A list of ggproto objects to be plotted.
