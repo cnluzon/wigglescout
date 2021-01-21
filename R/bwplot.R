@@ -535,7 +535,7 @@ plot_bw_profile <- function(bwfiles,
 
   .profile_body(values, show_error, colors) +
     .heatmap_lines(nloci, max(values$index), bin_size,
-                         upstream, downstream, mode) +
+                         upstream, downstream, mode, expand = FALSE) +
     labs(
       title = "Profile plot",
       x = x_title,
@@ -890,11 +890,20 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @param loci Number of loci (rows)
 #' @param nbins Number of bins (columns)
+#' @param expand Whether to apply padding to the ticks.
+#'   Otherwise a strange box shows on heatmap.
 #' @inheritParams plot_bw_heatmap
 #' @return A list of ggproto objects to be plotted.
-.heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode) {
+.heatmap_lines <- function(loci,
+                           nbins,
+                           bin_size,
+                           upstream,
+                           downstream,
+                           mode,
+                           expand = TRUE) {
 
-  axis_breaks <- .profile_breaks(nbins, upstream, downstream, bin_size, mode)
+  axis_breaks <-
+    .profile_breaks(nbins, upstream, downstream, bin_size, mode)
   axis_labels <- .profile_labels(upstream, downstream, mode)
 
   lines <- axis_breaks[2]
@@ -903,8 +912,13 @@ plot_bw_profile <- function(bwfiles,
   }
 
   x <- scale_x_continuous(breaks = axis_breaks,
-                          labels = axis_labels,
-                          expand = c(0, 0))
+                          labels = axis_labels)
+
+  if (expand == TRUE) {
+    x <- scale_x_continuous(breaks = axis_breaks,
+                            labels = axis_labels,
+                            expand = c(0, 0))
+  }
 
   gline <- geom_vline(
     xintercept = lines,
@@ -913,7 +927,7 @@ plot_bw_profile <- function(bwfiles,
     size = 0.2
   )
 
-  list(x, gline)
+    list(x, gline)
 }
 
 
