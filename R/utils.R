@@ -101,12 +101,16 @@ loci_to_granges <- function(loci) {
 #'
 #' @param params Named list with relevant parameters and their values
 #' @param outcome Named values with relevant outcomes and their values
+#' @importFrom utils packageVersion
 #' @return A caption string
 make_caption <- function(params, outcome) {
   verbose_params <- limited_size_caption_line(params)
   verbose_crop <- limited_size_caption_line(outcome)
 
   date <- format(Sys.time(), "%a %b %d %X %Y")
+  pkg_version <- paste("wigglescout v.", packageVersion("wigglescout"))
+  date <- paste(date, pkg_version, sep = ' - ')
+
   paste(verbose_params, verbose_crop, date, sep = "\n\n")
 }
 
