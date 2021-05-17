@@ -506,7 +506,11 @@ plot_bw_profile <- function(bwfiles,
       stop("If multiple loci provided only a single bwfile is allowed")
     }
     if (is.null(labels)) {
-      labels <- make_label_from_object(loci)
+      labels <- lapply(loci, make_label_from_object)
+      if (length(unique(labels)) < length(loci)) {
+        warning("Unlabeled objects or repeated labels. Adding numeric indices.")
+        labels <- paste(labels, 1:length(labels), sep = "_")
+      }
     }
     profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
                                        bg_bwfiles = bg_bwfiles,
