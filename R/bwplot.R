@@ -497,22 +497,51 @@ plot_bw_profile <- function(bwfiles,
                             remove_top = 0,
                             verbose = TRUE) {
 
-  values <- bw_profile(bwfiles, loci,
-    bg_bwfiles = bg_bwfiles,
-    mode = mode,
-    bin_size = bin_size,
-    upstream = upstream,
-    downstream = downstream,
-    middle = middle,
-    ignore_strand = ignore_strand,
-    norm_mode = norm_mode,
-    labels = labels,
-    remove_top = remove_top
-  )
+  values <- NULL
+  nloci <- NULL
+  x_label <- ""
 
-  nloci <- loci_length(loci)
+  if ((class(loci) == "list" && length(loci) > 1) || (class(loci) == "character" && length(loci) > 1)) {
+    if (length(bwfiles) > 1) {
+      stop("If multiple loci provided only a single bwfile is allowed")
+    }
+    if (is.null(labels)) {
+      labels <- make_label_from_object(loci)
+    }
+    profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
+                                       bg_bwfiles = bg_bwfiles,
+                                       mode = mode,
+                                       bin_size = bin_size,
+                                       upstream = upstream,
+                                       downstream = downstream,
+                                       middle = middle,
+                                       ignore_strand = ignore_strand,
+                                       norm_mode = norm_mode,
+                                       remove_top = remove_top)
+
+    value_list <- purrr::map2(loci, labels, profile_function)
+    values <- do.call(rbind, value_list)
+    x_title <- "Multiple loci groups"
+  }
+  else {
+    values <- bw_profile(bwfiles, loci, bg_bwfiles = bg_bwfiles,
+                         mode = mode,
+                         bin_size = bin_size,
+                         upstream = upstream,
+                         downstream = downstream,
+                         middle = middle,
+                         ignore_strand = ignore_strand,
+                         norm_mode = norm_mode,
+                         labels = labels,
+                         remove_top = remove_top)
+
+
+    nloci <- loci_length(loci)
+    x_title <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+  }
+
   y_label <- make_norm_label(norm_mode, bg_bwfiles)
-  x_title <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+
 
   verbose_tag <- NULL
   if (verbose) {

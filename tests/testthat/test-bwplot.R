@@ -456,6 +456,33 @@ test_that(
     })
   })
 
+test_that(
+  "plot_bw_profile with GRanges list returns a ggplot object", {
+    m <- mock(profile_values, cycle = TRUE)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(bw1, loci = list(import(bed), import(bed)))
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile with loci file list returns a ggplot object", {
+    m <- mock(profile_values, cycle = TRUE)
+    with_mock(bw_profile = m, {
+      p <- plot_bw_profile(bw1, loci = c(bed, bed))
+      expect_is(p, "ggplot")
+    })
+  })
+
+test_that(
+  "plot_bw_profile with loci file list and bwlist fails", {
+    m <- mock(profile_values, cycle = TRUE)
+    with_mock(bw_profile = m, {
+      expect_error(p <- plot_bw_profile(c(bw1, bw2), loci = c(bed, bed)),
+                   "If multiple loci provided only a single bwfile is allowed")
+
+    })
+  })
 
 test_that(
   "plot_bw_profile with defaults has a line layer", {
