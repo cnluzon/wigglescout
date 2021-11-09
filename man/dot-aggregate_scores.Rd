@@ -20,8 +20,6 @@ median: median-of-distribution. The median of the aggregated value per
   locus is reported.
 }
 
-FIXME: importFrom tidyselect where does not work according to:
-https://github.com/r-lib/tidyselect/issues/201
 This does not pass the checks but does not break the build process either
 so I left it as is, so the note thrown by build is noted everytime.}
 }
