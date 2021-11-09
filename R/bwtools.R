@@ -537,14 +537,13 @@ utils::globalVariables("where")
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
   validate_group_col(scored_granges, group_col)
 
+  score_cols <- names(mcols(scored_granges))
+  score_cols <- score_cols[!score_cols %in% c(group_col)]
+
   df <- data.frame(scored_granges) %>%
-    select(c(names(mcols(scored_granges)), width))
+    select(c(score_cols, group_col, width))
 
   validate_categories(df[, group_col])
-  # Make sure special characters are taken into account
-  score_cols <- colnames(mcols(scored_granges))
-  score_cols <- make.names(score_cols)
-  score_cols <- score_cols[!score_cols %in% c(group_col)]
 
   if (aggregate_by == "true_mean") {
     sum_vals <- df[, score_cols, drop = F] * df$width
