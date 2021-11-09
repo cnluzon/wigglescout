@@ -541,7 +541,7 @@ utils::globalVariables("where")
   score_cols <- score_cols[!score_cols %in% c(group_col)]
 
   df <- data.frame(scored_granges) %>%
-    select(c(score_cols, group_col, width))
+    select(c(score_cols, group_col, .data$width))
 
   validate_categories(df[, group_col])
 
