@@ -531,18 +531,15 @@ utils::globalVariables("where")
 #' This does not pass the checks but does not break the build process either
 #' so I left it as is, so the note thrown by build is noted everytime.
 #'
-#' @importFrom dplyr group_by_at summarise across `%>%`
+#' @importFrom dplyr group_by_at summarise across select `%>%`
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
   validate_group_col(scored_granges, group_col)
 
-  # GRanges objects are 1-based and inclusive [start, end]
-  end_value <- GenomicRanges::end(scored_granges)
-  start_value <- GenomicRanges::start(scored_granges)
-  scored_granges$length <- end_value - start_value + 1
+  df <- data.frame(scored_granges) %>%
+    select(c(names(mcols(scored_granges)), width))
 
-  df <- data.frame(mcols(scored_granges))
   validate_categories(df[, group_col])
   # Make sure special characters are taken into account
   score_cols <- colnames(mcols(scored_granges))
@@ -550,10 +547,10 @@ utils::globalVariables("where")
   score_cols <- score_cols[!score_cols %in% c(group_col)]
 
   if (aggregate_by == "true_mean") {
-    sum_vals <- df[, score_cols] * df$length
+    sum_vals <- df[, score_cols, drop = F] * df$width
     colnames(sum_vals) <- score_cols
     sum_vals[, group_col] <- df[, group_col]
-    sum_vals$length <- df$length
+    sum_vals$width <- df$width
 
     # Summarize SUM only
     sum_vals <- sum_vals %>%
@@ -561,7 +558,7 @@ utils::globalVariables("where")
       summarise(across(where(is.numeric), sum))
 
     # Divide sum(scores) by sum(length) and keep only scores
-    df <- sum_vals[, score_cols] / sum_vals$length
+    df <- sum_vals[, score_cols, drop = F] / sum_vals$width
     df[, group_col] <- sum_vals[, group_col]
   } else if (aggregate_by %in% c("mean", "median")) {
     f <- get(aggregate_by)
@@ -572,7 +569,7 @@ utils::globalVariables("where")
     stop(paste("Function not implemented as aggregate_by:", aggregate_by))
   }
 
-  score_cols <- score_cols[!score_cols %in% c("length")]
+  score_cols <- score_cols[!score_cols %in% c("width")]
   df <- df[, c(score_cols, group_col), drop = FALSE]
   data.frame(df)
 }
