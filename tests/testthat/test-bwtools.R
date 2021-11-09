@@ -13,7 +13,7 @@ bw1 <- tempfile("bigwig", fileext = ".bw")
 bw2 <- tempfile("bigwig", fileext = ".bw")
 bg1 <- tempfile("bigwig_bg1", fileext = ".bw")
 bg2 <- tempfile("bigwig_bg2", fileext = ".bw")
-bw_special <- tempfile("bigwñg", fileext = ".bw")
+bw_special <- tempfile("bigwig-2ñ", fileext = ".bw")
 
 bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
 unnamed_bed <- system.file("testdata", "not_labeled.bed", package = "wigglescout")
