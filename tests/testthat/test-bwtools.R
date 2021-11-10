@@ -380,6 +380,15 @@ test_that(
     expect_equal(values[2]$bw2, 8.25)
 })
 
+test_that("aggregated bw_loci returns a data.frame", {
+  values <- bw_loci(bw_special,
+                    bed_with_names,
+                    aggregate_by = "true_mean"
+  )
+
+  expect_is(values, "data.frame")
+})
+
 test_that("bw_loci handles default names with special characters", {
   values <- bw_loci(bw_special,
                     bed_with_names,
@@ -408,7 +417,6 @@ test_that("bw_loci returns correct mean-of-means aggregated values", {
                     aggregate_by = "mean"
   )
 
-  expect_is(values, "data.frame")
   expect_equal(values["typeA", "bw1"], 7)
   expect_equal(values["typeB", "bw1"], 13.3333333333)
 })
@@ -420,7 +428,6 @@ test_that("bw_loci returns correct true_mean aggregated values", {
                     aggregate_by = "true_mean"
   )
 
-  expect_is(values, "data.frame")
   expect_equal(values["typeA", "bw1"], 7)
   expect_equal(values["typeB", "bw1"], 11.125)
 })
@@ -454,7 +461,6 @@ test_that("bw_loci returns correct median-of-means aggregated values", {
                     aggregate_by = "median"
   )
 
-  expect_is(values, "data.frame")
   expect_equal(values["typeA", "bw1"], 7)
   expect_equal(values["typeB", "bw1"], 16.5)
 })
@@ -486,7 +492,6 @@ test_that("bw_loci runs with background == 0 and aggregate_by parameter", {
                     aggregate_by = "mean"
   )
 
-  expect_is(values, "data.frame")
   expect_equal(values["typeA", "bw1"], Inf)
   expect_equal(values["typeB", "bw1"], Inf)
 })
