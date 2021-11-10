@@ -334,16 +334,21 @@ test_that("calculate_matrix_norm removes percentile", {
 
 ## bw_loci ---------------------------------------------------
 
-test_that("bw_loci returns correct per locus values", {
+test_that("bw_loci returns GRanges object", {
   values <- bw_loci(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
   expect_is(values, "GRanges")
+})
+
+test_that("bw_loci returns correct per locus values", {
+  values <- bw_loci(bw1, bed_with_names, labels = "bw1", per_locus_stat = "mean")
+
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
 })
 
 test_that("bw_loci accepts GRanges objects", {
   values <- bw_loci(bw1, granges, labels = "bw1", per_locus_stat = "mean")
-  expect_is(values, "GRanges")
+
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
 })
@@ -355,7 +360,6 @@ test_that("bw_loci returns correct per locus values on multiple files", {
                     per_locus_stat = "mean"
   )
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
   expect_equal(values[1]$bw2, 19)
@@ -371,10 +375,10 @@ test_that(
                       per_locus_stat = "mean"
     )
 
-    expect_is(values, "GRanges")
+
     expect_equal(values[1]$bw2, 9.5)
     expect_equal(values[2]$bw2, 8.25)
-  })
+})
 
 test_that("bw_loci handles default names with special characters", {
   values <- bw_loci(bw_special,
