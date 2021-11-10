@@ -79,6 +79,9 @@ test_that(".bw_ranges returns GRanges same order as input", {
                   score=1:20)
   expect_equal(bins, gr)
 
+  # Reverse the input, the output also reversed order
+  bins <- .bw_ranges(bw1, rev(tiles), per_locus_stat = "mean")
+  expect_equal(bins, rev(gr))
 })
 
 test_that(".bw_ranges returns correct values", {
