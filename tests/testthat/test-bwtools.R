@@ -77,8 +77,8 @@ test_that(".bw_ranges returns GRanges same order as input", {
                   IRanges(start = c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
                           end = c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
                   score=1:20)
-
   expect_equal(bins, gr)
+
 })
 
 test_that(".bw_ranges returns correct values", {
@@ -211,6 +211,17 @@ test_that(".multi_bw_ranges removes percentile single column", {
 
 ## multi_bw_ranges_norm -------------------------------------------
 
+test_that(".multi_bw_ranges_norm returns a GRanges object", {
+  values <- .multi_bw_ranges_norm(
+    c(bw1, bw2),
+    bg_bwfilelist = c(bw1, bw2),
+    c("bw1", "bw2"),
+    tiles,
+    norm_func = identity
+  )
+  expect_is(values, "GRanges")
+})
+
 test_that(
   ".multi_bw_ranges_norm with bwfiles == background returns all 1 values", {
     values <- .multi_bw_ranges_norm(c(bw1, bw2),
@@ -220,7 +231,6 @@ test_that(
                                    norm_func = identity
     )
 
-    expect_is(values, "GRanges")
     expect_equal(values[1]$bw1, 1)
     expect_equal(values[1]$bw2, 1)
     expect_equal(values[2]$bw1, 1)
@@ -236,7 +246,6 @@ test_that(
                                     norm_func = identity
     )
 
-    expect_is(values, "GRanges")
     expect_equal(values[1]$bw1, Inf)
     expect_equal(values[1]$bw2, Inf)
     expect_equal(values[2]$bw1, Inf)
@@ -254,7 +263,6 @@ test_that(
       norm_func = identity
     )
 
-    expect_is(values, "GRanges")
     expect_equal(values[1]$bw3_zeros, NaN)
     expect_equal(values[1]$bw2, Inf)
   })
@@ -267,7 +275,6 @@ test_that(".multi_bw_ranges_norm returns correct values", {
                                  norm_func = identity
   )
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[2]$bw1, 2)
   expect_equal(values[1]$bw2, 10)
@@ -295,7 +302,6 @@ test_that(".multi_bw_ranges_norm removes percentile", {
                             remove_top = 0.1
   )
 
-  expect_is(values, "GRanges")
   expect_equal(max(values$bw1), 18)
   expect_equal(max(values$bw2), 18)
 })
@@ -307,7 +313,6 @@ test_that(".multi_bw_ranges_norm removes percentile single column", {
                             remove_top = 0.1
   )
 
-  expect_is(values, "GRanges")
   expect_equal(max(values$bw1), 18)
 })
 
