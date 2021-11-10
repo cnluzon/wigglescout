@@ -520,7 +520,7 @@ test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
 
 ## bw_bins ---------------------------------------------------
 
-test_that("bw_bins returns correct per locus values", {
+test_that("bw_bins returns a GRanges object", {
   values <- bw_bins(bw1,
                     selection = import(bed_with_names),
                     labels = "bw1",
@@ -528,6 +528,15 @@ test_that("bw_bins returns correct per locus values", {
   )
 
   expect_is(values, "GRanges")
+})
+
+test_that("bw_bins returns correct per locus values", {
+  values <- bw_bins(bw1,
+                    selection = import(bed_with_names),
+                    labels = "bw1",
+                    per_locus_stat = "mean"
+  )
+
   expect_equal(values[1]$bw1, 5.5)
   expect_equal(values[2]$bw1, 15.5)
 })
@@ -540,7 +549,6 @@ test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
                     per_locus_stat = "mean"
   )
 
-  expect_is(values, 'GRanges')
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[2]$bw1, 1)
 })
