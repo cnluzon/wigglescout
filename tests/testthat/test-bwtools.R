@@ -81,7 +81,7 @@ test_that(".bw_ranges returns correct values", {
 
 test_that("bw_ranges returns correct values on subset", {
   subset <- GRanges(seqnames = c("chr1"),
-                    ranges = IRanges(c(10, 40)))
+                    ranges = IRanges(10, 40))
 
   bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean", selection = subset)
 
@@ -134,7 +134,7 @@ test_that(".multi_bw_ranges returns correct values for single bigWig", {
 })
 
 test_that(".multi_bw_ranges returns correct values on subset", {
-  subset <- GRanges(seqnames = c("chr1"), ranges = IRanges(c(30, 50)))
+  subset <- GRanges(seqnames = c("chr1"), ranges = IRanges(30, 50))
   values <- .multi_bw_ranges(c(bw1, bw2),
                              c("bw1", "bw2"),
                              tiles,
