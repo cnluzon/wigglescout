@@ -708,9 +708,6 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @importFrom reshape2 melt
 .summary_body <- function(values) {
-  if (sum(values) == 0) {
-    warning("All zero-values matrix. Using same background as bw input?")
-  }
   values <- round(values, 2)
 
   # y axis goes from bottom to top!
@@ -721,15 +718,16 @@ plot_bw_profile <- function(bwfiles,
   ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
   values$type <- factor(values$type, levels=ordered_levels)
 
-
   vals_long <- melt(values, id.vars = "type")
   vals_long$variable <- factor(vals_long$variable, levels=sample_names)
 
+  # Make sure NaN values will be written
+  vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
 
   plot <-
     ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
     geom_tile(color = "white", size = 0.6) +
-    geom_text(aes_string(label = "value"), size = 4) +
+    geom_text(aes_string(label = "text_value"), size = 4) +
     coord_fixed() +
     scale_y_discrete(position = "right") +
     theme_minimal(base_size = 16) +
@@ -1010,14 +1008,15 @@ plot_bw_profile <- function(bwfiles,
 .colorscale <- function(norm_mode, bg_bwfiles) {
   legend_label <- make_norm_label(norm_mode, bg_bwfiles)
   colorscale <-
-    scale_fill_gradient(name = legend_label, low = "white", high = "#B22222")
+    scale_fill_gradient(name = legend_label, low = "white", high = "#b22222", na.value = "#cccccc")
   if (!is.null(bg_bwfiles)) {
     colorscale <-
       scale_fill_gradient2(
         name = legend_label,
         low = "#2e6694",
         mid = "white",
-        high = "#B22222"
+        high = "#b22222",
+        na.value = "#cccccc"
       )
   }
   colorscale
