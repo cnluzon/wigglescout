@@ -118,10 +118,14 @@ test_that("bw_ranges returns correct values on subset", {
 
 ## multi_bw_ranges ------------------------------------------------
 
+test_that(".multi_bw_ranges returns a GRanges object", {
+  values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
+  expect_is(values, "GRanges")
+})
+
 test_that(".multi_bw_ranges returns correct values", {
   values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[1]$bw2, 20)
   expect_equal(values[2]$bw1, 2)
@@ -143,7 +147,6 @@ test_that(".multi_bw_ranges several processors returns correct values", {
   future::plan(multisession, workers=2)
   values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[1]$bw2, 20)
   expect_equal(values[2]$bw1, 2)
@@ -154,7 +157,6 @@ test_that(".multi_bw_ranges several processors returns correct values", {
 test_that(".multi_bw_ranges returns correct values for single bigWig", {
   values <- .multi_bw_ranges(bw1, "bw1", tiles)
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[2]$bw1, 2)
 })
@@ -167,7 +169,6 @@ test_that(".multi_bw_ranges returns correct values on subset", {
                              selection = subset
   )
 
-  expect_is(values, "GRanges")
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[1]$bw2, 19)
   expect_equal(values[2]$bw1, 3)
@@ -183,7 +184,6 @@ test_that(".multi_bw_ranges removes value even if quantile very small, due to in
                              remove_top = 0.01
   )
 
-  expect_is(values, "GRanges")
   expect_equal(max(values$bw1), 19)
   expect_equal(max(values$bw2), 19)
 })
@@ -195,7 +195,6 @@ test_that(".multi_bw_ranges removes percentile", {
                              remove_top = 0.05
   )
 
-  expect_is(values, "GRanges")
   expect_equal(max(values$bw1), 19)
   expect_equal(max(values$bw2), 19)
 })
@@ -207,7 +206,6 @@ test_that(".multi_bw_ranges removes percentile single column", {
                              remove_top = 0.1
   )
 
-  expect_is(values, "GRanges")
   expect_equal(max(values$bw1), 18)
 })
 
