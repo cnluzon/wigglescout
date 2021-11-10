@@ -68,7 +68,17 @@ test_that("Setup files exist", {
 test_that(".bw_ranges returns a GRanges object", {
   bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean")
   expect_is(bins, "GRanges")
+})
 
+test_that(".bw_ranges returns GRanges same order as input", {
+  bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean")
+
+  gr <- GRanges(Rle(c("chr1", "chr2"), c(10, 10)),
+                  IRanges(start = c(seq(1, 181, by = 20), seq(1, 181, by = 20)),
+                          end = c(seq(20, 200, by = 20), seq(20, 200, by = 20))),
+                  score=1:20)
+
+  expect_equal(bins, gr)
 })
 
 test_that(".bw_ranges returns correct values", {
@@ -77,6 +87,22 @@ test_that(".bw_ranges returns correct values", {
   expect_equal(bins[1]$score, 1)
   expect_equal(bins[2]$score, 2)
   expect_equal(bins[10]$score, 10)
+})
+
+test_that(".bw_ranges returns correct values in different size tiles", {
+  tiles_2 <- tileGenome(c(chr1 = 200, chr2 = 200),
+                        tilewidth = 10,
+                        cut.last.tile.in.chrom = TRUE)
+
+  # Expected GR
+  gr <- GRanges(Rle(c("chr1", "chr2"), c(20, 20)),
+                IRanges(start = c(seq(1, 191, by = 10), seq(1, 191, by = 10)),
+                        end = c(seq(10, 200, by = 10), seq(10, 200, by = 10))),
+                score=as.numeric(Rle(1:20, 2)))
+
+  bins <- .bw_ranges(bw1, tiles_2, per_locus_stat = "mean")
+
+  expect_equal(bins, gr)
 })
 
 test_that("bw_ranges returns correct values on subset", {
