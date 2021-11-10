@@ -326,12 +326,9 @@ test_that("calculate_matrix_norm removes percentile", {
                                    upstream = 6, downstream = 6,
                                    remove_top = 0.05)
 
-  expect_is(values, "matrix")
   expect_equal(nrow(values), 4)
   expect_equal(max(values), 17)
-
 })
-
 
 # Exported functions -----------------------------------------
 
