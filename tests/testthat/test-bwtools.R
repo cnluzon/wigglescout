@@ -11,8 +11,10 @@ bed_to_bw <- function(bed, bw, chromsizes) {
 
 bw1 <- tempfile("bigwig", fileext = ".bw")
 bw2 <- tempfile("bigwig", fileext = ".bw")
+bw3_zeros <- tempfile("bigwig", fileext = ".bw")
 bg1 <- tempfile("bigwig_bg1", fileext = ".bw")
 bg2 <- tempfile("bigwig_bg2", fileext = ".bw")
+bg3_zeros <- tempfile("bigwig_bg3", fileext = ".bw")
 bw_special <- tempfile("bigwig-2ñ", fileext = ".bw")
 
 bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
@@ -29,25 +31,30 @@ setup({
   # Read bed files and transform these to bigwig
   bed_to_bw(system.file("testdata", "bed1.bed", package = "wigglescout"), bw1, chromsizes)
   bed_to_bw(system.file("testdata", "bed2.bed", package = "wigglescout"), bw2, chromsizes)
+  bed_to_bw(system.file("testdata", "bed3.bed", package = "wigglescout"), bw3_zeros, chromsizes)
   bed_to_bw(system.file("testdata", "bg1.bed", package = "wigglescout"), bg1, chromsizes)
   bed_to_bw(system.file("testdata", "bg2.bed", package = "wigglescout"), bg2, chromsizes)
+  bed_to_bw(system.file("testdata", "bg3.bed", package = "wigglescout"), bg3_zeros, chromsizes)
   bed_to_bw(system.file("testdata", "bg2.bed", package = "wigglescout"), bw_special, chromsizes)
-
 })
 
 teardown({
   unlink(bw1)
   unlink(bw2)
+  unlink(bw3_zeros)
   unlink(bg1)
   unlink(bg2)
+  unlink(bg3_zeros)
   unlink(bw_special)
 })
 
 test_that("Setup files exist", {
   expect_true(file_test("-f", bw1))
   expect_true(file_test("-f", bw2))
+  expect_true(file_test("-f", bw3_zeros))
   expect_true(file_test("-f", bg1))
   expect_true(file_test("-f", bg2))
+  expect_true(file_test("-f", bg3_zeros))
   expect_true(file_test("-f", bed_with_names))
   expect_true(file_test("-f", bw_special))
 })
@@ -87,6 +94,19 @@ test_that(".multi_bw_ranges returns correct values", {
   expect_equal(values[2]$bw2, 19)
 })
 
+
+test_that(".multi_bw_ranges with zeros returns correct values", {
+  subset <- GRanges(seqnames = c("chr2"), ranges = IRanges(1, 40))
+  values <- .multi_bw_ranges(c(bw1, bw3_zeros), c("bw1", "bw3_zeros"), tiles,
+                             selection = subset)
+
+  expect_equal(values[1]$bw1, 11)
+  expect_equal(values[1]$bw3_zeros, 0)
+  expect_equal(values[2]$bw1, 12)
+  expect_equal(values[2]$bw3_zeros, 0)
+})
+
+
 test_that(".multi_bw_ranges several processors returns correct values", {
   future::plan(multisession, workers=2)
   values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), tiles)
@@ -113,6 +133,38 @@ test_that(
     expect_equal(values[1]$bw2, 1)
     expect_equal(values[2]$bw1, 1)
     expect_equal(values[2]$bw2, 1)
+  })
+
+test_that(
+  ".multi_bw_ranges_norm with background == 0 returns Infinite values", {
+    values <- .multi_bw_ranges_norm(c(bw1, bw2),
+                                    bg_bwfilelist = c(bg3_zeros, bg3_zeros),
+                                    c("bw1", "bw2"),
+                                    tiles,
+                                    norm_func = identity
+    )
+
+    expect_is(values, "GRanges")
+    expect_equal(values[1]$bw1, Inf)
+    expect_equal(values[1]$bw2, Inf)
+    expect_equal(values[2]$bw1, Inf)
+    expect_equal(values[2]$bw2, Inf)
+  })
+
+test_that(
+  ".multi_bw_ranges_norm with 0/0 returns NaN values", {
+    values <- .multi_bw_ranges_norm(
+      c(bw3_zeros, bw2),
+      bg_bwfilelist = c(bg3_zeros, bg3_zeros),
+      c("bw3_zeros", "bw2"),
+      tiles,
+      selection = GRanges(seqnames = c("chr1"), ranges = IRanges(1, 20)),
+      norm_func = identity
+    )
+
+    expect_is(values, "GRanges")
+    expect_equal(values[1]$bw3_zeros, NaN)
+    expect_equal(values[1]$bw2, Inf)
   })
 
 test_that(".multi_bw_ranges_norm returns correct values", {
@@ -153,7 +205,6 @@ test_that(".multi_bw_ranges returns correct values for single bigWig", {
 
 test_that(".multi_bw_ranges returns correct values on subset", {
   subset <- GRanges(seqnames = c("chr1"), ranges = IRanges(c(30, 50)))
-
   values <- .multi_bw_ranges(c(bw1, bw2),
                             c("bw1", "bw2"),
                             tiles,
@@ -653,6 +704,29 @@ test_that("bw_loci runs with background and aggregate_by parameter", {
   expect_is(values, "data.frame")
 })
 
+test_that("bw_loci runs with background == 0 and aggregate_by parameter", {
+  values <- bw_loci(bw1, bed_with_names, bg_bwfiles = bg3_zeros,
+                    labels = "bw1",
+                    per_locus_stat = "mean",
+                    aggregate_by = "mean"
+  )
+
+  expect_is(values, "data.frame")
+  expect_equal(values["typeA", "bw1"], Inf)
+  expect_equal(values["typeB", "bw1"], Inf)
+})
+
+test_that("bw_loci runs with 0/0 and aggregated values", {
+  values <- bw_loci(bw3_zeros, bed_with_names, bg_bwfiles = bg3_zeros,
+                    labels = "bw3_zeros",
+                    per_locus_stat = "mean",
+                    aggregate_by = "mean"
+  )
+
+  expect_equal(values["typeA", "bw3_zeros"], NaN)
+
+})
+
 test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
   expect_error({
     values <- bw_loci(bw1, unnamed_bed, bg_bwfiles = bw2,
@@ -776,3 +850,4 @@ test_that("bw_heatmap with bg returns 1 when fg == bg", {
   expect_equal(values[[1]][5, ], c(rep(1,10)))
 
 })
+
