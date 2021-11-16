@@ -15,7 +15,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: R (>= 3.6)
-biocViews:
+biocViews:  Software, Visualization, Sequencing, SequencingData, Coverage, ChIPSeq, ATACSeq, ChIPSeqData
 Imports:
   rtracklayer,
   dplyr,
