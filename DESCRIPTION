@@ -18,9 +18,7 @@ Depends: R (>= 3.6)
 biocViews:
 Imports:
   rtracklayer,
-  rmarkdown,
   dplyr,
-  tidyselect,
   grDevices,
   stats,
   methods,
@@ -28,21 +26,16 @@ Imports:
   stringr,
   reshape2,
   GenomeInfoDb,
-  GenomeInfoDbData,
   GenomicRanges,
   IRanges,
   purrr,
-  prettydoc,
-  scales,
   RColorBrewer,
   RCurl,
   tools,
-  furrr,
-  future
+  furrr
 Suggests: 
-    knitr,
-    testthat,
-    mockery
+  testthat,
+  mockery
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout
 BugReports: https://github.com/cnluzon/wigglescout/issues
