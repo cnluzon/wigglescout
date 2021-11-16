@@ -35,7 +35,8 @@ Imports:
   furrr
 Suggests: 
   testthat,
-  mockery
+  mockery,
+  knitr
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout
 BugReports: https://github.com/cnluzon/wigglescout/issues
