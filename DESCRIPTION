@@ -32,11 +32,13 @@ Imports:
   RColorBrewer,
   RCurl,
   tools,
-  furrr
+  furrr,
+  scales
 Suggests: 
   testthat,
   mockery,
-  knitr
+  knitr,
+  future
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout
 BugReports: https://github.com/cnluzon/wigglescout/issues
