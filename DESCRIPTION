@@ -7,15 +7,14 @@ Authors@R:
            role = c("aut", "cre"),
            email = "carmen.navarro@scilifelab.se"
            )
-Description: A set of tools to easily extract, visualize and perform statistical
-  tests on sets of bigWig files.
+Description: A set of tools to easily extract, summarize and visualize
+coverage on bigWig files genome-wide or in a locus-specific way. 
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Depends: R (>= 4.1)
-biocViews:  Software, Visualization, Sequencing, SequencingData, Coverage, ChIPSeq, ATACSeq, ChIPSeqData
+biocViews: Software, Visualization, Sequencing, Coverage, ChIPSeq, ATACSeq
 Imports:
   rtracklayer,
   dplyr,
