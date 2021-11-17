@@ -32,8 +32,7 @@ Imports:
   RColorBrewer,
   RCurl,
   tools,
-  furrr,
-  scales
+  furrr
 Suggests: 
   testthat,
   mockery,
