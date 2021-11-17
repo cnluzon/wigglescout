@@ -424,7 +424,8 @@ bw_profile <- function(bwfiles,
 #' Build a unscored bins GRanges object.
 #'
 #' Build a GRanges of bins of a given size, for a specific genome. Supported
-#' genomes (required for the package): mm9, mm10, hg38.
+#' genomes rely on \link[GenomeInfoDb]{Seqinfo}. This requires internet access
+#' to work.
 #'
 #' @param bin_size Bin size.
 #' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
@@ -432,6 +433,11 @@ bw_profile <- function(bwfiles,
 #' @importFrom GenomeInfoDb Seqinfo seqlengths
 #' @return A GRanges object
 #' @export
+#' @examples
+#'
+#' build_bins(bin_size = 50000, genome = "mm9")
+#' build_bins(bin_size = 50000, genome = "hg38")
+#' build_bins(bin_size = 50000, genome = "mm10")
 build_bins <- function(bin_size = 10000, genome = "mm9") {
   seqinfo <- seqlengths(Seqinfo(genome = genome))
   tileGenome(seqinfo, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
