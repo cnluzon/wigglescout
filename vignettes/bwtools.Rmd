@@ -70,7 +70,6 @@ with such region.
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
-library(scales)
 library(rtracklayer)
 library(GenomicRanges)
 library(wigglescout)
