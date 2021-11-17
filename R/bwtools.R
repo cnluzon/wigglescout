@@ -351,6 +351,18 @@ bw_heatmap <- function(bwfiles,
 #' @inheritParams bw_bins
 #' @return a data frame in long format
 #' @export
+#' @examples
+#' # Get the raw files
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#'
+#' # Profiles are returned in long format and include mean, median and stderror
+#' bw_profile(bw, loci = bed, mode = "stretch")
+#'
+#' bw_profile(bw, loci = bed, mode = "start",
+#'            upstream = 1000, downstream = 1500)
+#'
 bw_profile <- function(bwfiles,
                        bg_bwfiles = NULL,
                        loci = NULL,

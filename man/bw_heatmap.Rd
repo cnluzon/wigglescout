@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwtools.R
 \name{bw_heatmap}
 \alias{bw_heatmap}
-\title{Calculate heatmap matrix of a bigWig file over a BED file}
+\title{Calculate heatmap matrix of a bigWig file over a GRanges or BED file}
 \usage{
 bw_heatmap(
   bwfiles,
