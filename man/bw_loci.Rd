@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwtools.R
 \name{bw_loci}
 \alias{bw_loci}
-\title{Build a bed-scored GRanges object from a bigWig file list and a BED file.}
+\title{Score a bigWig file list and a BED file or GRanges object.}
 \usage{
 bw_loci(
   bwfiles,
@@ -39,18 +39,40 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 whole distribution (remove_top == 0).}
 }
 \description{
-Build a scored GRanges object from a bigWig file list and a BED file.
-The aggregating function (per locus) can be min, max, sd, mean.
+Build a scored GRanges object from a bigWig file list and a BED file or
+GRanges object. The aggregating function (per locus) can be min, max,
+sd, mean.
 }
 \details{
+Values can be normalized using background bigWig files (usually input
+files). By default, the value obtained will be bigwig / bg_bigwig per locus,
+per bigWig.
+
 bwfiles and bg_bwfiles must have the same length. If you are using same
 background for several files, then file paths must be repeated accordingly.
 
-Values can be normalized using background bigWig files (usually input
-files). By default, the value obtained will be bigwig / bg_bigwig per bin,
-per bigWig.
+norm_mode can be either "fc", where values will represent bigwig / bg_bigwig,
+or "log2fc", values will represent log2(bigwig / bg_bigwig) per locus.
+}
+\examples{
+# Get the raw files
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 
-If norm_func is specified, this can be changed to any given function, for
-instance, if norm_func = log2, values will represent log2(bigwig / bg_bigwig)
-per bin.
+# Run single bw with single bed
+bw_loci(bw, bed)
+
+# Use of some parameters
+bw_loci(bw, bed, labels = c("H33"), remove_top = 0.01)
+
+# Log2 fold change
+bw_loci(bw, loci = bed, bg_bwfiles = bw_inp, norm_mode = "log2fc")
+
+# Multiple bigWig
+bw_loci(c(bw, bw2),
+        loci = bed,
+        bg_bwfiles = c(bw_inp, bw_inp),
+        norm_mode = "log2fc")
 }
