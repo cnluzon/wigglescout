@@ -79,62 +79,62 @@ plot_bw_bins_scatter <- function(x,
                                  verbose = TRUE,
                                  density = FALSE,
                                  selection = NULL) {
-  bins_x <- bw_bins(
-    x,
-    bg_bwfiles = bg_x,
-    bin_size = bin_size,
-    genome = genome,
-    norm_mode = norm_mode_x,
-    labels = "score",
-    selection = selection
-  )
-
-  bins_y <- bw_bins(
-    y,
-    bg_bwfiles = bg_y,
-    bin_size = bin_size,
-    genome = genome,
-    norm_mode = norm_mode_y,
-    labels = "score",
-    selection = selection
-  )
-
-  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
-
-  main_plot <- .scatterplot_body(
-    bins_x,
-    bins_y,
-    highlight = highlight_data$ranges,
-    minoverlap = minoverlap,
-    highlight_label = highlight_data$labels,
-    highlight_colors = highlight_colors,
-    remove_top = remove_top,
-    density = density
-  )
-
-  verbose_tag <- NULL
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      genome = genome,
-      bin_size = bin_size,
-      minoverlap = minoverlap,
-      remove_top = remove_top
+    bins_x <- bw_bins(
+        x,
+        bg_bwfiles = bg_x,
+        bin_size = bin_size,
+        genome = genome,
+        norm_mode = norm_mode_x,
+        labels = "score",
+        selection = selection
     )
 
-    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
-  }
+    bins_y <- bw_bins(
+        y,
+        bg_bwfiles = bg_y,
+        bin_size = bin_size,
+        genome = genome,
+        norm_mode = norm_mode_y,
+        labels = "score",
+        selection = selection
+    )
 
-  title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
-  x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
-  y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
+    highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-  main_plot$plot + labs(
-    title = title,
-    x = x_label,
-    y = y_label,
-    caption = verbose_tag
-  ) + .theme_default()
+    main_plot <- .scatterplot_body(
+        bins_x,
+        bins_y,
+        highlight = highlight_data$ranges,
+        minoverlap = minoverlap,
+        highlight_label = highlight_data$labels,
+        highlight_colors = highlight_colors,
+        remove_top = remove_top,
+        density = density
+    )
+
+    verbose_tag <- NULL
+    if (verbose) {
+        # Show parameters and relevant values
+        relevant_params <- list(
+            genome = genome,
+            bin_size = bin_size,
+            minoverlap = minoverlap,
+            remove_top = remove_top
+        )
+
+        verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
+    }
+
+    title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
+    x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
+    y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
+
+    main_plot$plot + labs(
+        title = title,
+        x = x_label,
+        y = y_label,
+        caption = verbose_tag
+    ) + .theme_default()
 }
 
 #' Bin-based violin plot of a set of bigWig files
@@ -180,58 +180,58 @@ plot_bw_bins_violin <- function(bwfiles,
                                 remove_top = 0,
                                 verbose = TRUE,
                                 selection = NULL) {
-  bins_values <- bw_bins(
-    bwfiles,
-    bg_bwfiles = bg_bwfiles,
-    labels = labels,
-    bin_size = bin_size,
-    genome = genome,
-    per_locus_stat = per_locus_stat,
-    norm_mode = norm_mode,
-    remove_top = 0,
-    selection = selection
-  )
-
-  columns <- labels
-  if (is.null(labels)) {
-    columns <- .make_label_from_object(bwfiles)
-  }
-
-  main_plot <- .violin_body(
-    bins_values[, columns],
-    highlight = highlight,
-    minoverlap = minoverlap,
-    highlight_label = highlight_label,
-    highlight_colors = highlight_colors,
-    remove_top = remove_top
-  )
-
-  verbose_tag <- NULL
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      genome = genome,
-      bin_size = bin_size,
-      minoverlap = minoverlap,
-      remove_top = remove_top
+    bins_values <- bw_bins(
+        bwfiles,
+        bg_bwfiles = bg_bwfiles,
+        labels = labels,
+        bin_size = bin_size,
+        genome = genome,
+        per_locus_stat = per_locus_stat,
+        norm_mode = norm_mode,
+        remove_top = 0,
+        selection = selection
     )
 
-    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
-  }
+    columns <- labels
+    if (is.null(labels)) {
+        columns <- .make_label_from_object(bwfiles)
+    }
 
-  title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
-  y_label <- .make_norm_label(norm_mode, bg_bwfiles)
-
-  main_plot$plot + labs(
-    title = title,
-    x = "",
-    y = y_label,
-    caption = verbose_tag
-  ) + .theme_default() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
+    main_plot <- .violin_body(
+        bins_values[, columns],
+        highlight = highlight,
+        minoverlap = minoverlap,
+        highlight_label = highlight_label,
+        highlight_colors = highlight_colors,
+        remove_top = remove_top
     )
+
+    verbose_tag <- NULL
+    if (verbose) {
+        # Show parameters and relevant values
+        relevant_params <- list(
+            genome = genome,
+            bin_size = bin_size,
+            minoverlap = minoverlap,
+            remove_top = remove_top
+        )
+
+        verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
+    }
+
+    title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
+    y_label <- .make_norm_label(norm_mode, bg_bwfiles)
+
+    main_plot$plot + labs(
+        title = title,
+        x = "",
+        y = y_label,
+        caption = verbose_tag
+    ) + .theme_default() +
+        theme(
+            axis.text.x = element_text(angle = 45, hjust = 1),
+            legend.position = "none"
+        )
 }
 
 #' Plot a heatmap of a given bigWig file over a set of loci
@@ -284,63 +284,66 @@ plot_bw_heatmap <- function(bwfile,
                             max_rows_allowed = 10000,
                             order_by = NULL,
                             verbose = TRUE) {
-  values <- bw_heatmap(
-    bwfile,
-    loci,
-    bg_bwfiles = bg_bwfile,
-    mode = mode,
-    bin_size = bin_size,
-    upstream = upstream,
-    downstream = downstream,
-    middle = middle,
-    ignore_strand = ignore_strand,
-    norm_mode = norm_mode
-  )
-
-  main_plot <-
-    .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed, order_by)
-
-  verbose_tag <- NULL
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      mode = mode,
-      bin_size = bin_size,
-      middle = middle,
-      ignore_strand = ignore_strand,
-      row_resolution = max_rows_allowed
+    values <- bw_heatmap(
+        bwfile,
+        loci,
+        bg_bwfiles = bg_bwfile,
+        mode = mode,
+        bin_size = bin_size,
+        upstream = upstream,
+        downstream = downstream,
+        middle = middle,
+        ignore_strand = ignore_strand,
+        norm_mode = norm_mode
     )
 
-    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
-  }
+    main_plot <-
+        .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed, order_by)
 
-  nloci <- nrow(values[[1]])
-  y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci", sep = " ")
-  x_title <- .make_label_from_object(bwfile)
-  title <- "Heatmap"
+    verbose_tag <- NULL
+    if (verbose) {
+        # Show parameters and relevant values
+        relevant_params <- list(
+            mode = mode,
+            bin_size = bin_size,
+            middle = middle,
+            ignore_strand = ignore_strand,
+            row_resolution = max_rows_allowed
+        )
+
+        verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
+    }
+
+    nloci <- nrow(values[[1]])
+    y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci",
+                     sep = " ")
+    x_title <- .make_label_from_object(bwfile)
+    title <- "Heatmap"
 
 
-  main_plot$plot + .theme_default() +
-    theme(axis.line = element_blank(),
-          panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
-    .heatmap_lines(nloci,
-                   ncol(values[[1]]),
-                   bin_size,
-                   upstream,
-                   downstream,
-                   mode) +
-    scale_y_continuous(
-      breaks = c(1, nloci),
-      labels = c(nloci, "0"),
-      expand = c(0, 0)
-    ) +
-    labs(
-      fill = .make_norm_label(norm_mode, bg_bwfile),
-      title = title,
-      x = x_title,
-      y = y_label,
-      caption = verbose_tag
-    )
+    main_plot$plot + .theme_default() +
+        theme(axis.line = element_blank(),
+              panel.border = element_rect(color = "black",
+                                          fill = NA,
+                                          size = 0.1)) +
+        .heatmap_lines(nloci,
+                       ncol(values[[1]]),
+                       bin_size,
+                       upstream,
+                       downstream,
+                       mode) +
+        scale_y_continuous(
+            breaks = c(1, nloci),
+            labels = c(nloci, "0"),
+            expand = c(0, 0)
+        ) +
+        labs(
+            fill = .make_norm_label(norm_mode, bg_bwfile),
+            title = title,
+            x = x_title,
+            y = y_label,
+            caption = verbose_tag
+        )
 }
 
 
@@ -404,59 +407,59 @@ plot_bw_loci_scatter <- function(x,
                                  highlight_colors = NULL,
                                  remove_top = 0,
                                  verbose = TRUE) {
-  values_x <- bw_loci(
-    x,
-    bg_bwfiles = bg_x,
-    loci = loci,
-    norm_mode = norm_mode_x,
-    labels = "score"
-  )
-
-  values_y <- bw_loci(
-    y,
-    bg_bwfiles = bg_y,
-    loci = loci,
-    norm_mode = norm_mode_y,
-    labels = "score"
-  )
-
-  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
-
-  main_plot <- .scatterplot_body(values_x, values_y,
-    highlight = highlight_data$ranges,
-    minoverlap = minoverlap,
-    highlight_label = highlight_data$labels,
-    highlight_colors = highlight_colors,
-    remove_top = remove_top
-  )
-
-  # Show parameters and relevant values
-  loci_name <- "GRanges object"
-  if (is(loci, "character")) {
-    loci_name <- basename(loci)
-  }
-
-  verbose_tag <- NULL
-  if (verbose) {
-    relevant_params <- list(
-      loci = loci_name,
-      minoverlap = minoverlap,
-      remove_top = remove_top
+    values_x <- bw_loci(
+        x,
+        bg_bwfiles = bg_x,
+        loci = loci,
+        norm_mode = norm_mode_x,
+        labels = "score"
     )
 
-    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
-  }
+    values_y <- bw_loci(
+        y,
+        bg_bwfiles = bg_y,
+        loci = loci,
+        norm_mode = norm_mode_y,
+        labels = "score"
+    )
 
-  title <- paste("Per-locus coverage (", loci_name, ")", sep = "")
-  x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
-  y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
+    highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-  main_plot$plot + .theme_default() + labs(
-    title = title,
-    x = x_label,
-    y = y_label,
-    caption = verbose_tag
-  )
+    main_plot <- .scatterplot_body(values_x, values_y,
+                                   highlight = highlight_data$ranges,
+                                   minoverlap = minoverlap,
+                                   highlight_label = highlight_data$labels,
+                                   highlight_colors = highlight_colors,
+                                   remove_top = remove_top
+    )
+
+    # Show parameters and relevant values
+    loci_name <- "GRanges object"
+    if (is(loci, "character")) {
+        loci_name <- basename(loci)
+    }
+
+    verbose_tag <- NULL
+    if (verbose) {
+        relevant_params <- list(
+            loci = loci_name,
+            minoverlap = minoverlap,
+            remove_top = remove_top
+        )
+
+        verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
+    }
+
+    title <- paste("Per-locus coverage (", loci_name, ")", sep = "")
+    x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
+    y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
+
+    main_plot$plot + .theme_default() + labs(
+        title = title,
+        x = x_label,
+        y = y_label,
+        caption = verbose_tag
+    )
 }
 
 #' Summary heatmap of a categorized BED or GRanges object
@@ -489,36 +492,36 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          norm_mode = "fc",
                                          remove_top = 0,
                                          verbose = TRUE) {
-  summary_values <- bw_loci(bwfiles, loci,
-    bg_bwfiles = bg_bwfiles,
-    aggregate_by = aggregate_by,
-    norm_mode = norm_mode,
-    labels = labels,
-    remove_top = remove_top
-  )
-
-  colorscale <- .colorscale(norm_mode, bg_bwfiles)
-  plot <- .summary_body(summary_values)
-
-  title <- paste("Coverage per region (", aggregate_by, ")")
-
-  verbose_tag <- NULL
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      aggregate_by = aggregate_by,
-      remove_top = remove_top
+    summary_values <- bw_loci(bwfiles, loci,
+                              bg_bwfiles = bg_bwfiles,
+                              aggregate_by = aggregate_by,
+                              norm_mode = norm_mode,
+                              labels = labels,
+                              remove_top = remove_top
     )
 
-    verbose_tag <- .make_caption(relevant_params, list())
-  }
+    colorscale <- .colorscale(norm_mode, bg_bwfiles)
+    plot <- .summary_body(summary_values)
 
-  plot + colorscale + labs(
-    title = title,
-    caption = verbose_tag,
-    x = "",
-    y = ""
-  )
+    title <- paste("Coverage per region (", aggregate_by, ")")
+
+    verbose_tag <- NULL
+    if (verbose) {
+        # Show parameters and relevant values
+        relevant_params <- list(
+            aggregate_by = aggregate_by,
+            remove_top = remove_top
+        )
+
+        verbose_tag <- .make_caption(relevant_params, list())
+    }
+
+    plot + colorscale + labs(
+        title = title,
+        caption = verbose_tag,
+        x = "",
+        y = ""
+    )
 }
 
 
@@ -559,86 +562,87 @@ plot_bw_profile <- function(bwfiles,
                             remove_top = 0,
                             verbose = TRUE) {
 
-  values <- NULL
-  nloci <- NULL
-  x_label <- ""
+    values <- NULL
+    nloci <- NULL
+    x_label <- ""
 
-  if ((is(loci, "list") && length(loci) > 1) ||
-      (is(loci, "character") && length(loci) > 1)) {
-    if (length(bwfiles) > 1) {
-      stop("If multiple loci provided only a single bwfile is allowed")
+    if ((is(loci, "list") && length(loci) > 1) ||
+        (is(loci, "character") && length(loci) > 1)) {
+        if (length(bwfiles) > 1) {
+            stop("If multiple loci provided only a single bwfile is allowed")
+        }
+        if (is.null(labels)) {
+            labels <- lapply(loci, .make_label_from_object)
+            if (length(unique(labels)) < length(loci)) {
+                warning("Unlabeled objects or repeated labels. ",
+                        "Adding numeric indices.")
+                labels <- paste(labels, seq_len(length(labels)), sep = "_")
+            }
+        }
+        profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
+                                           bg_bwfiles = bg_bwfiles,
+                                           mode = mode,
+                                           bin_size = bin_size,
+                                           upstream = upstream,
+                                           downstream = downstream,
+                                           middle = middle,
+                                           ignore_strand = ignore_strand,
+                                           norm_mode = norm_mode,
+                                           remove_top = remove_top)
+
+        value_list <- purrr::map2(loci, labels, profile_function)
+        values <- do.call(rbind, value_list)
+        x_title <- "Multiple loci groups"
     }
-    if (is.null(labels)) {
-      labels <- lapply(loci, .make_label_from_object)
-      if (length(unique(labels)) < length(loci)) {
-        warning("Unlabeled objects or repeated labels. Adding numeric indices.")
-        labels <- paste(labels, seq_len(length(labels)), sep = "_")
-      }
+    else {
+        values <- bw_profile(bwfiles, loci, bg_bwfiles = bg_bwfiles,
+                             mode = mode,
+                             bin_size = bin_size,
+                             upstream = upstream,
+                             downstream = downstream,
+                             middle = middle,
+                             ignore_strand = ignore_strand,
+                             norm_mode = norm_mode,
+                             labels = labels,
+                             remove_top = remove_top)
+
+
+        nloci <- .loci_length(loci)
+        x_title <- paste(.make_label_from_object(loci),
+                         "-", nloci, "loci", sep = " ")
     }
-    profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
-                                       bg_bwfiles = bg_bwfiles,
-                                       mode = mode,
-                                       bin_size = bin_size,
-                                       upstream = upstream,
-                                       downstream = downstream,
-                                       middle = middle,
-                                       ignore_strand = ignore_strand,
-                                       norm_mode = norm_mode,
-                                       remove_top = remove_top)
 
-    value_list <- purrr::map2(loci, labels, profile_function)
-    values <- do.call(rbind, value_list)
-    x_title <- "Multiple loci groups"
-  }
-  else {
-    values <- bw_profile(bwfiles, loci, bg_bwfiles = bg_bwfiles,
-                         mode = mode,
-                         bin_size = bin_size,
-                         upstream = upstream,
-                         downstream = downstream,
-                         middle = middle,
-                         ignore_strand = ignore_strand,
-                         norm_mode = norm_mode,
-                         labels = labels,
-                         remove_top = remove_top)
+    y_label <- .make_norm_label(norm_mode, bg_bwfiles)
 
 
-    nloci <- .loci_length(loci)
-    x_title <- paste(.make_label_from_object(loci),
-                     "-", nloci, "loci", sep = " ")
-  }
+    verbose_tag <- NULL
+    if (verbose) {
+        # Show parameters and relevant values
+        relevant_params <- list(
+            bin_size = bin_size,
+            middle = middle,
+            mode = mode,
+            ignore_strand = ignore_strand,
+            remove_top = remove_top
+        )
 
-  y_label <- .make_norm_label(norm_mode, bg_bwfiles)
+        verbose_tag <- .make_caption(relevant_params, list())
+    }
 
+    if (!is.null(bg_bwfiles) && show_error == TRUE) {
+        warning("Stderr estimate not available when normalizing by input")
+        show_error <- FALSE
+    }
 
-  verbose_tag <- NULL
-  if (verbose) {
-    # Show parameters and relevant values
-    relevant_params <- list(
-      bin_size = bin_size,
-      middle = middle,
-      mode = mode,
-      ignore_strand = ignore_strand,
-      remove_top = remove_top
-    )
-
-    verbose_tag <- .make_caption(relevant_params, list())
-  }
-
-  if (!is.null(bg_bwfiles) && show_error == TRUE) {
-    warning("Stderr estimate not available when normalizing by input")
-    show_error <- FALSE
-  }
-
-  .profile_body(values, show_error, colors) +
-    .heatmap_lines(nloci, max(values$index), bin_size,
-                         upstream, downstream, mode, expand = FALSE) +
-    labs(
-      title = "Profile plot",
-      x = x_title,
-      y = y_label,
-      caption = verbose_tag
-    )
+    .profile_body(values, show_error, colors) +
+        .heatmap_lines(nloci, max(values$index), bin_size,
+                       upstream, downstream, mode, expand = FALSE) +
+        labs(
+            title = "Profile plot",
+            x = x_title,
+            y = y_label,
+            caption = verbose_tag
+        )
 }
 
 # Helper plot functions ---------------------------------------------------
@@ -651,75 +655,76 @@ plot_bw_profile <- function(bwfiles,
 #' @return Named list plot and calculated values
 .heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed,
                           order_by) {
-  # Order matrix by mean and transpose it (image works flipped)
-  if (is.null(order_by)) {
-    order_by <- order(rowMeans(values), decreasing = FALSE)
-  }
-  m <- t(values[order_by, ])
+    # Order matrix by mean and transpose it (image works flipped)
+    if (is.null(order_by)) {
+        order_by <- order(rowMeans(values), decreasing = FALSE)
+    }
+    m <- t(values[order_by, ])
 
-  nvalues <- nrow(m) * ncol(m)
+    nvalues <- nrow(m) * ncol(m)
 
-  n_non_finite <- length(m[!is.finite(m)])
-  m[!is.finite(m)] <- NA
+    n_non_finite <- length(m[!is.finite(m)])
+    m[!is.finite(m)] <- NA
 
-  zlim <- .color_limits(m, zmin, zmax)
+    zlim <- .color_limits(m, zmin, zmax)
 
-  zmin <- zlim[[1]]
-  zmax <- zlim[[2]]
+    zmin <- zlim[[1]]
+    zmax <- zlim[[2]]
 
-  # Cap values out of zlim
-  n_bottom_capped <- length(m[m < zmin])
-  m[m < zmin] <- zmin
+    # Cap values out of zlim
+    n_bottom_capped <- length(m[m < zmin])
+    m[m < zmin] <- zmin
 
-  n_top_capped <- length(m[m > zmax])
-  m[m > zmax] <- zmax
+    n_top_capped <- length(m[m > zmax])
+    m[m > zmax] <- zmax
 
-  df <- melt(m)
-  colnames(df) <- c("x", "y", "value")
+    df <- melt(m)
+    colnames(df) <- c("x", "y", "value")
 
-  df2 <- df
+    df2 <- df
 
-  downsample_factor <- NULL
-  if (ncol(m) > max_rows_allowed) {
-    # Downsample rows only and downsample only enough to fit max_rows. So
-    # we make sure we do not extremely downsample a value that only slightly
-    # exceeds our max resolution.
-    warning("Large matrix of ", ncol(m), ". Downscaling to ", max_rows_allowed)
-    downsample_factor <- round(ncol(m) / max_rows_allowed)
+    downsample_factor <- NULL
+    if (ncol(m) > max_rows_allowed) {
+        # Downsample rows only and downsample only enough to fit max_rows. So
+        # we make sure we do not extremely downsample a value that only slightly
+        # exceeds our max resolution.
+        warning("Large matrix of ", ncol(m),
+                ". Downscaling to ", max_rows_allowed)
+        downsample_factor <- round(ncol(m) / max_rows_allowed)
 
-    # .data prevents R CMD Check note
-    df2 <- df %>%
-      dplyr::group_by(
-        x = .data$x,
-        y = downsample_factor * round(.data$y / downsample_factor)
-      ) %>%
-      dplyr::summarise(value = mean(.data$value))
-  }
+        # .data prevents R CMD Check note
+        df2 <- df %>%
+            dplyr::group_by(
+                x = .data$x,
+                y = downsample_factor * round(.data$y / downsample_factor)
+            ) %>%
+            dplyr::summarise(value = mean(.data$value))
+    }
 
-  gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
+    gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
 
-  p <-
-    ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
-    geom_raster() +
-    scale_fill_gradientn(
-      colours = gcol(100),
-      limits = c(zmin, zmax),
-      breaks = c(zmin, zmax),
-      labels = format(c(zmin, zmax), digits = 2),
-      na.value = "#cccccc"
+    p <-
+        ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
+        geom_raster() +
+        scale_fill_gradientn(
+            colours = gcol(100),
+            limits = c(zmin, zmax),
+            breaks = c(zmin, zmax),
+            labels = format(c(zmin, zmax), digits = 2),
+            na.value = "#cccccc"
+        )
+
+    calculated <- list(
+        ncells = nvalues,
+        zmin = .round_ignore_null(zmin, 3),
+        zmax = .round_ignore_null(zmax, 3),
+        top_capped_vals = n_top_capped,
+        bottom_capped_vals = n_bottom_capped,
+        non_finite = n_non_finite,
+        downsample_factor = downsample_factor
     )
 
-  calculated <- list(
-    ncells = nvalues,
-    zmin = .round_ignore_null(zmin, 3),
-    zmax = .round_ignore_null(zmax, 3),
-    top_capped_vals = n_top_capped,
-    bottom_capped_vals = n_bottom_capped,
-    non_finite = n_non_finite,
-    downsample_factor = downsample_factor
-  )
-
-  list(plot = p, calculated = calculated)
+    list(plot = p, calculated = calculated)
 }
 
 #' Helper function plots a profile from a dataframe
@@ -731,37 +736,37 @@ plot_bw_profile <- function(bwfiles,
 #' @return A ggplot object
 .profile_body <- function(values, show_error, colors) {
 
-  values$min_error <- values$mean - values$sderror
-  values$max_error <- values$mean + values$sderror
+    values$min_error <- values$mean - values$sderror
+    values$max_error <- values$mean + values$sderror
 
-  p <- ggplot(
-    values,
-    aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
-  ) + geom_line(size=1) + .theme_default() +
-    theme(
-      legend.position = c(0.80, 0.90),
-      legend.direction = "vertical",
-      legend.title = element_blank(),
-      legend.background = element_rect(fill = alpha("white", 0.3))
-    )
+    p <- ggplot(
+        values,
+        aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
+    ) + geom_line(size=1) + .theme_default() +
+        theme(
+            legend.position = c(0.80, 0.90),
+            legend.direction = "vertical",
+            legend.title = element_blank(),
+            legend.background = element_rect(fill = alpha("white", 0.3))
+        )
 
-  if (!is.null(colors)) {
-    p <- p +
-      scale_color_manual(values = colors) +
-      scale_fill_manual(values = colors)
-  }
+    if (!is.null(colors)) {
+        p <- p +
+            scale_color_manual(values = colors) +
+            scale_fill_manual(values = colors)
+    }
 
-  if (show_error) {
-    p <- p + geom_ribbon(aes_string(
-      x = "index",
-      ymin = "min_error",
-      ymax = "max_error"
-    ),
-    color = NA, alpha = 0.3
-    )
-  }
+    if (show_error) {
+        p <- p + geom_ribbon(aes_string(
+            x = "index",
+            ymin = "min_error",
+            ymax = "max_error"
+        ),
+        color = NA, alpha = 0.3
+        )
+    }
 
-  p
+    p
 }
 
 
@@ -770,38 +775,38 @@ plot_bw_profile <- function(bwfiles,
 #' @return A ggplot object.
 #' @importFrom reshape2 melt
 .summary_body <- function(values) {
-  values <- round(values, 2)
+    values <- round(values, 2)
 
-  # y axis goes from bottom to top!
-  sample_names <- rev(colnames(values))
-  values$type <- rownames(values)
+    # y axis goes from bottom to top!
+    sample_names <- rev(colnames(values))
+    values$type <- rownames(values)
 
-  # Natural sort
-  ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
-  values$type <- factor(values$type, levels=ordered_levels)
+    # Natural sort
+    ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
+    values$type <- factor(values$type, levels=ordered_levels)
 
-  vals_long <- melt(values, id.vars = "type")
-  vals_long$variable <- factor(vals_long$variable, levels=sample_names)
+    vals_long <- melt(values, id.vars = "type")
+    vals_long$variable <- factor(vals_long$variable, levels=sample_names)
 
-  # Make sure NaN values will be written
-  vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
+    # Make sure NaN values will be written
+    vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
 
-  plot <-
-    ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
-    geom_tile(color = "white", size = 0.6) +
-    geom_text(aes_string(label = "text_value"), size = 4) +
-    coord_fixed() +
-    scale_y_discrete(position = "right") +
-    theme_minimal(base_size = 16) +
-    theme(
-      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-      legend.position = c(0.9, 1.2),
-      legend.direction = "horizontal",
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank()
-    )
+    plot <-
+        ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
+        geom_tile(color = "white", size = 0.6) +
+        geom_text(aes_string(label = "text_value"), size = 4) +
+        coord_fixed() +
+        scale_y_discrete(position = "right") +
+        theme_minimal(base_size = 16) +
+        theme(
+            axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+            legend.position = c(0.9, 1.2),
+            legend.direction = "horizontal",
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank()
+        )
 
-  plot
+    plot
 }
 
 
@@ -837,69 +842,69 @@ plot_bw_profile <- function(bwfiles,
                               remove_top = 0,
                               density = FALSE) {
 
-  filtered_values_x <- .remove_top_by_mean(x, remove_top, c("score"))
-  filtered_values_y <- .remove_top_by_mean(y, remove_top, c("score"))
+    filtered_values_x <- .remove_top_by_mean(x, remove_top, c("score"))
+    filtered_values_y <- .remove_top_by_mean(y, remove_top, c("score"))
 
-  # merge both
-  df_x <- data.frame(filtered_values_x$ranges)
-  df_y <- data.frame(filtered_values_y$ranges)
+    # merge both
+    df_x <- data.frame(filtered_values_x$ranges)
+    df_y <- data.frame(filtered_values_y$ranges)
 
-  bin_id <- c("seqnames", "start", "end", "strand", "width")
-  df <- merge(df_x, df_y, by = bin_id)
-  df <- df[, c(bin_id, "score.x", "score.y")]
-  colnames(df) <- c(bin_id, "x", "y")
+    bin_id <- c("seqnames", "start", "end", "strand", "width")
+    df <- merge(df_x, df_y, by = bin_id)
+    df <- df[, c(bin_id, "score.x", "score.y")]
+    colnames(df) <- c(bin_id, "x", "y")
 
-  filtered_values <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
+    filtered_values <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
 
-  calculated <-
-    list(
-      points = nrow(df),
-      NA.x = filtered_values_x$calculated$na,
-      filtered.x = filtered_values_x$calculated$filtered,
-      quant.x = .round_ignore_null(filtered_values_x$calculated$quantile),
-      NA.y = filtered_values_y$calculated$na,
-      filtered.y = filtered_values_y$calculated$filtered,
-      quant.y = .round_ignore_null(filtered_values_y$calculated$quantile)
-    )
+    calculated <-
+        list(
+            points = nrow(df),
+            NA.x = filtered_values_x$calculated$na,
+            filtered.x = filtered_values_x$calculated$filtered,
+            quant.x = .round_ignore_null(filtered_values_x$calculated$quantile),
+            NA.y = filtered_values_y$calculated$na,
+            filtered.y = filtered_values_y$calculated$filtered,
+            quant.y = .round_ignore_null(filtered_values_y$calculated$quantile)
+        )
 
-  filtered_values <- list(ranges=filtered_values, calculated=calculated)
+    filtered_values <- list(ranges=filtered_values, calculated=calculated)
 
-  extra_plot <- NULL
-  extra_colors <- NULL
+    extra_plot <- NULL
+    extra_colors <- NULL
 
-  if (!is.null(highlight)) {
-    highlight_values <- .multi_ranges_overlap(
-      filtered_values$ranges,
-      highlight,
-      highlight_label,
-      minoverlap
-    )
+    if (!is.null(highlight)) {
+        highlight_values <- .multi_ranges_overlap(
+            filtered_values$ranges,
+            highlight,
+            highlight_label,
+            minoverlap
+        )
 
-    extra_plot <- geom_point(
-      data = highlight_values,
-      aes_string(x = "x", y = "y", color = "group"),
-      alpha = 0.8
-    )
+        extra_plot <- geom_point(
+            data = highlight_values,
+            aes_string(x = "x", y = "y", color = "group"),
+            alpha = 0.8
+        )
 
-    if (!is.null(highlight_colors)) {
-      extra_colors <- scale_color_manual(values = highlight_colors)
+        if (!is.null(highlight_colors)) {
+            extra_colors <- scale_color_manual(values = highlight_colors)
+        }
     }
-  }
 
-  df <- data.frame(filtered_values$ranges)
+    df <- data.frame(filtered_values$ranges)
 
-  points <- geom_point(color = "#bbbbbb", alpha = 0.7)
-  if (density) {
-    points <- list(geom_bin2d(binwidth=0.05),
-                   scale_fill_gradient(low="#dddddd", high="#B22222"))
-  }
+    points <- geom_point(color = "#bbbbbb", alpha = 0.7)
+    if (density) {
+        points <- list(geom_bin2d(binwidth=0.05),
+                       scale_fill_gradient(low="#dddddd", high="#B22222"))
+    }
 
-  p <- ggplot(df, aes_string(x = "x", y = "y")) +
-    points +
-    extra_plot +
-    extra_colors
+    p <- ggplot(df, aes_string(x = "x", y = "y")) +
+        points +
+        extra_plot +
+        extra_colors
 
-  list(plot = p, calculated = calculated)
+    list(plot = p, calculated = calculated)
 }
 
 
@@ -913,69 +918,69 @@ plot_bw_profile <- function(bwfiles,
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
 .violin_body <- function(gr,
-                               highlight = NULL,
-                               minoverlap = 0L,
-                               highlight_label = NULL,
-                               highlight_colors = NULL,
-                               remove_top = 0) {
-  bwnames <- names(mcols(gr))
-  bins_filtered <- .remove_top_by_mean(gr, remove_top, bwnames)
+                         highlight = NULL,
+                         minoverlap = 0L,
+                         highlight_label = NULL,
+                         highlight_colors = NULL,
+                         remove_top = 0) {
+    bwnames <- names(mcols(gr))
+    bins_filtered <- .remove_top_by_mean(gr, remove_top, bwnames)
 
-  df <- data.frame(bins_filtered$ranges)
-  bin_id <- c("seqnames", "start", "end")
+    df <- data.frame(bins_filtered$ranges)
+    bin_id <- c("seqnames", "start", "end")
 
-  melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
+    melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
 
-  extra_plot <- NULL
-  extra_colors <- NULL
+    extra_plot <- NULL
+    extra_colors <- NULL
 
-  n_highlighted_points <- 0
+    n_highlighted_points <- 0
 
-  if (!is.null(highlight)) {
-    highlight_data <- .convert_and_label_loci(highlight, highlight_label)
+    if (!is.null(highlight)) {
+        highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-    highlight_values <- .multi_ranges_overlap(
-      bins_filtered$ranges,
-      highlight_data$ranges,
-      highlight_data$labels,
-      minoverlap
-    )
+        highlight_values <- .multi_ranges_overlap(
+            bins_filtered$ranges,
+            highlight_data$ranges,
+            highlight_data$labels,
+            minoverlap
+        )
 
-    n_highlighted_points <- nrow(highlight_values)
-    bin_id <-
-      c("seqnames", "start", "end", "width", "strand", "group")
-    melted_highlight <- melt(highlight_values, id.vars = bin_id)
+        n_highlighted_points <- nrow(highlight_values)
+        bin_id <-
+            c("seqnames", "start", "end", "width", "strand", "group")
+        melted_highlight <- melt(highlight_values, id.vars = bin_id)
 
-    extra_plot <- geom_jitter(
-      data = melted_highlight,
-      aes_string(x = "variable", y = "value", color = "variable"),
-      alpha = 0.7
-    )
+        extra_plot <- geom_jitter(
+            data = melted_highlight,
+            aes_string(x = "variable", y = "value", color = "variable"),
+            alpha = 0.7
+        )
 
-    if (!is.null(highlight_colors)) {
-      extra_colors <- scale_color_manual(values = highlight_colors)
+        if (!is.null(highlight_colors)) {
+            extra_colors <- scale_color_manual(values = highlight_colors)
+        }
     }
-  }
 
-  p <-
-    ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
-    geom_violin(fill = "#cccccc") +
-    theme(
-      legend.position = "none",
-      axis.text.x = element_text(angle = 45, hjust = 1)
-    ) +
-    extra_plot +
-    extra_colors
+    p <-
+        ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
+        geom_violin(fill = "#cccccc") +
+        theme(
+            legend.position = "none",
+            axis.text.x = element_text(angle = 45, hjust = 1)
+        ) +
+        extra_plot +
+        extra_colors
 
-  calculated <- list(
-    points = length(gr),
-    highlighted = n_highlighted_points,
-    removed = bins_filtered$calculated$filtered,
-    NAs = bins_filtered$calculated$na,
-    quantile_cutoff = .round_ignore_null(bins_filtered$calculated$quantile)
-  )
+    calculated <- list(
+        points = length(gr),
+        highlighted = n_highlighted_points,
+        removed = bins_filtered$calculated$filtered,
+        NAs = bins_filtered$calculated$na,
+        quantile_cutoff = .round_ignore_null(bins_filtered$calculated$quantile)
+    )
 
-  list(plot = p, calculated = calculated)
+    list(plot = p, calculated = calculated)
 }
 
 
@@ -995,30 +1000,30 @@ plot_bw_profile <- function(bwfiles,
                            mode,
                            expand = TRUE) {
 
-  axis_breaks <-
-    .profile_breaks(nbins, upstream, downstream, bin_size, mode)
-  axis_labels <- .profile_labels(upstream, downstream, mode)
+    axis_breaks <-
+        .profile_breaks(nbins, upstream, downstream, bin_size, mode)
+    axis_labels <- .profile_labels(upstream, downstream, mode)
 
-  lines <- axis_breaks[2]
-  if (mode == "stretch") {
-    lines <- axis_breaks[2:3]
-  }
+    lines <- axis_breaks[2]
+    if (mode == "stretch") {
+        lines <- axis_breaks[2:3]
+    }
 
-  x <- scale_x_continuous(breaks = axis_breaks,
-                          labels = axis_labels)
-
-  if (expand == TRUE) {
     x <- scale_x_continuous(breaks = axis_breaks,
-                            labels = axis_labels,
-                            expand = c(0, 0))
-  }
+                            labels = axis_labels)
 
-  gline <- geom_vline(
-    xintercept = lines,
-    linetype = "dashed",
-    color = "#111111",
-    size = 0.2
-  )
+    if (expand == TRUE) {
+        x <- scale_x_continuous(breaks = axis_breaks,
+                                labels = axis_labels,
+                                expand = c(0, 0))
+    }
+
+    gline <- geom_vline(
+        xintercept = lines,
+        linetype = "dashed",
+        color = "#111111",
+        size = 0.2
+    )
 
     list(x, gline)
 }
@@ -1037,28 +1042,28 @@ plot_bw_profile <- function(bwfiles,
 #'    is added as factor.
 .multi_ranges_overlap <- function(main_ranges, other_ranges, labels,
                                   minoverlap) {
-  .label_df <- function(df, name) {
-    data.frame(df, group = name)
-  }
+    .label_df <- function(df, name) {
+        data.frame(df, group = name)
+    }
 
-  subset_func <- partial(
-    IRanges::subsetByOverlaps,
-    x = main_ranges,
-    minoverlap = minoverlap
-  )
+    subset_func <- partial(
+        IRanges::subsetByOverlaps,
+        x = main_ranges,
+        minoverlap = minoverlap
+    )
 
-  ranges_subset <- lapply(other_ranges, subset_func)
-  subset_df <- lapply(ranges_subset, data.frame)
+    ranges_subset <- lapply(other_ranges, subset_func)
+    subset_df <- lapply(ranges_subset, data.frame)
 
-  df_values_labeled <- map2(subset_df, labels, .label_df)
-  highlight_values <- do.call(rbind, df_values_labeled)
+    df_values_labeled <- map2(subset_df, labels, .label_df)
+    highlight_values <- do.call(rbind, df_values_labeled)
 
-  # Order of factors need to match to assign properly colors to points
-  highlight_values$group <- factor(highlight_values$group,
-    levels = labels
-  )
+    # Order of factors need to match to assign properly colors to points
+    highlight_values$group <- factor(highlight_values$group,
+                                     levels = labels
+    )
 
-  highlight_values
+    highlight_values
 }
 
 
@@ -1069,21 +1074,23 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return a ggproto object
 .colorscale <- function(norm_mode, bg_bwfiles) {
-  legend_label <- .make_norm_label(norm_mode, bg_bwfiles)
-  colorscale <-
-    scale_fill_gradient(name = legend_label, low = "white", high = "#b22222",
-                        na.value = "#cccccc")
-  if (!is.null(bg_bwfiles)) {
+    legend_label <- .make_norm_label(norm_mode, bg_bwfiles)
     colorscale <-
-      scale_fill_gradient2(
-        name = legend_label,
-        low = "#2e6694",
-        mid = "white",
-        high = "#b22222",
-        na.value = "#cccccc"
-      )
-  }
-  colorscale
+        scale_fill_gradient(name = legend_label,
+                            low = "white",
+                            high = "#b22222",
+                            na.value = "#cccccc")
+    if (!is.null(bg_bwfiles)) {
+        colorscale <-
+            scale_fill_gradient2(
+                name = legend_label,
+                low = "#2e6694",
+                mid = "white",
+                high = "#b22222",
+                na.value = "#cccccc"
+            )
+    }
+    colorscale
 }
 
 #' Calculate color limits from a value matrix and provided parameters
@@ -1094,17 +1101,17 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return A pair of c(min, max)
 .color_limits <- function(m, zmin, zmax) {
-  # colorscale limits percentiles: 0.01 - 0.99
-  zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm = TRUE)
+    # colorscale limits percentiles: 0.01 - 0.99
+    zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm = TRUE)
 
-  if (!is.null(zmin)) {
-    zlim[[1]] <- zmin
-  }
+    if (!is.null(zmin)) {
+        zlim[[1]] <- zmin
+    }
 
-  if (!is.null(zmax)) {
-    zlim[[2]] <- zmax
-  }
-  zlim
+    if (!is.null(zmax)) {
+        zlim[[2]] <- zmax
+    }
+    zlim
 }
 
 #' Compute where the break ticks go in heatmap and profile
@@ -1114,25 +1121,25 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return Array of numeric
 .profile_breaks <- function(nrows, upstream, downstream, bin_size, mode) {
-  upstream_nbins <- floor(upstream / bin_size)
-  downstream_nbins <- floor(downstream / bin_size)
+    upstream_nbins <- floor(upstream / bin_size)
+    downstream_nbins <- floor(downstream / bin_size)
 
-  # index value starts at 1
-  axis_breaks <- c(1, upstream_nbins + 1, nrows + 1)
+    # index value starts at 1
+    axis_breaks <- c(1, upstream_nbins + 1, nrows + 1)
 
-  # Put ticks on the edges
-  axis_breaks <- axis_breaks - 0.5
-
-  if (mode == "stretch") {
-    axis_breaks <- c(1,
-                     upstream_nbins + 1,
-                     nrows - downstream_nbins + 1,
-                     nrows + 1)
-    # center ticks on the middle of the bins
+    # Put ticks on the edges
     axis_breaks <- axis_breaks - 0.5
-  }
 
-  axis_breaks
+    if (mode == "stretch") {
+        axis_breaks <- c(1,
+                         upstream_nbins + 1,
+                         nrows - downstream_nbins + 1,
+                         nrows + 1)
+        # center ticks on the middle of the bins
+        axis_breaks <- axis_breaks - 0.5
+    }
+
+    axis_breaks
 }
 
 #' Make profile labels
@@ -1143,19 +1150,19 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return Array of strings
 .profile_labels <- function(upstream, downstream, mode) {
-  if (mode == "stretch") {
-    c(
-      paste("-", upstream / 1000, "kb", sep = ""),
-      "start", "end",
-      paste("+", downstream / 1000, "kb", sep = "")
-    )
-  } else {
-    c(
-      paste("-", upstream / 1000, "kb", sep = ""),
-      mode,
-      paste("+", downstream / 1000, "kb", sep = "")
-    )
-  }
+    if (mode == "stretch") {
+        c(
+            paste("-", upstream / 1000, "kb", sep = ""),
+            "start", "end",
+            paste("+", downstream / 1000, "kb", sep = "")
+        )
+    } else {
+        c(
+            paste("-", upstream / 1000, "kb", sep = ""),
+            mode,
+            paste("+", downstream / 1000, "kb", sep = "")
+        )
+    }
 }
 
 #' Internal processing of loci sets and labels.
@@ -1171,29 +1178,29 @@ plot_bw_profile <- function(bwfiles,
 #' @importFrom methods is
 #' @return a named list with ranges and labels.
 .convert_and_label_loci <- function(loci_sets, labels) {
-  gr_list <- loci_sets
-  lab_list <- labels
-  if (!is.null(gr_list)) {
-    if (is(gr_list, "character")) {
-      # list is used instead of c() because GRanges c() concatenates ranges
-      gr_list <- lapply(loci_sets, rtracklayer::import, format = "BED")
-      if (is.null(labels)) {
-        lab_list <- basename(loci_sets)
-      }
+    gr_list <- loci_sets
+    lab_list <- labels
+    if (!is.null(gr_list)) {
+        if (is(gr_list, "character")) {
+            # list is used because GRanges c() concatenates ranges
+            gr_list <- lapply(loci_sets, rtracklayer::import, format = "BED")
+            if (is.null(labels)) {
+                lab_list <- basename(loci_sets)
+            }
+        }
+        else {
+            if (is.null(labels)) {
+                stop("GRanges used as highlight loci but no labels provided")
+            }
+            if (!is(gr_list, "list")) {
+                # If single GRanges was passed it needs to be converted to list
+                gr_list <- list(gr_list)
+            }
+        }
     }
-    else {
-      if (is.null(labels)) {
-        stop("GRanges used as highlight loci but no labels provided")
-      }
-      if (!is(gr_list, "list")) {
-        # If single GRanges was passed it needs to be converted to list
-        gr_list <- list(gr_list)
-      }
+    if (length(gr_list) != length(lab_list)) {
+        stop("Highlight loci sets don't match the number of labels provided")
     }
-  }
-  if (length(gr_list) != length(lab_list)) {
-    stop("Highlight loci sets don't match the number of labels provided")
-  }
 
-  list(ranges = gr_list, labels = lab_list)
+    list(ranges = gr_list, labels = lab_list)
 }

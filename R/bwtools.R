@@ -71,66 +71,66 @@ bw_loci <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  .validate_filelist(bwfiles)
-  .validate_locus_parameter(loci)
-  norm_func <- .process_norm_mode(norm_mode)
+    .validate_filelist(bwfiles)
+    .validate_locus_parameter(loci)
+    norm_func <- .process_norm_mode(norm_mode)
 
-  if (is.null(labels)) {
-    labels <- .make_label_from_object(bwfiles)
-  } else {
-    # Ensures later on we only try to access valid labels
-    labels <- make.names(labels)
-  }
-
-  bed <- .loci_to_granges(loci)
-
-  result <- NULL
-  if (is.null(aggregate_by)) {
-    if (is.null(bg_bwfiles)) {
-      result <- .multi_bw_ranges(bwfiles, labels,
-        granges = bed,
-        per_locus_stat = per_locus_stat,
-        remove_top = remove_top
-      )
+    if (is.null(labels)) {
+        labels <- .make_label_from_object(bwfiles)
+    } else {
+        # Ensures later on we only try to access valid labels
+        labels <- make.names(labels)
     }
-    else {
-      # Only want to normalize per-locus if not aggregating
-      result <- .multi_bw_ranges_norm(
-        bwfiles,
-        bg_bwfilelist = bg_bwfiles,
-        labels = labels,
-        granges = bed,
-        per_locus_stat = per_locus_stat,
-        norm_func = norm_func,
-        remove_top = remove_top,
-      )
+
+    bed <- .loci_to_granges(loci)
+
+    result <- NULL
+    if (is.null(aggregate_by)) {
+        if (is.null(bg_bwfiles)) {
+            result <- .multi_bw_ranges(bwfiles, labels,
+                                       granges = bed,
+                                       per_locus_stat = per_locus_stat,
+                                       remove_top = remove_top
+            )
+        }
+        else {
+            # Only want to normalize per-locus if not aggregating
+            result <- .multi_bw_ranges_norm(
+                bwfiles,
+                bg_bwfilelist = bg_bwfiles,
+                labels = labels,
+                granges = bed,
+                per_locus_stat = per_locus_stat,
+                norm_func = norm_func,
+                remove_top = remove_top,
+            )
+        }
+    } else {
+        result <- .multi_bw_ranges_aggregated(bwfiles,
+                                              labels = labels,
+                                              granges = bed,
+                                              per_locus_stat = per_locus_stat,
+                                              aggregate_by = aggregate_by,
+                                              remove_top = remove_top
+        )
+
+        if (!is.null(bg_bwfiles)) {
+            bg <- .multi_bw_ranges_aggregated(bg_bwfiles,
+                                              labels = labels,
+                                              granges = bed,
+                                              per_locus_stat = per_locus_stat,
+                                              aggregate_by = aggregate_by,
+                                              remove_top = remove_top
+            )
+
+            rows <- rownames(result)
+            result <- data.frame(norm_func(result[rows, labels] / bg[rows, labels]))
+            rownames(result) <- rows
+            colnames(result) <- labels
+        }
     }
-  } else {
-    result <- .multi_bw_ranges_aggregated(bwfiles,
-      labels = labels,
-      granges = bed,
-      per_locus_stat = per_locus_stat,
-      aggregate_by = aggregate_by,
-      remove_top = remove_top
-    )
 
-    if (!is.null(bg_bwfiles)) {
-      bg <- .multi_bw_ranges_aggregated(bg_bwfiles,
-        labels = labels,
-        granges = bed,
-        per_locus_stat = per_locus_stat,
-        aggregate_by = aggregate_by,
-        remove_top = remove_top
-      )
-
-      rows <- rownames(result)
-      result <- data.frame(norm_func(result[rows, labels] / bg[rows, labels]))
-      rownames(result) <- rows
-      colnames(result) <- labels
-    }
-  }
-
-  result
+    result
 }
 
 
@@ -200,31 +200,31 @@ bw_bins <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  .validate_filelist(bwfiles)
-  norm_func <- .process_norm_mode(norm_mode)
+    .validate_filelist(bwfiles)
+    norm_func <- .process_norm_mode(norm_mode)
 
-  if (is.null(labels)) {
-    labels <- .make_label_from_object(bwfiles)
-  }
+    if (is.null(labels)) {
+        labels <- .make_label_from_object(bwfiles)
+    }
 
-  tiles <- build_bins(bin_size = bin_size, genome = genome)
+    tiles <- build_bins(bin_size = bin_size, genome = genome)
 
-  if (is.null(bg_bwfiles)) {
-    result <- .multi_bw_ranges(bwfiles, labels, tiles,
-      per_locus_stat = per_locus_stat,
-      selection = selection,
-      remove_top = remove_top
-    )
-  } else {
-    result <- .multi_bw_ranges_norm(bwfiles, bg_bwfiles, labels, tiles,
-      per_locus_stat = per_locus_stat,
-      selection = selection,
-      norm_func = norm_func,
-      remove_top = remove_top
-    )
-  }
+    if (is.null(bg_bwfiles)) {
+        result <- .multi_bw_ranges(bwfiles, labels, tiles,
+                                   per_locus_stat = per_locus_stat,
+                                   selection = selection,
+                                   remove_top = remove_top
+        )
+    } else {
+        result <- .multi_bw_ranges_norm(bwfiles, bg_bwfiles, labels, tiles,
+                                        per_locus_stat = per_locus_stat,
+                                        selection = selection,
+                                        norm_func = norm_func,
+                                        remove_top = remove_top
+        )
+    }
 
-  result
+    result
 }
 
 #' Calculate heatmap matrix of a bigWig file over a GRanges or BED file
@@ -281,41 +281,40 @@ bw_heatmap <- function(bwfiles,
                        ignore_strand = FALSE,
                        norm_mode = "fc") {
 
-  .validate_filelist(bwfiles)
-  .validate_locus_parameter(loci)
-  granges <- .loci_to_granges(loci)
-  norm_func <- .process_norm_mode(norm_mode)
+    .validate_filelist(bwfiles)
+    .validate_locus_parameter(loci)
+    granges <- .loci_to_granges(loci)
+    norm_func <- .process_norm_mode(norm_mode)
 
-  .validate_profile_parameters(bin_size, upstream, downstream)
+    .validate_profile_parameters(bin_size, upstream, downstream)
 
-  if (is.null(labels)) {
-    labels <- basename(bwfiles)
-  }
+    if (is.null(labels)) {
+        labels <- basename(bwfiles)
+    }
 
-  if (length(bwfiles) != length(labels)) {
-    stop("labels and bwfiles must have the same length")
-  }
+    if (length(bwfiles) != length(labels)) {
+        stop("labels and bwfiles must have the same length")
+    }
 
-  calculate_matrix_norm_fixed <- partial(.calculate_matrix_norm,
-    granges = granges,
-    mode = mode,
-    bin_size = bin_size,
-    upstream = upstream,
-    downstream = downstream,
-    middle = middle,
-    ignore_strand = ignore_strand,
-    norm_func = norm_func,
-    remove_top = 0
-  )
+    calculate_matrix_norm_fixed <- partial(.calculate_matrix_norm,
+                                           granges = granges,
+                                           mode = mode,
+                                           bin_size = bin_size,
+                                           upstream = upstream,
+                                           downstream = downstream,
+                                           middle = middle,
+                                           ignore_strand = ignore_strand,
+                                           norm_func = norm_func,
+                                           remove_top = 0
+    )
 
-  if (is.null(bg_bwfiles)) {
-    values_list <- future_map(bwfiles, calculate_matrix_norm_fixed,
-                              bg_bw = NULL)
-  } else {
-    values_list <- future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
-  }
+    if (is.null(bg_bwfiles)) {
+        values_list <- future_map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
+    } else {
+        values_list <- future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
+    }
 
-  values_list
+    values_list
 }
 
 
@@ -384,48 +383,48 @@ bw_profile <- function(bwfiles,
                        norm_mode = "fc",
                        remove_top = 0) {
 
-  .validate_filelist(bwfiles)
-  .validate_locus_parameter(loci)
-  granges <- .loci_to_granges(loci)
-  norm_func <- .process_norm_mode(norm_mode)
+    .validate_filelist(bwfiles)
+    .validate_locus_parameter(loci)
+    granges <- .loci_to_granges(loci)
+    norm_func <- .process_norm_mode(norm_mode)
 
-  .validate_profile_parameters(bin_size, upstream, downstream)
+    .validate_profile_parameters(bin_size, upstream, downstream)
 
-  if (is.null(labels)) {
-    labels <- .make_label_from_object(bwfiles)
-  }
+    if (is.null(labels)) {
+        labels <- .make_label_from_object(bwfiles)
+    }
 
-  if (length(bwfiles) != length(labels)) {
-    stop("labels and bwfiles must have the same length")
-  }
+    if (length(bwfiles) != length(labels)) {
+        stop("labels and bwfiles must have the same length")
+    }
 
-  calculate_bw_profile_fixed <- purrr::partial(.calculate_bw_profile,
-    granges = granges,
-    mode = mode,
-    bin_size = bin_size,
-    upstream = upstream,
-    downstream = downstream,
-    middle = middle,
-    ignore_strand = ignore_strand,
-    norm_func = norm_func,
-    remove_top = remove_top
-  )
-
-  if (is.null(bg_bwfiles)) {
-    values_list <- furrr::future_map2(bwfiles, labels,
-      calculate_bw_profile_fixed,
-      bg_bw = NULL
+    calculate_bw_profile_fixed <- purrr::partial(.calculate_bw_profile,
+                                                 granges = granges,
+                                                 mode = mode,
+                                                 bin_size = bin_size,
+                                                 upstream = upstream,
+                                                 downstream = downstream,
+                                                 middle = middle,
+                                                 ignore_strand = ignore_strand,
+                                                 norm_func = norm_func,
+                                                 remove_top = remove_top
     )
-  } else {
-    values_list <- furrr::future_pmap(
-      list(bwfiles, bg_bwfiles, labels),
-      calculate_bw_profile_fixed
-    )
-  }
 
-  values <- do.call(rbind, values_list)
+    if (is.null(bg_bwfiles)) {
+        values_list <- furrr::future_map2(bwfiles, labels,
+                                          calculate_bw_profile_fixed,
+                                          bg_bw = NULL
+        )
+    } else {
+        values_list <- furrr::future_pmap(
+            list(bwfiles, bg_bwfiles, labels),
+            calculate_bw_profile_fixed
+        )
+    }
 
-  values
+    values <- do.call(rbind, values_list)
+
+    values
 }
 
 
@@ -472,20 +471,20 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
                        per_locus_stat = "mean",
                        selection = NULL) {
 
-  valid_bwfile <- bwfile
-  if (RCurl::url.exists(bwfile)) {
-    valid_bwfile <- tempfile()
-    download.file(bwfile, valid_bwfile)
-  }
+    valid_bwfile <- bwfile
+    if (RCurl::url.exists(bwfile)) {
+        valid_bwfile <- tempfile()
+        download.file(bwfile, valid_bwfile)
+    }
 
-  bw <- BigWigFile(valid_bwfile)
-  explicit_summary <- getMethod("summary", "BigWigFile")
+    bw <- BigWigFile(valid_bwfile)
+    explicit_summary <- getMethod("summary", "BigWigFile")
 
-  if (!is.null(selection)) {
-    granges <- subsetByOverlaps(granges, selection)
-  }
+    if (!is.null(selection)) {
+        granges <- subsetByOverlaps(granges, selection)
+    }
 
-  unlist(explicit_summary(bw, granges, type = per_locus_stat))
+    unlist(explicit_summary(bw, granges, type = per_locus_stat))
 }
 
 #' Intersect a list of bigWig files with a GRanges object
@@ -506,31 +505,31 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
                              selection = NULL,
                              remove_top = 0) {
 
-  if (length(bwfiles) != length(labels)) {
-    stop("BigWig file list and column names must have the same length.")
-  }
+    if (length(bwfiles) != length(labels)) {
+        stop("BigWig file list and column names must have the same length.")
+    }
 
-  summaries <- furrr::future_map(bwfiles, .bw_ranges,
-    granges = granges,
-    per_locus_stat = per_locus_stat,
-    selection = selection
-  )
+    summaries <- furrr::future_map(bwfiles, .bw_ranges,
+                                   granges = granges,
+                                   per_locus_stat = per_locus_stat,
+                                   selection = selection
+    )
 
-  # granges_cbind sorts each element so it's safer to merge and no need to
-  # sort after
-  result <- .granges_cbind(summaries, labels)
+    # granges_cbind sorts each element so it's safer to merge and no need to
+    # sort after
+    result <- .granges_cbind(summaries, labels)
 
-  # Include names if granges has them
-  if ("name" %in% names(mcols(granges))) {
-    result$name <- granges$name
-  }
+    # Include names if granges has them
+    if ("name" %in% names(mcols(granges))) {
+        result$name <- granges$name
+    }
 
-  result <- .remove_top_by_mean(
-    result, remove_top,
-    !names(mcols(result)) %in% c("name")
-  )
+    result <- .remove_top_by_mean(
+        result, remove_top,
+        !names(mcols(result)) %in% c("name")
+    )
 
-  result$ranges
+    result$ranges
 }
 
 #' Intersect a list of bigWig files with a GRanges object and aggregate by name
@@ -545,19 +544,19 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
                                         aggregate_by,
                                         remove_top) {
 
-  result <- .multi_bw_ranges(bwfiles, labels,
-    granges = granges,
-    per_locus_stat = per_locus_stat,
-    remove_top = remove_top
-  )
+    result <- .multi_bw_ranges(bwfiles, labels,
+                               granges = granges,
+                               per_locus_stat = per_locus_stat,
+                               remove_top = remove_top
+    )
 
-  df <- .aggregate_scores(
-    result,
-    group_col = "name",
-    aggregate_by = aggregate_by
-  )
+    df <- .aggregate_scores(
+        result,
+        group_col = "name",
+        aggregate_by = aggregate_by
+    )
 
-  .natural_sort_by_field(df, "name")
+    .natural_sort_by_field(df, "name")
 }
 
 
@@ -583,28 +582,28 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
                                   selection = NULL,
                                   norm_func = identity,
                                   remove_top = 0) {
-  if (length(bwfilelist) != length(bg_bwfilelist)) {
-    stop("Background and signal bwfile lists must have the same length.")
-  }
+    if (length(bwfilelist) != length(bg_bwfilelist)) {
+        stop("Background and signal bwfile lists must have the same length.")
+    }
 
-  result <- .multi_bw_ranges(bwfilelist, labels, granges,
-    per_locus_stat = per_locus_stat,
-    selection = selection
-  )
+    result <- .multi_bw_ranges(bwfilelist, labels, granges,
+                               per_locus_stat = per_locus_stat,
+                               selection = selection
+    )
 
-  bg <- .multi_bw_ranges(bg_bwfilelist, labels, granges,
-    per_locus_stat = per_locus_stat,
-    selection = selection
-  )
+    bg <- .multi_bw_ranges(bg_bwfilelist, labels, granges,
+                           per_locus_stat = per_locus_stat,
+                           selection = selection
+    )
 
-  result_df <- data.frame(result)
-  bg_df <- data.frame(bg)
-  result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
+    result_df <- data.frame(result)
+    bg_df <- data.frame(bg)
+    result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
 
-  result <- makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
-  result <- .remove_top_by_mean(result, remove_top, labels)
+    result <- makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
+    result <- .remove_top_by_mean(result, remove_top, labels)
 
-  result$ranges
+    result$ranges
 }
 
 # FIXME: importFrom tidyselect where does not work according to:
@@ -636,42 +635,42 @@ utils::globalVariables("where")
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
-  .validate_group_col(scored_granges, group_col)
+    .validate_group_col(scored_granges, group_col)
 
-  score_cols <- names(mcols(scored_granges))
-  score_cols <- score_cols[!score_cols %in% c(group_col)]
+    score_cols <- names(mcols(scored_granges))
+    score_cols <- score_cols[!score_cols %in% c(group_col)]
 
-  df <- data.frame(scored_granges) %>%
-    select(c(score_cols, group_col, .data$width))
+    df <- data.frame(scored_granges) %>%
+        select(c(score_cols, group_col, .data$width))
 
-  .validate_categories(df[, group_col])
+    .validate_categories(df[, group_col])
 
-  if (aggregate_by == "true_mean") {
-    sum_vals <- df[, score_cols, drop = FALSE] * df$width
-    colnames(sum_vals) <- score_cols
-    sum_vals[, group_col] <- df[, group_col]
-    sum_vals$width <- df$width
+    if (aggregate_by == "true_mean") {
+        sum_vals <- df[, score_cols, drop = FALSE] * df$width
+        colnames(sum_vals) <- score_cols
+        sum_vals[, group_col] <- df[, group_col]
+        sum_vals$width <- df$width
 
-    # Summarize SUM only
-    sum_vals <- sum_vals %>%
-      group_by_at(group_col) %>%
-      summarise(across(where(is.numeric), sum))
+        # Summarize SUM only
+        sum_vals <- sum_vals %>%
+            group_by_at(group_col) %>%
+            summarise(across(where(is.numeric), sum))
 
-    # Divide sum(scores) by sum(length) and keep only scores
-    df <- sum_vals[, score_cols, drop = FALSE] / sum_vals$width
-    df[, group_col] <- sum_vals[, group_col]
-  } else if (aggregate_by %in% c("mean", "median")) {
-    f <- get(aggregate_by)
-    df <- df %>%
-      group_by_at(group_col) %>%
-      summarise(across(where(is.numeric), f))
-  } else {
-    stop("Function not implemented as aggregate_by: ", aggregate_by)
-  }
+        # Divide sum(scores) by sum(length) and keep only scores
+        df <- sum_vals[, score_cols, drop = FALSE] / sum_vals$width
+        df[, group_col] <- sum_vals[, group_col]
+    } else if (aggregate_by %in% c("mean", "median")) {
+        f <- get(aggregate_by)
+        df <- df %>%
+            group_by_at(group_col) %>%
+            summarise(across(where(is.numeric), f))
+    } else {
+        stop("Function not implemented as aggregate_by: ", aggregate_by)
+    }
 
-  score_cols <- score_cols[!score_cols %in% c("width")]
-  df <- df[, c(score_cols, group_col), drop = FALSE]
-  data.frame(df)
+    score_cols <- score_cols[!score_cols %in% c("width")]
+    df <- df[, c(score_cols, group_col), drop = FALSE]
+    data.frame(df)
 }
 
 
@@ -717,48 +716,48 @@ utils::globalVariables("where")
                                   ignore_strand = FALSE,
                                   norm_func = identity,
                                   remove_top = 0) {
-  if (is.null(label)) {
-    label <- basename(bw)
-  }
+    if (is.null(label)) {
+        label <- basename(bw)
+    }
 
-  fg <- .calculate_matrix_norm(bw, granges,
-    mode = mode,
-    bin_size = bin_size,
-    upstream = upstream,
-    downstream = downstream,
-    middle = middle,
-    ignore_strand = ignore_strand,
-    norm_func = identity,
-    remove_top = remove_top
-  )
-
-  fg_sum <- .summarize_matrix(fg, label)
-  full <- fg_sum
-
-  if (! is.null(bg_bw)) {
-    bg <- .calculate_matrix_norm(
-      bg_bw,
-      granges,
-      mode = mode,
-      bin_size = bin_size,
-      upstream = upstream,
-      downstream = downstream,
-      middle = middle,
-      ignore_strand = ignore_strand,
-      norm_func = identity,
-      remove_top = remove_top
+    fg <- .calculate_matrix_norm(bw, granges,
+                                 mode = mode,
+                                 bin_size = bin_size,
+                                 upstream = upstream,
+                                 downstream = downstream,
+                                 middle = middle,
+                                 ignore_strand = ignore_strand,
+                                 norm_func = identity,
+                                 remove_top = remove_top
     )
 
-    bg_sum <- .summarize_matrix(bg, "bg")
+    fg_sum <- .summarize_matrix(fg, label)
+    full <- fg_sum
 
-    # FIXME: median and sderror? Does sderror even make sense here?
-    full <- data.frame(index = fg_sum$index, sample = fg_sum$sample,
-                       mean = norm_func(fg_sum$mean / bg_sum$mean),
-                       sderror = norm_func(fg_sum$mean / bg_sum$mean),
-                       median = norm_func(fg_sum$median / bg_sum$median))
-  }
+    if (! is.null(bg_bw)) {
+        bg <- .calculate_matrix_norm(
+            bg_bw,
+            granges,
+            mode = mode,
+            bin_size = bin_size,
+            upstream = upstream,
+            downstream = downstream,
+            middle = middle,
+            ignore_strand = ignore_strand,
+            norm_func = identity,
+            remove_top = remove_top
+        )
 
-  full
+        bg_sum <- .summarize_matrix(bg, "bg")
+
+        # FIXME: median and sderror? Does sderror even make sense here?
+        full <- data.frame(index = fg_sum$index, sample = fg_sum$sample,
+                           mean = norm_func(fg_sum$mean / bg_sum$mean),
+                           sderror = norm_func(fg_sum$mean / bg_sum$mean),
+                           median = norm_func(fg_sum$median / bg_sum$median))
+    }
+
+    full
 }
 
 #' Calculate a normalized heatmap matrix for a bigWig file over a BED file
@@ -777,58 +776,58 @@ utils::globalVariables("where")
                                    ignore_strand = FALSE,
                                    norm_func = identity,
                                    remove_top = 0) {
-  if (mode == "stretch") {
-    full <- .calculate_stretch_matrix(bw, granges,
-      bin_size = bin_size,
-      upstream = upstream,
-      downstream = downstream,
-      middle = middle,
-      ignore_strand = ignore_strand
-    )
+    if (mode == "stretch") {
+        full <- .calculate_stretch_matrix(bw, granges,
+                                          bin_size = bin_size,
+                                          upstream = upstream,
+                                          downstream = downstream,
+                                          middle = middle,
+                                          ignore_strand = ignore_strand
+        )
 
-    if (!is.null(bg_bw)) {
-      bg <- .calculate_stretch_matrix(bg_bw, granges,
-        bin_size = bin_size,
-        upstream = upstream,
-        downstream = downstream,
-        ignore_strand = ignore_strand
-      )
+        if (!is.null(bg_bw)) {
+            bg <- .calculate_stretch_matrix(bg_bw, granges,
+                                            bin_size = bin_size,
+                                            upstream = upstream,
+                                            downstream = downstream,
+                                            ignore_strand = ignore_strand
+            )
 
-      full <- norm_func(full / bg)
+            full <- norm_func(full / bg)
+        }
+    } else {
+        start_pos <- GenomicRanges::resize(granges, 1, fix = mode)
+        granges <- GenomicRanges::promoters(start_pos, upstream, downstream)
+
+        # To properly center one needs to floor separately upstream and downstream.
+        # This way the tick will always be in between bins.
+        npoints <- floor(upstream / bin_size) + floor(downstream / bin_size)
+
+        full <- .intersect_bw_and_granges(
+            bw,
+            granges,
+            npoints = npoints,
+            ignore_strand = FALSE
+        )
+
+        if (!is.null(bg_bw)) {
+            bg <- .intersect_bw_and_granges(
+                bg_bw,
+                granges,
+                npoints = npoints,
+                ignore_strand = FALSE
+            )
+
+            full <- norm_func(full / bg)
+        }
     }
-  } else {
-    start_pos <- GenomicRanges::resize(granges, 1, fix = mode)
-    granges <- GenomicRanges::promoters(start_pos, upstream, downstream)
 
-    # To properly center one needs to floor separately upstream and downstream.
-    # This way the tick will always be in between bins.
-    npoints <- floor(upstream / bin_size) + floor(downstream / bin_size)
-
-    full <- .intersect_bw_and_granges(
-      bw,
-      granges,
-      npoints = npoints,
-      ignore_strand = FALSE
-    )
-
-    if (!is.null(bg_bw)) {
-      bg <- .intersect_bw_and_granges(
-        bg_bw,
-        granges,
-        npoints = npoints,
-        ignore_strand = FALSE
-      )
-
-      full <- norm_func(full / bg)
+    if (remove_top > 0) {
+        top_quantile <- quantile(rowMeans(full), probs = c(1 - remove_top))
+        full <- full[rowMeans(full) <= top_quantile, ]
     }
-  }
 
-  if (remove_top > 0) {
-    top_quantile <- quantile(rowMeans(full), probs = c(1 - remove_top))
-    full <- full[rowMeans(full) <= top_quantile, ]
-  }
-
-  full
+    full
 }
 
 
@@ -842,6 +841,7 @@ utils::globalVariables("where")
 #' @param middle Number of base pairs that the middle section has. If not
 #'   provided, median is used.
 #' @param ignore_strand Ignore strand (bool)
+#' @importFrom GenomicRanges flank width
 #'
 #' @return Summary matrix
 .calculate_stretch_matrix <- function(bw,
@@ -851,35 +851,36 @@ utils::globalVariables("where")
                                       downstream = 2500,
                                       middle = NULL,
                                       ignore_strand = FALSE) {
-  left_npoints <- floor(upstream / bin_size)
-  right_npoints <- floor(downstream / bin_size)
+    left_npoints <- floor(upstream / bin_size)
+    right_npoints <- floor(downstream / bin_size)
 
-  if (is.null(middle)) {
-    # Stretch to the median value of the GR object
-    middle <- floor(median(GenomicRanges::width(granges)))
-  }
+    if (is.null(middle)) {
+        # Stretch to the median value of the GR object
+        middle <- floor(median(width(granges)))
+    }
 
-  middle_npoints <- floor(middle / bin_size)
+    middle_npoints <- floor(middle / bin_size)
 
-  left <- .intersect_bw_and_granges(bw,
-    GenomicRanges::flank(granges, upstream, start = TRUE),
-    npoints = left_npoints,
-    ignore_strand = ignore_strand
-  )
+    left <- .intersect_bw_and_granges(bw,
+                                      flank(granges, upstream, start = TRUE),
+                                      npoints = left_npoints,
+                                      ignore_strand = ignore_strand
+    )
 
-  right <- .intersect_bw_and_granges(bw,
-    GenomicRanges::flank(granges, downstream, start = FALSE),
-    npoints = right_npoints,
-    ignore_strand = ignore_strand
-  )
+    right <- .intersect_bw_and_granges(bw,
+                                       flank(granges,
+                                             downstream, start = FALSE),
+                                       npoints = right_npoints,
+                                       ignore_strand = ignore_strand
+    )
 
-  middle <- .intersect_bw_and_granges(bw,
-    granges,
-    npoints = middle_npoints,
-    ignore_strand = ignore_strand
-  )
+    middle <- .intersect_bw_and_granges(bw,
+                                        granges,
+                                        npoints = middle_npoints,
+                                        ignore_strand = ignore_strand
+    )
 
-  cbind(left, middle, right)
+    cbind(left, middle, right)
 }
 
 
@@ -897,22 +898,22 @@ utils::globalVariables("where")
                                       granges,
                                       npoints,
                                       ignore_strand = FALSE) {
-  bwfile <- .fetch_bigwig(bw)
+    bwfile <- .fetch_bigwig(bw)
 
-  values <- rtracklayer::summary(bwfile,
-    which = granges,
-    as = "matrix",
-    size = npoints
-  )
+    values <- rtracklayer::summary(bwfile,
+                                   which = granges,
+                                   as = "matrix",
+                                   size = npoints
+    )
 
-  # Reverse minus strand rows
-  if (!ignore_strand) {
-    indices <- seq(ncol(values), 1)
-    values[as.character(GenomicRanges::strand(granges)) == "-", ] <-
-      values[as.character(GenomicRanges::strand(granges)) == "-", indices]
-  }
+    # Reverse minus strand rows
+    if (!ignore_strand) {
+        indices <- seq(ncol(values), 1)
+        values[as.character(GenomicRanges::strand(granges)) == "-", ] <-
+            values[as.character(GenomicRanges::strand(granges)) == "-", indices]
+    }
 
-  values
+    values
 }
 
 
@@ -922,10 +923,10 @@ utils::globalVariables("where")
 #'
 #' @return A function
 .process_norm_mode <- function(mode) {
-  switch(mode,
-    "fc" = identity,
-    "log2fc" = log2
-  )
+    switch(mode,
+           "fc" = identity,
+           "log2fc" = log2
+    )
 }
 
 
@@ -939,31 +940,31 @@ utils::globalVariables("where")
 #' @importFrom stats median sd
 #' @return A data frame with summarized values, stderr and medians, plus label.
 .summarize_matrix <- function(matrix, label) {
-  # Ignore Inf and NaN in the computation of means/SD
-  matrix[is.infinite(matrix)] <- NA
+    # Ignore Inf and NaN in the computation of means/SD
+    matrix[is.infinite(matrix)] <- NA
 
-  omitted_vals <- sum(is.na(matrix))
-  if (omitted_vals > 100) {
-    mean_per_locus <- omitted_vals / nrow(matrix)
-    warning(
-      "Profile plot: ",
-      omitted_vals, " generated ( ",
-      mean_per_locus, " per locus)"
+    omitted_vals <- sum(is.na(matrix))
+    if (omitted_vals > 100) {
+        mean_per_locus <- omitted_vals / nrow(matrix)
+        warning(
+            "Profile plot: ",
+            omitted_vals, " generated ( ",
+            mean_per_locus, " per locus)"
+        )
+    }
+
+    df <- data.frame(
+        mean = colMeans(matrix, na.rm = TRUE),
+        sderror = apply(
+            matrix, 2,
+            function(n) {
+                sd(n, na.rm = TRUE) / sqrt(sum(!is.na(n)))
+            }
+        ),
+        median = apply(matrix, 2, median, na.rm = TRUE)
     )
-  }
 
-  df <- data.frame(
-    mean = colMeans(matrix, na.rm = TRUE),
-    sderror = apply(
-      matrix, 2,
-      function(n) {
-        sd(n, na.rm = TRUE) / sqrt(sum(!is.na(n)))
-      }
-    ),
-    median = apply(matrix, 2, median, na.rm = TRUE)
-  )
-
-  df$index <- as.integer(rownames(df))
-  df$sample <- label
-  df
+    df$index <- as.integer(rownames(df))
+    df$sample <- label
+    df
 }

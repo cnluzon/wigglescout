@@ -7,6 +7,7 @@
     - Replace T/F values with TRUE/FALSE.
     - Calls like warning(), stop() do not contain paste() calls or
       error keywords.
+    - Indent 4 spaces all.
 
 # wigglescout 0.13.4
 
