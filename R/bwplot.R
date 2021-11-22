@@ -563,7 +563,7 @@ plot_bw_profile <- function(bwfiles,
       labels <- lapply(loci, .make_label_from_object)
       if (length(unique(labels)) < length(loci)) {
         warning("Unlabeled objects or repeated labels. Adding numeric indices.")
-        labels <- paste(labels, 1:length(labels), sep = "_")
+        labels <- paste(labels, seq_len(length(labels)), sep = "_")
       }
     }
     profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
