@@ -519,7 +519,7 @@ test_that(
     m <- mock(profile_values)
     with_mock(bw_profile = m, {
       expect_warning({p <- plot_bw_profile(bw1, bg_bwfiles = bw2, loci = bed, show_error=TRUE)},
-                     "Error estimate not available when normalizing by input")
+                     "Stderr estimate not available when normalizing by input")
 
       expect_is(p, "ggplot")
       expect_false("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))

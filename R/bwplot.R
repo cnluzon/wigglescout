@@ -616,7 +616,7 @@ plot_bw_profile <- function(bwfiles,
   }
 
   if (!is.null(bg_bwfiles) && show_error == TRUE) {
-    warning("Error estimate not available when normalizing by input")
+    warning("Stderr estimate not available when normalizing by input")
     show_error <- FALSE
   }
 
