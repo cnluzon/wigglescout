@@ -7,8 +7,13 @@ Authors@R:
            role = c("aut", "cre"),
            email = "carmen.navarro@scilifelab.se"
            )
-Description: A set of tools to easily extract, summarize and visualize
-  coverage on bigWig files genome-wide or in a locus-specific way.
+Description: Wigglescout is a set of tools to easily extract, summarize and
+  visualize coverage on bigWig files. It provides a set of functions that
+  calculate summary values genome-wide or in a locus-specific way. On top of
+  these calculation functions, an out-of-the-box set of plotting functions is
+  provided, to make figures like scatterplots, heatmaps, and profile plots.
+  Wigglescout is built on top of widely used libraries, such as rtracklayer,
+  GenomicRanges, dplyr and ggplot2.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -31,6 +36,7 @@ Imports:
   RColorBrewer,
   RCurl,
   tools,
+  utils,
   furrr
 Suggests: 
   testthat,
