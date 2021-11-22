@@ -377,6 +377,7 @@ plot_bw_heatmap <- function(bwfile,
 #' @param verbose Verbose plot. Returns a plot with all relevant parameters in
 #'   a caption.
 #' @import ggplot2
+#' @importFrom methods is
 #' @return A ggplot object.
 #' @examples
 #' # Get the raw files
@@ -427,7 +428,7 @@ plot_bw_loci_scatter <- function(x,
 
   # Show parameters and relevant values
   loci_name <- "GRanges object"
-  if (class(loci) == "character") {
+  if (is(loci, "character")) {
     loci_name <- basename(loci)
   }
 
@@ -525,6 +526,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @inheritParams bw_profile
 #' @import ggplot2
+#' @importFrom methods is
 #' @return A ggplot object.
 #' @examples
 #' # Get the raw files
@@ -555,7 +557,7 @@ plot_bw_profile <- function(bwfiles,
   nloci <- NULL
   x_label <- ""
 
-  if ((class(loci) == "list" && length(loci) > 1) || (class(loci) == "character" && length(loci) > 1)) {
+  if ((is(loci, "list") && length(loci) > 1) || (is(loci, "character") && length(loci) > 1)) {
     if (length(bwfiles) > 1) {
       stop("If multiple loci provided only a single bwfile is allowed")
     }
@@ -1150,13 +1152,13 @@ plot_bw_profile <- function(bwfiles,
 #'   all BED files or all GRanges objects.
 #' @param labels One or more labels. Lengths need to match loci_sets or be NULL,
 #'   in which case loci_sets are assumed to be BED files.
-
+#' @importFrom methods is
 #' @return a named list with ranges and labels.
 .convert_and_label_loci <- function(loci_sets, labels) {
   gr_list <- loci_sets
   lab_list <- labels
   if (!is.null(gr_list)) {
-    if (class(gr_list) == "character") {
+    if (is(gr_list, "character")) {
       # list is used instead of c() because GRanges c() concatenates ranges
       gr_list <- lapply(loci_sets, rtracklayer::import, format = "BED")
       if (is.null(labels)) {
@@ -1167,7 +1169,7 @@ plot_bw_profile <- function(bwfiles,
       if (is.null(labels)) {
         stop("GRanges used as highlight loci but no labels provided")
       }
-      if (class(gr_list) != "list") {
+      if (!is(gr_list, "list")) {
         # If single GRanges was passed it needs to be converted to list
         gr_list <- list(gr_list)
       }

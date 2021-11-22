@@ -85,10 +85,11 @@
 #' @param loci Either a BED file or a GRanges object
 #' @return A GRanges object
 #' @importFrom rtracklayer import
+#' @importFrom methods is
 #' @importFrom GenomeInfoDb sortSeqlevels
 .loci_to_granges <- function(loci) {
   bed <- loci
-  if (class(loci) == "character") {
+  if (is(loci, "character")){
     bed <- import(loci, format = "BED")
   }
 
@@ -288,13 +289,14 @@
 #' the parameter is otherwise a GRanges object, which is also valid.
 #'
 #' @param locus_param Parameter to validate
+#' @importFrom methods is
 #' @return NULL
 .validate_locus_parameter <- function(locus_param) {
-  if (class(locus_param) == "character") {
+  if (is(locus_param, "character")) {
     .validate_filelist(locus_param)
   }
   else {
-    if (class(locus_param) != "GRanges") {
+    if (!is(locus_param, "GRanges")) {
       msg <- paste0("Unexpected type: ", class(locus_param))
       stop(msg)
     }
