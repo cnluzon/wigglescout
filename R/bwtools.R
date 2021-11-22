@@ -660,7 +660,7 @@ utils::globalVariables("where")
       group_by_at(group_col) %>%
       summarise(across(where(is.numeric), f))
   } else {
-    stop(paste("Function not implemented as aggregate_by:", aggregate_by))
+    stop("Function not implemented as aggregate_by: ", aggregate_by)
   }
 
   score_cols <- score_cols[!score_cols %in% c("width")]
@@ -939,11 +939,11 @@ utils::globalVariables("where")
   omitted_vals <- sum(is.na(matrix))
   if (omitted_vals > 100) {
     mean_per_locus <- omitted_vals / nrow(matrix)
-    warning(paste(
-      "Profile plot:",
-      omitted_vals, "generated (",
-      mean_per_locus, "per locus)"
-    ))
+    warning(
+      "Profile plot: ",
+      omitted_vals, " generated ( ",
+      mean_per_locus, " per locus)"
+    )
   }
 
   df <- data.frame(

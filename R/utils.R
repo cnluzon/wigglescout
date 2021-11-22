@@ -258,10 +258,9 @@
   # Test number of values in group_col
   ncat <- length(levels(as.factor(cat_values)))
   if (ncat > max_categories) {
-    warning(paste(
-      "Number of values in group column field very large:", ncat,
-      "(does BED file have unique IDs instead of categories?)"
-    ))
+    warning("Number of values in group column field very large: ", ncat,
+      " (does BED file have unique IDs instead of categories?)"
+    )
   }
 }
 
@@ -324,15 +323,15 @@
 #'
 .validate_profile_parameters <- function(bin_size, upstream, downstream) {
   if (bin_size <= 0) {
-    stop(paste("bin size must be a positive value:", bin_size))
+    stop("bin size must be a positive value: ", bin_size)
   }
 
   if (upstream <= 0) {
-    stop(paste("upstream size must be a positive value:", upstream))
+    stop("upstream size must be a positive value: ", upstream)
   }
 
   if (downstream <= 0) {
-    stop(paste("downstream size must be a positive value:", downstream))
+    stop("downstream size must be a positive value: ", downstream)
   }
 
   if (bin_size > upstream || bin_size > downstream) {

@@ -673,12 +673,7 @@ plot_bw_profile <- function(bwfiles,
     # Downsample rows only and downsample only enough to fit max_rows. So
     # we make sure we do not extremely downsample a value that only slightly
     # exceeds our max resolution.
-    warning(paste0(
-      "Large matrix of ",
-      ncol(m),
-      ". Downscaling to ",
-      max_rows_allowed
-    ))
+    warning("Large matrix of ", ncol(m), ". Downscaling to ", max_rows_allowed)
     downsample_factor <- round(ncol(m) / max_rows_allowed)
 
     # .data prevents R CMD Check note
