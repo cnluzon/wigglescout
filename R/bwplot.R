@@ -49,6 +49,18 @@
 #' @import ggplot2
 #' @inheritParams bw_bins
 #' @return A ggplot object.
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#'
+#' # Sample bigWig files only have valid values on this region
+#' locus <- GenomicRanges::GRanges(
+#'   seqnames = "chr15",
+#'   IRanges::IRanges(102600000, 103100000)
+#' )
+#'
+#' plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus)
 #' @export
 plot_bw_bins_scatter <- function(x,
                                  y,
@@ -139,6 +151,18 @@ plot_bw_bins_scatter <- function(x,
 #' @import ggplot2
 #' @importFrom reshape2 melt
 #' @return A ggplot object.
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#'
+#' # Sample bigWig files only have valid values on this region
+#' locus <- GenomicRanges::GRanges(
+#'   seqnames = "chr15",
+#'   IRanges::IRanges(102600000, 103100000)
+#' )
+#'
+#' plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus)
 #' @export
 plot_bw_bins_violin <- function(bwfiles,
                                 bg_bwfiles = NULL,
@@ -231,6 +255,14 @@ plot_bw_bins_violin <- function(bwfiles,
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
 #' @inheritParams plot_bw_profile
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#'
+#'
+#' plot_bw_heatmap(bw, loci = bed,
+#'                 mode = "center", upstream = 1000, downstream = 1500)
 #' @export
 plot_bw_heatmap <- function(bwfile,
                             loci,
@@ -346,6 +378,13 @@ plot_bw_heatmap <- function(bwfile,
 #'   a caption.
 #' @import ggplot2
 #' @return A ggplot object.
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#'
+#' plot_bw_loci_scatter(bw, bw2, loci = bed)
 #' @export
 plot_bw_loci_scatter <- function(x,
                                  y,
@@ -427,6 +466,13 @@ plot_bw_loci_scatter <- function(x,
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @inheritParams bw_loci
 #' @return A ggplot object
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package = "wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package = "wigglescout")
+#' bed <- system.file("extdata", "sample_chromhmm.bed", package = "wigglescout")
+#'
+#' plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed, labels = c("H33", "H3K9m3"))
 #' @export
 plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          loci,
@@ -480,6 +526,14 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 #' @inheritParams bw_profile
 #' @import ggplot2
 #' @return A ggplot object.
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#'
+#'
+#' plot_bw_profile(bw, loci = bed,
+#'                 mode = "stretch", upstream = 1000, downstream = 1000)
 #' @export
 plot_bw_profile <- function(bwfiles,
                             loci,

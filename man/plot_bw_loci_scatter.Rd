@@ -72,3 +72,11 @@ represent log2(x / bg_x) for each bin.
 Values that are invalid (NaN, Inf, -Inf) in doing such normalization will
 be ignored and shown as warnings, as this is ggplot default behavior.
 }
+\examples{
+# Get the raw files
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+
+plot_bw_loci_scatter(bw, bw2, loci = bed)
+}

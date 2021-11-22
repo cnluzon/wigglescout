@@ -79,3 +79,12 @@ function, if one would want to sort one heatmap by values on another one.}
 \description{
 Plot a heatmap of a given bigWig file over a set of loci
 }
+\examples{
+# Get the raw files
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+
+
+plot_bw_heatmap(bw, loci = bed,
+                mode = "center", upstream = 1000, downstream = 1500)
+}
