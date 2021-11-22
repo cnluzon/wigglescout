@@ -52,7 +52,8 @@
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
 #'
 #' # Sample bigWig files only have valid values on this region
 #' locus <- GenomicRanges::GRanges(
@@ -154,7 +155,8 @@ plot_bw_bins_scatter <- function(x,
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw",
+#'                    package="wigglescout")
 #'
 #' # Sample bigWig files only have valid values on this region
 #' locus <- GenomicRanges::GRanges(
@@ -245,7 +247,8 @@ plot_bw_bins_violin <- function(bwfiles,
 #' @param max_rows_allowed Maximum number of loci that will be allowed in the
 #'   plot. If the amount of loci exceeds this value, the plot will be binned
 #'   on the y axis until it fits max_rows_allowed. This speeds up plotting of
-#'   very large matrices, where higher resolution would not be perceivable by eye.
+#'   very large matrices, where higher resolution would not be perceivable by
+#'   eye.
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @param order_by Specific order to display rows. By default rows are sorted
 #'   decreasingly by mean. Order should be an array of integers of the same
@@ -382,7 +385,8 @@ plot_bw_heatmap <- function(bwfile,
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw",
+#'                    package="wigglescout")
 #' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #'
 #' plot_bw_loci_scatter(bw, bw2, loci = bed)
@@ -470,10 +474,12 @@ plot_bw_loci_scatter <- function(x,
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package = "wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package = "wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package = "wigglescout")
 #' bed <- system.file("extdata", "sample_chromhmm.bed", package = "wigglescout")
 #'
-#' plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed, labels = c("H33", "H3K9m3"))
+#' plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed,
+#'                              labels = c("H33", "H3K9m3"))
 #' @export
 plot_bw_loci_summary_heatmap <- function(bwfiles,
                                          loci,
@@ -557,7 +563,8 @@ plot_bw_profile <- function(bwfiles,
   nloci <- NULL
   x_label <- ""
 
-  if ((is(loci, "list") && length(loci) > 1) || (is(loci, "character") && length(loci) > 1)) {
+  if ((is(loci, "list") && length(loci) > 1) ||
+      (is(loci, "character") && length(loci) > 1)) {
     if (length(bwfiles) > 1) {
       stop("If multiple loci provided only a single bwfile is allowed")
     }
@@ -597,7 +604,8 @@ plot_bw_profile <- function(bwfiles,
 
 
     nloci <- .loci_length(loci)
-    x_title <- paste(.make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+    x_title <- paste(.make_label_from_object(loci),
+                     "-", nloci, "loci", sep = " ")
   }
 
   y_label <- .make_norm_label(norm_mode, bg_bwfiles)
@@ -641,7 +649,8 @@ plot_bw_profile <- function(bwfiles,
 #' @inheritParams plot_bw_heatmap
 #'
 #' @return Named list plot and calculated values
-.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed, order_by) {
+.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed,
+                          order_by) {
   # Order matrix by mean and transpose it (image works flipped)
   if (is.null(order_by)) {
     order_by <- order(rowMeans(values), decreasing = FALSE)
@@ -680,8 +689,10 @@ plot_bw_profile <- function(bwfiles,
 
     # .data prevents R CMD Check note
     df2 <- df %>%
-      dplyr::group_by(x = .data$x,
-                      y = downsample_factor * round(.data$y / downsample_factor)) %>%
+      dplyr::group_by(
+        x = .data$x,
+        y = downsample_factor * round(.data$y / downsample_factor)
+      ) %>%
       dplyr::summarise(value = mean(.data$value))
   }
 
@@ -1024,7 +1035,8 @@ plot_bw_profile <- function(bwfiles,
 #' @return A data.frame in tall format with the values of the overlapping loci.
 #'    Loci returned belong to other_ranges, NOT main_ranges. A group field
 #'    is added as factor.
-.multi_ranges_overlap <- function(main_ranges, other_ranges, labels, minoverlap) {
+.multi_ranges_overlap <- function(main_ranges, other_ranges, labels,
+                                  minoverlap) {
   .label_df <- function(df, name) {
     data.frame(df, group = name)
   }
@@ -1059,7 +1071,8 @@ plot_bw_profile <- function(bwfiles,
 .colorscale <- function(norm_mode, bg_bwfiles) {
   legend_label <- .make_norm_label(norm_mode, bg_bwfiles)
   colorscale <-
-    scale_fill_gradient(name = legend_label, low = "white", high = "#b22222", na.value = "#cccccc")
+    scale_fill_gradient(name = legend_label, low = "white", high = "#b22222",
+                        na.value = "#cccccc")
   if (!is.null(bg_bwfiles)) {
     colorscale <-
       scale_fill_gradient2(
@@ -1111,7 +1124,10 @@ plot_bw_profile <- function(bwfiles,
   axis_breaks <- axis_breaks - 0.5
 
   if (mode == "stretch") {
-    axis_breaks <- c(1, upstream_nbins + 1, nrows - downstream_nbins + 1, nrows + 1)
+    axis_breaks <- c(1,
+                     upstream_nbins + 1,
+                     nrows - downstream_nbins + 1,
+                     nrows + 1)
     # center ticks on the middle of the bins
     axis_breaks <- axis_breaks - 0.5
   }

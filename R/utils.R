@@ -187,8 +187,8 @@
 #' @param columns Which columns to use. If more than one, quantile will be
 #'   selected according to means.
 #'
-#' @return A named list, fields ranges for the resulting GRanges, plus calculated
-#'   values: quantile_value, filtered, na_values.
+#' @return A named list, fields ranges for the resulting GRanges, plus
+#'   calculated values: quantile_value, filtered, na_values.
 .remove_top_by_mean <- function(granges, quantile, columns) {
   n_filtered <- 0
   top_quantile <- NULL

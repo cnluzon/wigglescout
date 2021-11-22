@@ -62,7 +62,8 @@ or "log2fc", values will represent log2(bigwig / bg_bigwig) per locus.
 # Get the raw files
 bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata",
+                   "sample_H3K9me3_ChIP.bw", package="wigglescout")
 bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 
 # Run single bw with single bed

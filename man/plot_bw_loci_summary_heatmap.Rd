@@ -48,8 +48,10 @@ representing some type of category).
 \examples{
 # Get the raw files
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package = "wigglescout")
-bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package = "wigglescout")
+bw2 <- system.file("extdata",
+                   "sample_H3K9me3_ChIP.bw", package = "wigglescout")
 bed <- system.file("extdata", "sample_chromhmm.bed", package = "wigglescout")
 
-plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed, labels = c("H33", "H3K9m3"))
+plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed,
+                             labels = c("H33", "H3K9m3"))
 }

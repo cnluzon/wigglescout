@@ -38,7 +38,8 @@
 #' # Get the raw files
 #' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
 #' bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 #'
 #' # Run single bw with single bed
@@ -166,7 +167,8 @@ bw_loci <- function(bwfiles,
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
 #' bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 #'
 #' # Sample bigWig files only have valid values on this region
@@ -252,7 +254,8 @@ bw_bins <- function(bwfiles,
 #' # Get the raw files
 #' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
 #'
 #' # Heatmaps with a single bigWig
 #' h <- bw_heatmap(bw, loci = bed, mode = "stretch")
@@ -306,13 +309,15 @@ bw_heatmap <- function(bwfiles,
   )
 
   if (is.null(bg_bwfiles)) {
-    values_list <- future_map(bwfiles, calculate_matrix_norm_fixed, bg_bw = NULL)
+    values_list <- future_map(bwfiles, calculate_matrix_norm_fixed,
+                              bg_bw = NULL)
   } else {
     values_list <- future_map2(bwfiles, bg_bwfiles, calculate_matrix_norm_fixed)
   }
 
   values_list
 }
+
 
 
 #' Calculate profile values of a bigWig file over a BED file.
@@ -357,7 +362,8 @@ bw_heatmap <- function(bwfiles,
 #' # Get the raw files
 #' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
 #'
 #' # Profiles are returned in long format and include mean, median and stderror
 #' bw_profile(bw, loci = bed, mode = "stretch")
