@@ -641,7 +641,7 @@ utils::globalVariables("where")
   .validate_categories(df[, group_col])
 
   if (aggregate_by == "true_mean") {
-    sum_vals <- df[, score_cols, drop = F] * df$width
+    sum_vals <- df[, score_cols, drop = FALSE] * df$width
     colnames(sum_vals) <- score_cols
     sum_vals[, group_col] <- df[, group_col]
     sum_vals$width <- df$width
@@ -652,7 +652,7 @@ utils::globalVariables("where")
       summarise(across(where(is.numeric), sum))
 
     # Divide sum(scores) by sum(length) and keep only scores
-    df <- sum_vals[, score_cols, drop = F] / sum_vals$width
+    df <- sum_vals[, score_cols, drop = FALSE] / sum_vals$width
     df[, group_col] <- sum_vals[, group_col]
   } else if (aggregate_by %in% c("mean", "median")) {
     f <- get(aggregate_by)

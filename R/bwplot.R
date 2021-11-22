@@ -642,7 +642,7 @@ plot_bw_profile <- function(bwfiles,
 .heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed, order_by) {
   # Order matrix by mean and transpose it (image works flipped)
   if (is.null(order_by)) {
-    order_by <- order(rowMeans(values), decreasing = F)
+    order_by <- order(rowMeans(values), decreasing = FALSE)
   }
   m <- t(values[order_by, ])
 
