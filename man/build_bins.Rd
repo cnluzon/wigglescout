@@ -12,7 +12,7 @@ build_bins(bin_size = 10000, genome = "mm9")
 \item{genome}{Genome. Supported: mm9, mm10, hg38, hg38_latest.}
 }
 \value{
-A GRanges object
+A GRanges object with a tiled genome
 }
 \description{
 Build a GRanges of bins of a given size, for a specific genome. Supported

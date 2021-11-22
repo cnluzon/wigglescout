@@ -76,6 +76,9 @@ function, if one would want to sort one heatmap by values on another one.}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 }
+\value{
+A ggplot object
+}
 \description{
 Plot a heatmap of a given bigWig file over a set of loci
 }

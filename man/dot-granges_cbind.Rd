@@ -11,6 +11,9 @@
 
 \item{labels}{Vector of names for the score columns.}
 }
+\value{
+A Sorted GRanges object with all the columns.
+}
 \description{
 Perform a cbind operation on a GRanges list, appending scores to mcols.
 It will sort the GRanges elements in order to ensure the match is proper.

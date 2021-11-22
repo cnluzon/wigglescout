@@ -38,6 +38,10 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
 }
+\value{
+A GRanges object with each bwfile as a metadata column named
+after labels, if provided, or after filenames otherwise.
+}
 \description{
 Build a scored GRanges object from a bigWig file list and a BED file or
 GRanges object. The aggregating function (per locus) can be min, max,

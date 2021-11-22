@@ -10,6 +10,9 @@ also sorted.}
 \arguments{
 \item{loci}{Either a BED file or a GRanges object}
 }
+\value{
+A GRanges object
+}
 \description{
 Processes a loci and returns a GRanges object, sorted and with its seqlevels
 also sorted.
