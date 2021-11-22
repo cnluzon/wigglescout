@@ -51,3 +51,9 @@ ranges <- import(system.file("testdata", "bed1.bed", package="wigglescout"))
 ranges
 
 ```
+
+
+```{r session-info}
+sessionInfo()
+```
+

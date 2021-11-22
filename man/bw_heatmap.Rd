@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwtools.R
 \name{bw_heatmap}
 \alias{bw_heatmap}
-\title{Calculate heatmap matrix of a bigWig file over a BED file}
+\title{Calculate heatmap matrix of a bigWig file over a GRanges or BED file}
 \usage{
 bw_heatmap(
   bwfiles,
@@ -54,6 +54,41 @@ mode). If not provided, median length of all loci is used.}
 \item{norm_mode}{Function to apply to normalize bin values. Default fc:
 divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 }
+\value{
+A list of matrices where each element correspond to each bigWig file.
+}
 \description{
-Calculate heatmap matrix of a bigWig file over a BED file
+Calculates a matrix of values that corresponds to the usual heatmaps where
+each row is a locus and columns are data points taken each bin_size base
+pairs.
+}
+\details{
+Loci are aligned depending on mode parameter:
+\itemize{
+\item stretch. Aligns all starts and all ends, sort of stretching the loci.
+The median of these lenghts is taken as the pseudo-length in order to show
+a realistic plot when displayed.
+\item start. All loci are aligned by start.
+\item end. All loci are aligned by end.
+\item center. All loci are aligned by center.
+}
+}
+\examples{
+# Get the raw files
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+
+# Heatmaps with a single bigWig
+h <- bw_heatmap(bw, loci = bed, mode = "stretch")
+
+# h is a list
+h[[1]]
+
+# Heatmaps with multiple bigWig
+h <- bw_heatmap(c(bw, bw2), loci = bed, mode = "stretch")
+
+# h is a list
+h[[2]]
+
 }

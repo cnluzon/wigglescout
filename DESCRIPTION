@@ -1,26 +1,28 @@
 Package: wigglescout
-Title: Explore And Visualize Genomics BigWig Data
-Version: 0.13.3
+Title: Explore and Visualize Genomics BigWig Data
+Version: 0.13.4
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
            role = c("aut", "cre"),
            email = "carmen.navarro@scilifelab.se"
            )
-Description: A set of tools to easily extract, visualize and perform statistical
-  tests on sets of bigWig files.
+Description: Wigglescout is a set of tools to easily extract, summarize and
+  visualize coverage on bigWig files. It provides a set of functions that
+  calculate summary values genome-wide or in a locus-specific way. On top of
+  these calculation functions, an out-of-the-box set of plotting functions is
+  provided, to make figures like scatterplots, heatmaps, and profile plots.
+  Wigglescout is built on top of widely used libraries, such as rtracklayer,
+  GenomicRanges, dplyr and ggplot2.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
-Depends: R (>= 3.6)
-biocViews:
+Depends: R (>= 4.1)
+biocViews: Software, Visualization, Sequencing, Coverage, ChIPSeq, ATACSeq
 Imports:
   rtracklayer,
-  rmarkdown,
   dplyr,
-  tidyselect,
   grDevices,
   stats,
   methods,
@@ -28,21 +30,21 @@ Imports:
   stringr,
   reshape2,
   GenomeInfoDb,
-  GenomeInfoDbData,
   GenomicRanges,
   IRanges,
   purrr,
-  prettydoc,
-  scales,
   RColorBrewer,
   RCurl,
   tools,
-  furrr,
-  future
+  utils,
+  furrr
 Suggests: 
-    knitr,
-    testthat,
-    mockery
+  testthat,
+  mockery,
+  knitr,
+  future,
+  rmarkdown,
+  prettydoc
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout
 BugReports: https://github.com/cnluzon/wigglescout/issues

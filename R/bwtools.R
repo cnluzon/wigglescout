@@ -15,27 +15,50 @@
 
 # Main functions ---------------------------------------------------
 
-#' Build a bed-scored GRanges object from a bigWig file list and a BED file.
+#' Score a bigWig file list and a BED file or GRanges object.
 #'
-#' Build a scored GRanges object from a bigWig file list and a BED file.
-#' The aggregating function (per locus) can be min, max, sd, mean.
+#' Build a scored GRanges object from a bigWig file list and a BED file or
+#' GRanges object. The aggregating function (per locus) can be min, max,
+#' sd, mean.
+#'
+#' Values can be normalized using background bigWig files (usually input
+#' files). By default, the value obtained will be bigwig / bg_bigwig per locus,
+#' per bigWig.
 #'
 #' bwfiles and bg_bwfiles must have the same length. If you are using same
 #' background for several files, then file paths must be repeated accordingly.
 #'
-#' Values can be normalized using background bigWig files (usually input
-#' files). By default, the value obtained will be bigwig / bg_bigwig per bin,
-#' per bigWig.
-#'
-#' If norm_func is specified, this can be changed to any given function, for
-#' instance, if norm_func = log2, values will represent log2(bigwig / bg_bigwig)
-#' per bin.
+#' norm_mode can be either "fc", where values will represent bigwig / bg_bigwig,
+#' or "log2fc", values will represent log2(bigwig / bg_bigwig) per locus.
 #'
 #' @param loci GRanges or BED file to summarize the BigWig file at.
 #' @param aggregate_by Statistic to aggregate per group. If NULL, values are
 #'    not aggregated. This is the behavior by default.
+#' @examples
+#' # Get the raw files
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
+#'
+#' # Run single bw with single bed
+#' bw_loci(bw, bed)
+#'
+#' # Use of some parameters
+#' bw_loci(bw, bed, labels = c("H33"), remove_top = 0.01)
+#'
+#' # Log2 fold change
+#' bw_loci(bw, loci = bed, bg_bwfiles = bw_inp, norm_mode = "log2fc")
+#'
+#' # Multiple bigWig
+#' bw_loci(c(bw, bw2),
+#'         loci = bed,
+#'         bg_bwfiles = c(bw_inp, bw_inp),
+#'         norm_mode = "log2fc")
 #' @export
 #' @inheritParams bw_bins
+#' @return A GRanges object with each bwfile as a metadata column named
+#'     after labels, if provided, or after filenames otherwise.
 #' @importFrom rtracklayer import BigWigFile
 #' @importFrom GenomeInfoDb sortSeqlevels
 bw_loci <- function(bwfiles,
@@ -47,18 +70,18 @@ bw_loci <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   } else {
     # Ensures later on we only try to access valid labels
     labels <- make.names(labels)
   }
 
-  bed <- loci_to_granges(loci)
+  bed <- .loci_to_granges(loci)
 
   result <- NULL
   if (is.null(aggregate_by)) {
@@ -110,21 +133,16 @@ bw_loci <- function(bwfiles,
 }
 
 
-#' Build a binned-scored GRanges object from a bigWig file
+#' Build a binned-scored GRanges object from a set of bigWig files
 #'
-#' Build a binned-scored GRanges object from a bigWig file. The aggregating
-#' function per bin can be min, max, sd, mean.
+#' Build a binned-scored GRanges object from one or many bigWig files.
+#' The aggregating function per bin can be min, max, sd, mean.
 #'
 #' bwfiles and bg_bwfiles must have the same length. If you are using same
 #' background for several files, then file paths must be repeated accordingly.
 #'
-#' Values can be normalized using background bigWig files (usually input
-#' files). By default, the value obtained will be bigwig / bg_bigwig per bin,
-#' per bigWig.
-#'
-#' If norm_func is specified, this can be changed to any given function, for
-#' instance, if norm_func = log2, values will represent log2(bigwig / bg_bigwig)
-#' per bin.
+#' norm_mode can be either "fc", where values will represent bigwig / bg_bigwig,
+#' or "log2fc", values will represent log2(bigwig / bg_bigwig) per bin.
 #'
 #' @param bwfiles Path or array of paths to the bigWig files to be summarized.
 #' @param bg_bwfiles Path or array of paths to the bigWig files to be used as
@@ -145,6 +163,31 @@ bw_loci <- function(bwfiles,
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
+#'
+#' # Sample bigWig files only have valid values on this region
+#' locus <- GenomicRanges::GRanges(
+#'   seqnames = "chr15",
+#'   IRanges::IRanges(102600000, 103100000)
+#' )
+#'
+#' # Run single bw. The larger the bin size, the faster this is.
+#' bw_bins(bw, bin_size = 100000, labels = c("H33"), selection = locus)
+#'
+#' # Use of some parameters
+#' bw_bins(bw, bg_bwfiles = bw_inp, bin_size = 100000,
+#'        labels = c("H33"), norm_mode = "log2fc", selection = locus)
+#'
+#' # Multiple bigWig
+#' bw_bins(c(bw, bw2),
+#'         bin_size = 100000,
+#'         bg_bwfiles = c(bw_inp, bw_inp),
+#'         norm_mode = "log2fc",
+#'         selection = locus)
 bw_bins <- function(bwfiles,
                     bg_bwfiles = NULL,
                     labels = NULL,
@@ -155,11 +198,11 @@ bw_bins <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  validate_filelist(bwfiles)
+  .validate_filelist(bwfiles)
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   }
 
   tiles <- build_bins(bin_size = bin_size, genome = genome)
@@ -182,13 +225,47 @@ bw_bins <- function(bwfiles,
   result
 }
 
-#' Calculate heatmap matrix of a bigWig file over a BED file
+#' Calculate heatmap matrix of a bigWig file over a GRanges or BED file
 #'
+#' Calculates a matrix of values that corresponds to the usual heatmaps where
+#' each row is a locus and columns are data points taken each bin_size base
+#' pairs.
+#'
+#' Loci are aligned depending on mode parameter:
+#'
+#' - stretch. Aligns all starts and all ends, sort of stretching the loci.
+#' The median of these lenghts is taken as the pseudo-length in order to show
+#' a realistic plot when displayed.
+#'
+#' - start. All loci are aligned by start.
+#'
+#' - end. All loci are aligned by end.
+#'
+#' - center. All loci are aligned by center.
 #' @inheritParams bw_profile
 #' @importFrom furrr future_map future_map2
 #' @importFrom rtracklayer import
 #' @importFrom purrr partial
+#' @return A list of matrices where each element correspond to each bigWig file.
 #' @export
+#' @examples
+#' # Get the raw files
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#'
+#' # Heatmaps with a single bigWig
+#' h <- bw_heatmap(bw, loci = bed, mode = "stretch")
+#'
+#' # h is a list
+#' h[[1]]
+#'
+#' # Heatmaps with multiple bigWig
+#' h <- bw_heatmap(c(bw, bw2), loci = bed, mode = "stretch")
+#'
+#' # h is a list
+#' h[[2]]
+#'
 bw_heatmap <- function(bwfiles,
                        bg_bwfiles = NULL,
                        loci = NULL,
@@ -201,12 +278,12 @@ bw_heatmap <- function(bwfiles,
                        ignore_strand = FALSE,
                        norm_mode = "fc") {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
-  granges <- loci_to_granges(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
+  granges <- .loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
-  validate_profile_parameters(bin_size, upstream, downstream)
+  .validate_profile_parameters(bin_size, upstream, downstream)
 
   if (is.null(labels)) {
     labels <- basename(bwfiles)
@@ -276,6 +353,18 @@ bw_heatmap <- function(bwfiles,
 #' @inheritParams bw_bins
 #' @return a data frame in long format
 #' @export
+#' @examples
+#' # Get the raw files
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#'
+#' # Profiles are returned in long format and include mean, median and stderror
+#' bw_profile(bw, loci = bed, mode = "stretch")
+#'
+#' bw_profile(bw, loci = bed, mode = "start",
+#'            upstream = 1000, downstream = 1500)
+#'
 bw_profile <- function(bwfiles,
                        bg_bwfiles = NULL,
                        loci = NULL,
@@ -289,15 +378,15 @@ bw_profile <- function(bwfiles,
                        norm_mode = "fc",
                        remove_top = 0) {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
-  granges <- loci_to_granges(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
+  granges <- .loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
-  validate_profile_parameters(bin_size, upstream, downstream)
+  .validate_profile_parameters(bin_size, upstream, downstream)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   }
 
   if (length(bwfiles) != length(labels)) {
@@ -337,14 +426,20 @@ bw_profile <- function(bwfiles,
 #' Build a unscored bins GRanges object.
 #'
 #' Build a GRanges of bins of a given size, for a specific genome. Supported
-#' genomes (required for the package): mm9, mm10, hg38.
+#' genomes rely on \link[GenomeInfoDb]{Seqinfo}. This requires internet access
+#' to work.
 #'
 #' @param bin_size Bin size.
 #' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
 #' @importFrom GenomicRanges tileGenome
 #' @importFrom GenomeInfoDb Seqinfo seqlengths
-#' @return A GRanges object
+#' @return A GRanges object with a tiled genome
 #' @export
+#' @examples
+#'
+#' build_bins(bin_size = 50000, genome = "mm9")
+#' build_bins(bin_size = 50000, genome = "hg38")
+#' build_bins(bin_size = 50000, genome = "mm10")
 build_bins <- function(bin_size = 10000, genome = "mm9") {
   seqinfo <- seqlengths(Seqinfo(genome = genome))
   tileGenome(seqinfo, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
@@ -417,14 +512,14 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 
   # granges_cbind sorts each element so it's safer to merge and no need to
   # sort after
-  result <- granges_cbind(summaries, labels)
+  result <- .granges_cbind(summaries, labels)
 
   # Include names if granges has them
   if ("name" %in% names(mcols(granges))) {
     result$name <- granges$name
   }
 
-  result <- remove_top_by_mean(
+  result <- .remove_top_by_mean(
     result, remove_top,
     !names(mcols(result)) %in% c("name")
   )
@@ -456,7 +551,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
     aggregate_by = aggregate_by
   )
 
-  natural_sort_by_field(df, "name")
+  .natural_sort_by_field(df, "name")
 }
 
 
@@ -501,7 +596,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
   result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
 
   result <- makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
-  result <- remove_top_by_mean(result, remove_top, labels)
+  result <- .remove_top_by_mean(result, remove_top, labels)
 
   result$ranges
 }
@@ -535,7 +630,7 @@ utils::globalVariables("where")
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
-  validate_group_col(scored_granges, group_col)
+  .validate_group_col(scored_granges, group_col)
 
   score_cols <- names(mcols(scored_granges))
   score_cols <- score_cols[!score_cols %in% c(group_col)]
@@ -543,7 +638,7 @@ utils::globalVariables("where")
   df <- data.frame(scored_granges) %>%
     select(c(score_cols, group_col, .data$width))
 
-  validate_categories(df[, group_col])
+  .validate_categories(df[, group_col])
 
   if (aggregate_by == "true_mean") {
     sum_vals <- df[, score_cols, drop = F] * df$width
@@ -796,7 +891,7 @@ utils::globalVariables("where")
                                       granges,
                                       npoints,
                                       ignore_strand = FALSE) {
-  bwfile <- fetch_bigwig(bw)
+  bwfile <- .fetch_bigwig(bw)
 
   values <- rtracklayer::summary(bwfile,
     which = granges,

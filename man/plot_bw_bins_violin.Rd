@@ -65,3 +65,16 @@ Plots a violin plot of bin distribution of a set of bigWig files optionally
 overlaid with annotated bins. Bins overlapping loci of the provided BED
 file will be shown as a jitter plot on top of the violin plot.
 }
+\examples{
+# Get the raw files
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+
+# Sample bigWig files only have valid values on this region
+locus <- GenomicRanges::GRanges(
+  seqnames = "chr15",
+  IRanges::IRanges(102600000, 103100000)
+)
+
+plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus)
+}

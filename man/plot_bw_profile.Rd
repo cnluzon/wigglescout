@@ -74,3 +74,12 @@ A ggplot object.
 \description{
 Plots a profile of a set of bigWig files over a set of loci in a BED file.
 }
+\examples{
+# Get the raw files
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+
+
+plot_bw_profile(bw, loci = bed,
+                mode = "stretch", upstream = 1000, downstream = 1000)
+}

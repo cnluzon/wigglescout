@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwtools.R
 \name{bw_bins}
 \alias{bw_bins}
-\title{Build a binned-scored GRanges object from a bigWig file}
+\title{Build a binned-scored GRanges object from a set of bigWig files}
 \usage{
 bw_bins(
   bwfiles,
@@ -47,18 +47,39 @@ A GRanges object with each bwfile as a metadata column named
 after labels, if provided, or after filenames otherwise.
 }
 \description{
-Build a binned-scored GRanges object from a bigWig file. The aggregating
-function per bin can be min, max, sd, mean.
+Build a binned-scored GRanges object from one or many bigWig files.
+The aggregating function per bin can be min, max, sd, mean.
 }
 \details{
 bwfiles and bg_bwfiles must have the same length. If you are using same
 background for several files, then file paths must be repeated accordingly.
 
-Values can be normalized using background bigWig files (usually input
-files). By default, the value obtained will be bigwig / bg_bigwig per bin,
-per bigWig.
+norm_mode can be either "fc", where values will represent bigwig / bg_bigwig,
+or "log2fc", values will represent log2(bigwig / bg_bigwig) per bin.
+}
+\examples{
+# Get the raw files
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 
-If norm_func is specified, this can be changed to any given function, for
-instance, if norm_func = log2, values will represent log2(bigwig / bg_bigwig)
-per bin.
+# Sample bigWig files only have valid values on this region
+locus <- GenomicRanges::GRanges(
+  seqnames = "chr15",
+  IRanges::IRanges(102600000, 103100000)
+)
+
+# Run single bw. The larger the bin size, the faster this is.
+bw_bins(bw, bin_size = 100000, labels = c("H33"), selection = locus)
+
+# Use of some parameters
+bw_bins(bw, bg_bwfiles = bw_inp, bin_size = 100000,
+       labels = c("H33"), norm_mode = "log2fc", selection = locus)
+
+# Multiple bigWig
+bw_bins(c(bw, bw2),
+        bin_size = 100000,
+        bg_bwfiles = c(bw_inp, bw_inp),
+        norm_mode = "log2fc",
+        selection = locus)
 }

@@ -70,7 +70,6 @@ with such region.
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(ggplot2)
-library(scales)
 library(rtracklayer)
 library(GenomicRanges)
 library(wigglescout)
@@ -820,5 +819,8 @@ in time.
 My expectation is that `multicore` may be faster. However I have not benchmarked
 it, as it does not run within Rstudio.
 
+```{r session-info}
+sessionInfo()
+```
 
 
