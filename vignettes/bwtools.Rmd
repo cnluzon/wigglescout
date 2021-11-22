@@ -819,5 +819,8 @@ in time.
 My expectation is that `multicore` may be faster. However I have not benchmarked
 it, as it does not run within Rstudio.
 
+```{r session-info}
+sessionInfo()
+```
 
 
