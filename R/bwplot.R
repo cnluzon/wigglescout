@@ -64,21 +64,21 @@
 #' plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus)
 #' @export
 plot_bw_bins_scatter <- function(x,
-                                 y,
-                                 bg_x = NULL,
-                                 bg_y = NULL,
-                                 norm_mode_x = "fc",
-                                 norm_mode_y = "fc",
-                                 bin_size = 10000,
-                                 genome = "mm9",
-                                 highlight = NULL,
-                                 minoverlap = 0L,
-                                 highlight_label = NULL,
-                                 highlight_colors = NULL,
-                                 remove_top = 0,
-                                 verbose = TRUE,
-                                 density = FALSE,
-                                 selection = NULL) {
+                                y,
+                                bg_x = NULL,
+                                bg_y = NULL,
+                                norm_mode_x = "fc",
+                                norm_mode_y = "fc",
+                                bin_size = 10000,
+                                genome = "mm9",
+                                highlight = NULL,
+                                minoverlap = 0L,
+                                highlight_label = NULL,
+                                highlight_colors = NULL,
+                                remove_top = 0,
+                                verbose = TRUE,
+                                density = FALSE,
+                                selection = NULL) {
     bins_x <- bw_bins(
         x,
         bg_bwfiles = bg_x,
@@ -395,18 +395,18 @@ plot_bw_heatmap <- function(bwfile,
 #' plot_bw_loci_scatter(bw, bw2, loci = bed)
 #' @export
 plot_bw_loci_scatter <- function(x,
-                                 y,
-                                 loci,
-                                 bg_x = NULL,
-                                 bg_y = NULL,
-                                 norm_mode_x = "fc",
-                                 norm_mode_y = "fc",
-                                 highlight = NULL,
-                                 minoverlap = 0L,
-                                 highlight_label = NULL,
-                                 highlight_colors = NULL,
-                                 remove_top = 0,
-                                 verbose = TRUE) {
+                                y,
+                                loci,
+                                bg_x = NULL,
+                                bg_y = NULL,
+                                norm_mode_x = "fc",
+                                norm_mode_y = "fc",
+                                highlight = NULL,
+                                minoverlap = 0L,
+                                highlight_label = NULL,
+                                highlight_colors = NULL,
+                                remove_top = 0,
+                                verbose = TRUE) {
     values_x <- bw_loci(
         x,
         bg_bwfiles = bg_x,
@@ -485,13 +485,14 @@ plot_bw_loci_scatter <- function(x,
 #'                              labels = c("H33", "H3K9m3"))
 #' @export
 plot_bw_loci_summary_heatmap <- function(bwfiles,
-                                         loci,
-                                         bg_bwfiles = NULL,
-                                         labels = NULL,
-                                         aggregate_by = "true_mean",
-                                         norm_mode = "fc",
-                                         remove_top = 0,
-                                         verbose = TRUE) {
+                                        loci,
+                                        bg_bwfiles = NULL,
+                                        labels = NULL,
+                                        aggregate_by = "true_mean",
+                                        norm_mode = "fc",
+                                        remove_top = 0,
+                                        verbose = TRUE) {
+
     summary_values <- bw_loci(bwfiles, loci,
                               bg_bwfiles = bg_bwfiles,
                               aggregate_by = aggregate_by,
@@ -580,15 +581,15 @@ plot_bw_profile <- function(bwfiles,
             }
         }
         profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
-                                           bg_bwfiles = bg_bwfiles,
-                                           mode = mode,
-                                           bin_size = bin_size,
-                                           upstream = upstream,
-                                           downstream = downstream,
-                                           middle = middle,
-                                           ignore_strand = ignore_strand,
-                                           norm_mode = norm_mode,
-                                           remove_top = remove_top)
+                                            bg_bwfiles = bg_bwfiles,
+                                            mode = mode,
+                                            bin_size = bin_size,
+                                            upstream = upstream,
+                                            downstream = downstream,
+                                            middle = middle,
+                                            ignore_strand = ignore_strand,
+                                            norm_mode = norm_mode,
+                                            remove_top = remove_top)
 
         value_list <- purrr::map2(loci, labels, profile_function)
         values <- do.call(rbind, value_list)
@@ -596,24 +597,22 @@ plot_bw_profile <- function(bwfiles,
     }
     else {
         values <- bw_profile(bwfiles, loci, bg_bwfiles = bg_bwfiles,
-                             mode = mode,
-                             bin_size = bin_size,
-                             upstream = upstream,
-                             downstream = downstream,
-                             middle = middle,
-                             ignore_strand = ignore_strand,
-                             norm_mode = norm_mode,
-                             labels = labels,
-                             remove_top = remove_top)
-
+                                mode = mode,
+                                bin_size = bin_size,
+                                upstream = upstream,
+                                downstream = downstream,
+                                middle = middle,
+                                ignore_strand = ignore_strand,
+                                norm_mode = norm_mode,
+                                labels = labels,
+                                remove_top = remove_top)
 
         nloci <- .loci_length(loci)
         x_title <- paste(.make_label_from_object(loci),
-                         "-", nloci, "loci", sep = " ")
+                            "-", nloci, "loci", sep = " ")
     }
 
     y_label <- .make_norm_label(norm_mode, bg_bwfiles)
-
 
     verbose_tag <- NULL
     if (verbose) {
@@ -654,7 +653,7 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return Named list plot and calculated values
 .heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed,
-                          order_by) {
+                        order_by) {
     # Order matrix by mean and transpose it (image works flipped)
     if (is.null(order_by)) {
         order_by <- order(rowMeans(values), decreasing = FALSE)
@@ -805,7 +804,6 @@ plot_bw_profile <- function(bwfiles,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()
         )
-
     plot
 }
 
@@ -833,14 +831,13 @@ plot_bw_profile <- function(bwfiles,
 #' @import ggplot2
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
-.scatterplot_body <- function(x,
-                              y,
-                              highlight = NULL,
-                              minoverlap = 0L,
-                              highlight_label = NULL,
-                              highlight_colors = NULL,
-                              remove_top = 0,
-                              density = FALSE) {
+.scatterplot_body <- function(x, y,
+                                highlight = NULL,
+                                minoverlap = 0L,
+                                highlight_label = NULL,
+                                highlight_colors = NULL,
+                                remove_top = 0,
+                                density = FALSE) {
 
     filtered_values_x <- .remove_top_by_mean(x, remove_top, c("score"))
     filtered_values_y <- .remove_top_by_mean(y, remove_top, c("score"))
@@ -895,8 +892,10 @@ plot_bw_profile <- function(bwfiles,
 
     points <- geom_point(color = "#bbbbbb", alpha = 0.7)
     if (density) {
-        points <- list(geom_bin2d(binwidth=0.05),
-                       scale_fill_gradient(low="#dddddd", high="#B22222"))
+        points <- list(
+            geom_bin2d(binwidth=0.05),
+            scale_fill_gradient(low="#dddddd", high="#B22222")
+        )
     }
 
     p <- ggplot(df, aes_string(x = "x", y = "y")) +
@@ -918,11 +917,12 @@ plot_bw_profile <- function(bwfiles,
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
 .violin_body <- function(gr,
-                         highlight = NULL,
-                         minoverlap = 0L,
-                         highlight_label = NULL,
-                         highlight_colors = NULL,
-                         remove_top = 0) {
+                    highlight = NULL,
+                    minoverlap = 0L,
+                    highlight_label = NULL,
+                    highlight_colors = NULL,
+                    remove_top = 0) {
+
     bwnames <- names(mcols(gr))
     bins_filtered <- .remove_top_by_mean(gr, remove_top, bwnames)
 
@@ -992,13 +992,8 @@ plot_bw_profile <- function(bwfiles,
 #'   Otherwise a strange box shows on heatmap.
 #' @inheritParams plot_bw_heatmap
 #' @return A list of ggproto objects to be plotted.
-.heatmap_lines <- function(loci,
-                           nbins,
-                           bin_size,
-                           upstream,
-                           downstream,
-                           mode,
-                           expand = TRUE) {
+.heatmap_lines <- function(loci, nbins, bin_size, upstream, downstream, mode,
+                            expand = TRUE) {
 
     axis_breaks <-
         .profile_breaks(nbins, upstream, downstream, bin_size, mode)
@@ -1009,13 +1004,14 @@ plot_bw_profile <- function(bwfiles,
         lines <- axis_breaks[2:3]
     }
 
-    x <- scale_x_continuous(breaks = axis_breaks,
-                            labels = axis_labels)
+    x <- scale_x_continuous(breaks = axis_breaks, labels = axis_labels)
 
     if (expand == TRUE) {
-        x <- scale_x_continuous(breaks = axis_breaks,
-                                labels = axis_labels,
-                                expand = c(0, 0))
+        x <- scale_x_continuous(
+            breaks = axis_breaks,
+            labels = axis_labels,
+            expand = c(0, 0)
+        )
     }
 
     gline <- geom_vline(
@@ -1041,7 +1037,7 @@ plot_bw_profile <- function(bwfiles,
 #'    Loci returned belong to other_ranges, NOT main_ranges. A group field
 #'    is added as factor.
 .multi_ranges_overlap <- function(main_ranges, other_ranges, labels,
-                                  minoverlap) {
+                                    minoverlap) {
     .label_df <- function(df, name) {
         data.frame(df, group = name)
     }
@@ -1059,9 +1055,7 @@ plot_bw_profile <- function(bwfiles,
     highlight_values <- do.call(rbind, df_values_labeled)
 
     # Order of factors need to match to assign properly colors to points
-    highlight_values$group <- factor(highlight_values$group,
-                                     levels = labels
-    )
+    highlight_values$group <- factor(highlight_values$group, levels = labels)
 
     highlight_values
 }
@@ -1075,20 +1069,20 @@ plot_bw_profile <- function(bwfiles,
 #' @return a ggproto object
 .colorscale <- function(norm_mode, bg_bwfiles) {
     legend_label <- .make_norm_label(norm_mode, bg_bwfiles)
-    colorscale <-
-        scale_fill_gradient(name = legend_label,
-                            low = "white",
-                            high = "#b22222",
-                            na.value = "#cccccc")
+    colorscale <- scale_fill_gradient(
+        name = legend_label,
+        low = "white",
+        high = "#b22222",
+        na.value = "#cccccc"
+    )
     if (!is.null(bg_bwfiles)) {
-        colorscale <-
-            scale_fill_gradient2(
-                name = legend_label,
-                low = "#2e6694",
-                mid = "white",
-                high = "#b22222",
-                na.value = "#cccccc"
-            )
+        colorscale <- scale_fill_gradient2(
+            name = legend_label,
+            low = "#2e6694",
+            mid = "white",
+            high = "#b22222",
+            na.value = "#cccccc"
+        )
     }
     colorscale
 }
@@ -1131,14 +1125,15 @@ plot_bw_profile <- function(bwfiles,
     axis_breaks <- axis_breaks - 0.5
 
     if (mode == "stretch") {
-        axis_breaks <- c(1,
-                         upstream_nbins + 1,
-                         nrows - downstream_nbins + 1,
-                         nrows + 1)
+        axis_breaks <- c(
+            1,
+            upstream_nbins + 1,
+            nrows - downstream_nbins + 1,
+            nrows + 1
+        )
         # center ticks on the middle of the bins
         axis_breaks <- axis_breaks - 0.5
     }
-
     axis_breaks
 }
 
