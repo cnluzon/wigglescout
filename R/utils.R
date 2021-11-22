@@ -241,6 +241,7 @@
 
 #' Set default theme as classic with larger font size
 #' @import ggplot2
+#' @return ggproto object
 .theme_default <- function() {
     theme_classic(base_size = 18) +
         theme(plot.caption = element_text(size = 11))

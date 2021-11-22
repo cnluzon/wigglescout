@@ -765,6 +765,7 @@ utils::globalVariables("where")
 #' @inheritParams .calculate_bw_profile
 #' @param norm_func Normalization function
 #' @importFrom stats quantile
+#' @return Summary matrix
 .calculate_matrix_norm <- function(bw,
                                    granges,
                                    bg_bw = NULL,
