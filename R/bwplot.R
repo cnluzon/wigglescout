@@ -255,6 +255,7 @@ plot_bw_bins_violin <- function(bwfiles,
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom grDevices colorRampPalette
 #' @inheritParams plot_bw_profile
+#' @return A ggplot object
 #' @examples
 #' # Get the raw files
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
@@ -338,7 +339,6 @@ plot_bw_heatmap <- function(bwfile,
       caption = verbose_tag
     )
 }
-
 
 
 #' Locus-based scatterplot of a pair of bigWig files
@@ -759,7 +759,7 @@ plot_bw_profile <- function(bwfiles,
 
 #' Helper function for plotting a summary matrix
 #' @param values Summary matrix
-#'
+#' @return A ggplot object.
 #' @importFrom reshape2 melt
 .summary_body <- function(values) {
   values <- round(values, 2)

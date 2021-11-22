@@ -57,6 +57,8 @@
 #'         norm_mode = "log2fc")
 #' @export
 #' @inheritParams bw_bins
+#' @return A GRanges object with each bwfile as a metadata column named
+#'     after labels, if provided, or after filenames otherwise.
 #' @importFrom rtracklayer import BigWigFile
 #' @importFrom GenomeInfoDb sortSeqlevels
 bw_loci <- function(bwfiles,
@@ -431,7 +433,7 @@ bw_profile <- function(bwfiles,
 #' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
 #' @importFrom GenomicRanges tileGenome
 #' @importFrom GenomeInfoDb Seqinfo seqlengths
-#' @return A GRanges object
+#' @return A GRanges object with a tiled genome
 #' @export
 #' @examples
 #'

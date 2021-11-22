@@ -24,6 +24,7 @@
 #'
 #' @param grlist A list of GRanges objects that have all the same fields.
 #' @param labels Vector of names for the score columns.
+#' @return A Sorted GRanges object with all the columns.
 #' @importFrom GenomeInfoDb sortSeqlevels
 .granges_cbind <- function(grlist, labels) {
   fixed_fields <- c("seqnames", "start", "end", "width", "strand")
@@ -82,7 +83,7 @@
 #' also sorted.
 #'
 #' @param loci Either a BED file or a GRanges object
-#'
+#' @return A GRanges object
 #' @importFrom rtracklayer import
 #' @importFrom GenomeInfoDb sortSeqlevels
 .loci_to_granges <- function(loci) {
@@ -251,6 +252,7 @@
 #' Throws a warning if it finds more than 50 different values.
 #'
 #' @param cat_values An array of values
+#' @return NULL
 .validate_categories <- function(cat_values) {
   max_categories <- 50
   # Test number of values in group_col
@@ -287,7 +289,7 @@
 #' the parameter is otherwise a GRanges object, which is also valid.
 #'
 #' @param locus_param Parameter to validate
-#'
+#' @return NULL
 .validate_locus_parameter <- function(locus_param) {
   if (class(locus_param) == "character") {
     .validate_filelist(locus_param)
@@ -305,6 +307,7 @@
 #'
 #' @param granges GRanges object to check
 #' @param group_col Group column name. Usually, name.
+#' @return NULL
 .validate_group_col <- function(granges, group_col) {
   if (!group_col %in% names(mcols(granges))) {
     stop(paste("Invalid group column not present in granges", group_col))
@@ -317,6 +320,7 @@
 #' @param bin_size Bin size. Must be a positive number.
 #' @param upstream Upstream bp. Must be positive and larger than bin size.
 #' @param downstream Downstream bp. Must be positive and larger than bin size.
+#' @return NULL
 #'
 .validate_profile_parameters <- function(bin_size, upstream, downstream) {
   if (bin_size <= 0) {
