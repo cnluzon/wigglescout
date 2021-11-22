@@ -64,12 +64,6 @@ jobs:
           BiocCheck::BiocCheck(".")
         shell: Rscript {0}
         
-      - name: Bioconductor BiocCheckGitClone
-        run: |
-          BiocManager::install("BiocCheck")
-          BiocCheck::BiocCheckGitClone(".")
-        shell: Rscript {0}
-        
       - name: Show testthat output
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
