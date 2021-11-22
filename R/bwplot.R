@@ -121,19 +121,19 @@ plot_bw_bins_scatter <- function(x,
       remove_top = remove_top
     )
 
-    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
   }
 
   title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
-  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
-  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
+  x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
+  y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
 
   main_plot$plot + labs(
     title = title,
     x = x_label,
     y = y_label,
     caption = verbose_tag
-  ) + theme_default()
+  ) + .theme_default()
 }
 
 #' Bin-based violin plot of a set of bigWig files
@@ -192,7 +192,7 @@ plot_bw_bins_violin <- function(bwfiles,
 
   columns <- labels
   if (is.null(labels)) {
-    columns <- make_label_from_object(bwfiles)
+    columns <- .make_label_from_object(bwfiles)
   }
 
   main_plot <- .violin_body(
@@ -214,18 +214,18 @@ plot_bw_bins_violin <- function(bwfiles,
       remove_top = remove_top
     )
 
-    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
   }
 
   title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
-  y_label <- make_norm_label(norm_mode, bg_bwfiles)
+  y_label <- .make_norm_label(norm_mode, bg_bwfiles)
 
   main_plot$plot + labs(
     title = title,
     x = "",
     y = y_label,
     caption = verbose_tag
-  ) + theme_default() +
+  ) + .theme_default() +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
       legend.position = "none"
@@ -307,16 +307,16 @@ plot_bw_heatmap <- function(bwfile,
       row_resolution = max_rows_allowed
     )
 
-    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
   }
 
   nloci <- nrow(values[[1]])
-  y_label <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
-  x_title <- make_label_from_object(bwfile)
+  y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+  x_title <- .make_label_from_object(bwfile)
   title <- "Heatmap"
 
 
-  main_plot$plot + theme_default() +
+  main_plot$plot + .theme_default() +
     theme(axis.line = element_blank(),
           panel.border = element_rect(color = "black", fill = NA, size = 0.1)) +
     .heatmap_lines(nloci,
@@ -331,7 +331,7 @@ plot_bw_heatmap <- function(bwfile,
       expand = c(0, 0)
     ) +
     labs(
-      fill = make_norm_label(norm_mode, bg_bwfile),
+      fill = .make_norm_label(norm_mode, bg_bwfile),
       title = title,
       x = x_title,
       y = y_label,
@@ -439,14 +439,14 @@ plot_bw_loci_scatter <- function(x,
       remove_top = remove_top
     )
 
-    verbose_tag <- make_caption(relevant_params, main_plot$calculated)
+    verbose_tag <- .make_caption(relevant_params, main_plot$calculated)
   }
 
   title <- paste("Per-locus coverage (", loci_name, ")", sep = "")
-  x_label <- make_norm_file_label(norm_mode_x, x, bg_x)
-  y_label <- make_norm_file_label(norm_mode_y, y, bg_y)
+  x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
+  y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
 
-  main_plot$plot + theme_default() + labs(
+  main_plot$plot + .theme_default() + labs(
     title = title,
     x = x_label,
     y = y_label,
@@ -503,7 +503,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
       remove_top = remove_top
     )
 
-    verbose_tag <- make_caption(relevant_params, list())
+    verbose_tag <- .make_caption(relevant_params, list())
   }
 
   plot + colorscale + labs(
@@ -560,7 +560,7 @@ plot_bw_profile <- function(bwfiles,
       stop("If multiple loci provided only a single bwfile is allowed")
     }
     if (is.null(labels)) {
-      labels <- lapply(loci, make_label_from_object)
+      labels <- lapply(loci, .make_label_from_object)
       if (length(unique(labels)) < length(loci)) {
         warning("Unlabeled objects or repeated labels. Adding numeric indices.")
         labels <- paste(labels, 1:length(labels), sep = "_")
@@ -594,11 +594,11 @@ plot_bw_profile <- function(bwfiles,
                          remove_top = remove_top)
 
 
-    nloci <- loci_length(loci)
-    x_title <- paste(make_label_from_object(loci), "-", nloci, "loci", sep = " ")
+    nloci <- .loci_length(loci)
+    x_title <- paste(.make_label_from_object(loci), "-", nloci, "loci", sep = " ")
   }
 
-  y_label <- make_norm_label(norm_mode, bg_bwfiles)
+  y_label <- .make_norm_label(norm_mode, bg_bwfiles)
 
 
   verbose_tag <- NULL
@@ -612,7 +612,7 @@ plot_bw_profile <- function(bwfiles,
       remove_top = remove_top
     )
 
-    verbose_tag <- make_caption(relevant_params, list())
+    verbose_tag <- .make_caption(relevant_params, list())
   }
 
   if (!is.null(bg_bwfiles) && show_error == TRUE) {
@@ -703,8 +703,8 @@ plot_bw_profile <- function(bwfiles,
 
   calculated <- list(
     ncells = nvalues,
-    zmin = round_ignore_null(zmin, 3),
-    zmax = round_ignore_null(zmax, 3),
+    zmin = .round_ignore_null(zmin, 3),
+    zmax = .round_ignore_null(zmax, 3),
     top_capped_vals = n_top_capped,
     bottom_capped_vals = n_bottom_capped,
     non_finite = n_non_finite,
@@ -729,7 +729,7 @@ plot_bw_profile <- function(bwfiles,
   p <- ggplot(
     values,
     aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
-  ) + geom_line(size=1) + theme_default() +
+  ) + geom_line(size=1) + .theme_default() +
     theme(
       legend.position = c(0.80, 0.90),
       legend.direction = "vertical",
@@ -829,8 +829,8 @@ plot_bw_profile <- function(bwfiles,
                               remove_top = 0,
                               density = FALSE) {
 
-  filtered_values_x <- remove_top_by_mean(x, remove_top, c("score"))
-  filtered_values_y <- remove_top_by_mean(y, remove_top, c("score"))
+  filtered_values_x <- .remove_top_by_mean(x, remove_top, c("score"))
+  filtered_values_y <- .remove_top_by_mean(y, remove_top, c("score"))
 
   # merge both
   df_x <- data.frame(filtered_values_x$ranges)
@@ -848,10 +848,10 @@ plot_bw_profile <- function(bwfiles,
       points = nrow(df),
       NA.x = filtered_values_x$calculated$na,
       filtered.x = filtered_values_x$calculated$filtered,
-      quant.x = round_ignore_null(filtered_values_x$calculated$quantile),
+      quant.x = .round_ignore_null(filtered_values_x$calculated$quantile),
       NA.y = filtered_values_y$calculated$na,
       filtered.y = filtered_values_y$calculated$filtered,
-      quant.y = round_ignore_null(filtered_values_y$calculated$quantile)
+      quant.y = .round_ignore_null(filtered_values_y$calculated$quantile)
     )
 
   filtered_values <- list(ranges=filtered_values, calculated=calculated)
@@ -911,7 +911,7 @@ plot_bw_profile <- function(bwfiles,
                                highlight_colors = NULL,
                                remove_top = 0) {
   bwnames <- names(mcols(gr))
-  bins_filtered <- remove_top_by_mean(gr, remove_top, bwnames)
+  bins_filtered <- .remove_top_by_mean(gr, remove_top, bwnames)
 
   df <- data.frame(bins_filtered$ranges)
   bin_id <- c("seqnames", "start", "end")
@@ -964,7 +964,7 @@ plot_bw_profile <- function(bwfiles,
     highlighted = n_highlighted_points,
     removed = bins_filtered$calculated$filtered,
     NAs = bins_filtered$calculated$na,
-    quantile_cutoff = round_ignore_null(bins_filtered$calculated$quantile)
+    quantile_cutoff = .round_ignore_null(bins_filtered$calculated$quantile)
   )
 
   list(plot = p, calculated = calculated)
@@ -1060,7 +1060,7 @@ plot_bw_profile <- function(bwfiles,
 #'
 #' @return a ggproto object
 .colorscale <- function(norm_mode, bg_bwfiles) {
-  legend_label <- make_norm_label(norm_mode, bg_bwfiles)
+  legend_label <- .make_norm_label(norm_mode, bg_bwfiles)
   colorscale <-
     scale_fill_gradient(name = legend_label, low = "white", high = "#b22222", na.value = "#cccccc")
   if (!is.null(bg_bwfiles)) {

@@ -68,18 +68,18 @@ bw_loci <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   } else {
     # Ensures later on we only try to access valid labels
     labels <- make.names(labels)
   }
 
-  bed <- loci_to_granges(loci)
+  bed <- .loci_to_granges(loci)
 
   result <- NULL
   if (is.null(aggregate_by)) {
@@ -196,11 +196,11 @@ bw_bins <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0) {
 
-  validate_filelist(bwfiles)
+  .validate_filelist(bwfiles)
   norm_func <- .process_norm_mode(norm_mode)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   }
 
   tiles <- build_bins(bin_size = bin_size, genome = genome)
@@ -276,12 +276,12 @@ bw_heatmap <- function(bwfiles,
                        ignore_strand = FALSE,
                        norm_mode = "fc") {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
-  granges <- loci_to_granges(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
+  granges <- .loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
-  validate_profile_parameters(bin_size, upstream, downstream)
+  .validate_profile_parameters(bin_size, upstream, downstream)
 
   if (is.null(labels)) {
     labels <- basename(bwfiles)
@@ -376,15 +376,15 @@ bw_profile <- function(bwfiles,
                        norm_mode = "fc",
                        remove_top = 0) {
 
-  validate_filelist(bwfiles)
-  validate_locus_parameter(loci)
-  granges <- loci_to_granges(loci)
+  .validate_filelist(bwfiles)
+  .validate_locus_parameter(loci)
+  granges <- .loci_to_granges(loci)
   norm_func <- .process_norm_mode(norm_mode)
 
-  validate_profile_parameters(bin_size, upstream, downstream)
+  .validate_profile_parameters(bin_size, upstream, downstream)
 
   if (is.null(labels)) {
-    labels <- make_label_from_object(bwfiles)
+    labels <- .make_label_from_object(bwfiles)
   }
 
   if (length(bwfiles) != length(labels)) {
@@ -510,14 +510,14 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 
   # granges_cbind sorts each element so it's safer to merge and no need to
   # sort after
-  result <- granges_cbind(summaries, labels)
+  result <- .granges_cbind(summaries, labels)
 
   # Include names if granges has them
   if ("name" %in% names(mcols(granges))) {
     result$name <- granges$name
   }
 
-  result <- remove_top_by_mean(
+  result <- .remove_top_by_mean(
     result, remove_top,
     !names(mcols(result)) %in% c("name")
   )
@@ -549,7 +549,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
     aggregate_by = aggregate_by
   )
 
-  natural_sort_by_field(df, "name")
+  .natural_sort_by_field(df, "name")
 }
 
 
@@ -594,7 +594,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
   result_df[, labels] <- norm_func(result_df[, labels] / bg_df[, labels])
 
   result <- makeGRangesFromDataFrame(result_df, keep.extra.columns = TRUE)
-  result <- remove_top_by_mean(result, remove_top, labels)
+  result <- .remove_top_by_mean(result, remove_top, labels)
 
   result$ranges
 }
@@ -628,7 +628,7 @@ utils::globalVariables("where")
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
-  validate_group_col(scored_granges, group_col)
+  .validate_group_col(scored_granges, group_col)
 
   score_cols <- names(mcols(scored_granges))
   score_cols <- score_cols[!score_cols %in% c(group_col)]
@@ -636,7 +636,7 @@ utils::globalVariables("where")
   df <- data.frame(scored_granges) %>%
     select(c(score_cols, group_col, .data$width))
 
-  validate_categories(df[, group_col])
+  .validate_categories(df[, group_col])
 
   if (aggregate_by == "true_mean") {
     sum_vals <- df[, score_cols, drop = F] * df$width
@@ -889,7 +889,7 @@ utils::globalVariables("where")
                                       granges,
                                       npoints,
                                       ignore_strand = FALSE) {
-  bwfile <- fetch_bigwig(bw)
+  bwfile <- .fetch_bigwig(bw)
 
   values <- rtracklayer::summary(bwfile,
     which = granges,

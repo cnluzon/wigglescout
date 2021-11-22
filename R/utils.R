@@ -3,7 +3,7 @@
 #' @param bw BigWig file path or URL
 #'
 #' @return BigWigFile object
-fetch_bigwig <- function(bw) {
+.fetch_bigwig <- function(bw) {
   if (!is.null(bw)) {
     valid_bwfile <- bw
     if (RCurl::url.exists(bw)) {
@@ -25,7 +25,7 @@ fetch_bigwig <- function(bw) {
 #' @param grlist A list of GRanges objects that have all the same fields.
 #' @param labels Vector of names for the score columns.
 #' @importFrom GenomeInfoDb sortSeqlevels
-granges_cbind <- function(grlist, labels) {
+.granges_cbind <- function(grlist, labels) {
   fixed_fields <- c("seqnames", "start", "end", "width", "strand")
 
   grlist[[1]] <- sortSeqlevels(grlist[[1]])
@@ -47,7 +47,7 @@ granges_cbind <- function(grlist, labels) {
 #'
 #' @param named_list A named list
 #' @return A string
-key_value_string <- function(named_list) {
+.key_value_string <- function(named_list) {
   paste(names(named_list), named_list, sep = ":", collapse = ", ")
 }
 
@@ -57,10 +57,10 @@ key_value_string <- function(named_list) {
 #' @param named_list A named list
 #'
 #' @return A string
-limited_size_caption_line <- function(named_list) {
+.limited_size_caption_line <- function(named_list) {
   size_limit <- 3
   chunks <- split(named_list, ceiling(seq_along(named_list)/size_limit))
-  paste(sapply(chunks, key_value_string), collapse="\n")
+  paste(sapply(chunks, .key_value_string), collapse="\n")
 }
 
 
@@ -69,7 +69,7 @@ limited_size_caption_line <- function(named_list) {
 #' @param loci GRanges or BED
 #'
 #' @return An integer
-loci_length <- function(loci) {
+.loci_length <- function(loci) {
   if (is.character(loci)) {
     length(rtracklayer::import(loci, format="BED"))
   } else {
@@ -85,7 +85,7 @@ loci_length <- function(loci) {
 #'
 #' @importFrom rtracklayer import
 #' @importFrom GenomeInfoDb sortSeqlevels
-loci_to_granges <- function(loci) {
+.loci_to_granges <- function(loci) {
   bed <- loci
   if (class(loci) == "character") {
     bed <- import(loci, format = "BED")
@@ -103,9 +103,9 @@ loci_to_granges <- function(loci) {
 #' @param outcome Named values with relevant outcomes and their values
 #' @importFrom utils packageVersion
 #' @return A caption string
-make_caption <- function(params, outcome) {
-  verbose_params <- limited_size_caption_line(params)
-  verbose_crop <- limited_size_caption_line(outcome)
+.make_caption <- function(params, outcome) {
+  verbose_params <- .limited_size_caption_line(params)
+  verbose_crop <- .limited_size_caption_line(outcome)
 
   date <- format(Sys.time(), "%a %b %d %X %Y")
   pkg_version <- paste("wigglescout v.", packageVersion("wigglescout"))
@@ -120,7 +120,7 @@ make_caption <- function(params, outcome) {
 #' @param obj Something to convert to label
 #'
 #' @return A valid label name
-make_label_from_object <- function(obj) {
+.make_label_from_object <- function(obj) {
   if (is.character(obj)) {
     filename_clean <- basename(tools::file_path_sans_ext(obj))
     make.names(filename_clean)
@@ -137,7 +137,7 @@ make_label_from_object <- function(obj) {
 #' @param bg Background file.
 #'
 #' @return A string describing normalization.
-make_norm_label <- function(f, bg) {
+.make_norm_label <- function(f, bg) {
   label <- "RPGC"
   if (!is.null(bg)) {
     label <- switch(f,
@@ -156,8 +156,8 @@ make_norm_label <- function(f, bg) {
 #' @param bg Background file.
 #'
 #' @return A string describing normalization.
-make_norm_file_label <- function(f, fg, bg) {
-  paste(make_label_from_object(fg), "-", make_norm_label(f, bg))
+.make_norm_file_label <- function(f, fg, bg) {
+  paste(.make_label_from_object(fg), "-", .make_norm_label(f, bg))
 }
 
 
@@ -169,7 +169,7 @@ make_norm_file_label <- function(f, fg, bg) {
 #' @param col The column (usually name).
 #' @importFrom stringr str_sort
 #' @return A sorted df
-natural_sort_by_field <- function(df, col) {
+.natural_sort_by_field <- function(df, col) {
   rownames(df) <- df[, col]
   order <- str_sort(df[, col], numeric = TRUE)
   df[, col] <- NULL
@@ -187,8 +187,7 @@ natural_sort_by_field <- function(df, col) {
 #'
 #' @return A named list, fields ranges for the resulting GRanges, plus calculated
 #'   values: quantile_value, filtered, na_values.
-#' @export
-remove_top_by_mean <- function(granges, quantile, columns) {
+.remove_top_by_mean <- function(granges, quantile, columns) {
   n_filtered <- 0
   top_quantile <- NULL
 
@@ -231,7 +230,7 @@ remove_top_by_mean <- function(granges, quantile, columns) {
 #' @param digits How many digits round
 #'
 #' @return Rounded value, or NULL
-round_ignore_null <- function(v, digits=3) {
+.round_ignore_null <- function(v, digits=3) {
   rounded <- v
   if (!is.null(v)) {
     rounded <- round(v, digits)
@@ -241,7 +240,7 @@ round_ignore_null <- function(v, digits=3) {
 
 #' Set default theme as classic with larger font size
 #' @import ggplot2
-theme_default <- function() {
+.theme_default <- function() {
   theme_classic(base_size = 18) + theme(plot.caption = element_text(size = 11))
 }
 
@@ -252,7 +251,7 @@ theme_default <- function() {
 #' Throws a warning if it finds more than 50 different values.
 #'
 #' @param cat_values An array of values
-validate_categories <- function(cat_values) {
+.validate_categories <- function(cat_values) {
   max_categories <- 50
   # Test number of values in group_col
   ncat <- length(levels(as.factor(cat_values)))
@@ -272,7 +271,7 @@ validate_categories <- function(cat_values) {
 #' @param filelist An array of files
 #' @importFrom RCurl url.exists
 #' @return NULL
-validate_filelist <- function(filelist) {
+.validate_filelist <- function(filelist) {
   if (length(filelist) == 0) {
     stop("File list provided is empty.")
   }
@@ -289,9 +288,9 @@ validate_filelist <- function(filelist) {
 #'
 #' @param locus_param Parameter to validate
 #'
-validate_locus_parameter <- function(locus_param) {
+.validate_locus_parameter <- function(locus_param) {
   if (class(locus_param) == "character") {
-    validate_filelist(locus_param)
+    .validate_filelist(locus_param)
   }
   else {
     if (class(locus_param) != "GRanges") {
@@ -306,7 +305,7 @@ validate_locus_parameter <- function(locus_param) {
 #'
 #' @param granges GRanges object to check
 #' @param group_col Group column name. Usually, name.
-validate_group_col <- function(granges, group_col) {
+.validate_group_col <- function(granges, group_col) {
   if (!group_col %in% names(mcols(granges))) {
     stop(paste("Invalid group column not present in granges", group_col))
   }
@@ -319,7 +318,7 @@ validate_group_col <- function(granges, group_col) {
 #' @param upstream Upstream bp. Must be positive and larger than bin size.
 #' @param downstream Downstream bp. Must be positive and larger than bin size.
 #'
-validate_profile_parameters <- function(bin_size, upstream, downstream) {
+.validate_profile_parameters <- function(bin_size, upstream, downstream) {
   if (bin_size <= 0) {
     stop(paste("bin size must be a positive value:", bin_size))
   }
