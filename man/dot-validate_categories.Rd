@@ -9,6 +9,9 @@
 \arguments{
 \item{cat_values}{An array of values}
 }
+\value{
+Nothing (NULL) on success.
+}
 \description{
 Checks whether the number of categories is reasonable for an aggregation.
 Throws a warning if it finds more than 50 different values.

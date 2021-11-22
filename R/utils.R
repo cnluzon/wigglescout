@@ -253,7 +253,7 @@
 #' Throws a warning if it finds more than 50 different values.
 #'
 #' @param cat_values An array of values
-#' @return NULL
+#' @return Nothing (NULL) on success.
 .validate_categories <- function(cat_values) {
   max_categories <- 50
   # Test number of values in group_col
@@ -272,7 +272,7 @@
 #'
 #' @param filelist An array of files
 #' @importFrom RCurl url.exists
-#' @return NULL
+#' @return Nothing (NULL) on success.
 .validate_filelist <- function(filelist) {
   if (length(filelist) == 0) {
     stop("File list provided is empty.")
@@ -290,7 +290,7 @@
 #'
 #' @param locus_param Parameter to validate
 #' @importFrom methods is
-#' @return NULL
+#' @return Nothing (NULL) on success.
 .validate_locus_parameter <- function(locus_param) {
   if (is(locus_param, "character")) {
     .validate_filelist(locus_param)
@@ -308,10 +308,10 @@
 #'
 #' @param granges GRanges object to check
 #' @param group_col Group column name. Usually, name.
-#' @return NULL
+#' @return Nothing (NULL) on success.
 .validate_group_col <- function(granges, group_col) {
   if (!group_col %in% names(mcols(granges))) {
-    stop(paste("Invalid group column not present in granges", group_col))
+    stop("Invalid group column not present in granges", group_col)
   }
 }
 
@@ -321,7 +321,7 @@
 #' @param bin_size Bin size. Must be a positive number.
 #' @param upstream Upstream bp. Must be positive and larger than bin size.
 #' @param downstream Downstream bp. Must be positive and larger than bin size.
-#' @return NULL
+#' @return Nothing (NULL) on success.
 #'
 .validate_profile_parameters <- function(bin_size, upstream, downstream) {
   if (bin_size <= 0) {
