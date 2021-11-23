@@ -127,7 +127,9 @@ bw_loci <- function(bwfiles,
             )
 
             rows <- rownames(result)
-            result <- data.frame(norm_func(result[rows, labels] / bg[rows, labels]))
+            result <- data.frame(
+                norm_func(result[rows, labels] / bg[rows, labels])
+            )
             rownames(result) <- rows
             colnames(result) <- labels
         }
