@@ -426,6 +426,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 #' @inheritParams bw_profile
 #' @import ggplot2
 #' @importFrom methods is
+#' @importFrom purrr partial map2
 #' @return A ggplot object.
 #' @examples
 #' # Get the raw files
@@ -435,9 +436,11 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
 #'
 #' plot_bw_profile(bw, loci = bed,
 #'                 mode = "stretch", upstream = 1000, downstream = 1000)
+#'
+#' # It is also possible to run same bigWig across several BED files or GRanges
+#' plot_bw_profile(bw, loci = c(bed, bed), labels = c("A", "B"))
 #' @export
-plot_bw_profile <- function(bwfiles,
-                            loci,
+plot_bw_profile <- function(bwfiles, loci,
                             bg_bwfiles = NULL,
                             mode = "stretch",
                             bin_size = 100,
@@ -451,68 +454,52 @@ plot_bw_profile <- function(bwfiles,
                             colors = NULL,
                             remove_top = 0,
                             verbose = TRUE) {
-
+    .validate_input_numbers(bwfiles, loci)
     values <- NULL
     nloci <- NULL
     x_label <- ""
+    # Get parameter values that are relevant to the underlying function
+    par <- .get_wrapper_parameter_values(bw_profile, mget(names(formals())))
 
     if ((is(loci, "list") && length(loci) > 1) ||
         (is(loci, "character") && length(loci) > 1)) {
-        if (length(bwfiles) > 1) {
-            stop("If multiple loci provided only a single bwfile is allowed")
-        }
-        if (is.null(labels)) {
-            labels <- lapply(loci, .make_label_from_object)
-            if (length(unique(labels)) < length(loci)) {
-                warning("Unlabeled objects or repeated labels. ",
-                        "Adding numeric indices.")
-                labels <- paste(labels, seq_len(length(labels)), sep = "_")
-            }
-        }
-        profile_function <- purrr::partial(bw_profile, bwfile = bwfiles,
-                                            bg_bwfiles = bg_bwfiles,
-                                            mode = mode,
-                                            bin_size = bin_size,
-                                            upstream = upstream,
-                                            downstream = downstream,
-                                            middle = middle,
-                                            ignore_strand = ignore_strand,
-                                            norm_mode = norm_mode,
-                                            remove_top = remove_top)
+        labels <- .label_multiple_loci(loci, labels)
 
-        value_list <- purrr::map2(loci, labels, profile_function)
+        profile_function <- partial(bw_profile, bwfile = bwfiles,
+            bg_bwfiles = bg_bwfiles,
+            mode = mode,
+            bin_size = bin_size,
+            upstream = upstream,
+            downstream = downstream,
+            middle = middle,
+            ignore_strand = ignore_strand,
+            norm_mode = norm_mode,
+            remove_top = remove_top
+        )
+        value_list <- map2(loci, labels, profile_function)
         values <- do.call(rbind, value_list)
         x_title <- "Multiple loci groups"
     }
     else {
-        # Get parameter values that are relevant to the underlying function
-        par <- .get_wrapper_parameter_values(bw_profile, mget(names(formals())))
-        values <- do.call(bw_profile, mget(par))
 
+        values <- do.call(bw_profile, mget(par))
         nloci <- .loci_length(loci)
         x_title <- paste(.make_label_from_object(loci),
                             "-", nloci, "loci", sep = " ")
     }
-
     y_label <- .make_norm_label(norm_mode, bg_bwfiles)
-
     params <- mget(c("bin_size", "middle", "mode", "ignore_strand",
                      "remove_top"))
-
     caption <- .make_caption(params, list(), verbose = verbose)
-
     if (!is.null(bg_bwfiles) && show_error == TRUE) {
         warning("Stderr estimate not available when normalizing by input")
         show_error <- FALSE
     }
-
-    labels <- labs(title = "Profile plot", x = x_title, y = y_label,
+    labels <- labs(title = "Profile", x = x_title, y = y_label,
                    caption = caption)
-
     .profile_body(values, show_error, colors) +
         .heatmap_lines(nloci, max(values$index), bin_size,
-                       upstream, downstream, mode, expand = FALSE) +
-        labels
+                       upstream, downstream, mode, expand = FALSE) + labels
 }
 
 # Helper plot functions ---------------------------------------------------

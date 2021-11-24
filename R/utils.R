@@ -83,6 +83,25 @@
     paste(vapply(chunks, .key_value_string, character(1)), collapse="\n")
 }
 
+#' Label loci with a list of labels
+#'
+#' If some labels are duplicated, numbers are added to the end
+#'
+#' @param loci List of loci
+#' @param labels List of labels
+#'
+#' @return A list of labels
+.label_multiple_loci <- function(loci, labels) {
+    if (is.null(labels)) {
+        labels <- lapply(loci, .make_label_from_object)
+        if (length(unique(labels)) < length(loci)) {
+            warning("Unlabeled objects or repeated labels. ",
+                    "Adding numeric indices.")
+            labels <- paste(labels, seq_len(length(labels)), sep = "_")
+        }
+    }
+    labels
+}
 
 #' Checks how many loci
 #'
@@ -323,6 +342,15 @@
         if (!is(locus_param, "GRanges")) {
             msg <- paste0("Unexpected type: ", class(locus_param))
             stop(msg)
+        }
+    }
+}
+
+.validate_input_numbers <- function(bw, loci) {
+    if ((is(loci, "list") && length(loci) > 1) ||
+        (is(loci, "character") && length(loci) > 1)) {
+        if (length(bw) > 1) {
+            stop("If multiple loci provided only a single bwfile is allowed")
         }
     }
 }

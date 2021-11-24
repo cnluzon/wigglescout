@@ -409,7 +409,6 @@ bw_profile <- function(bwfiles,
     .validate_locus_parameter(loci)
     granges <- .loci_to_granges(loci)
     norm_func <- .process_norm_mode(norm_mode)
-
     .validate_profile_parameters(bin_size, upstream, downstream)
 
     if (is.null(labels)) {
@@ -420,8 +419,7 @@ bw_profile <- function(bwfiles,
         stop("labels and bwfiles must have the same length")
     }
 
-    calculate_bw_profile_fixed <- partial(
-        .calculate_bw_profile,
+    calculate_bw_profile_fixed <- partial(.calculate_bw_profile,
         granges = granges,
         mode = mode,
         bin_size = bin_size,
@@ -434,22 +432,16 @@ bw_profile <- function(bwfiles,
     )
 
     if (is.null(bg_bwfiles)) {
-        values_list <- future_map2(
-            bwfiles,
-            labels,
+        values_list <- future_map2(bwfiles, labels,
             calculate_bw_profile_fixed,
             bg_bw = NULL
         )
     } else {
-        values_list <- future_pmap(
-            list(bwfiles, bg_bwfiles, labels),
+        values_list <- future_pmap(list(bwfiles, bg_bwfiles, labels),
             calculate_bw_profile_fixed
         )
     }
-
-    values <- do.call(rbind, values_list)
-
-    values
+    do.call(rbind, values_list)
 }
 
 
