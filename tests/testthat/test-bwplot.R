@@ -148,46 +148,6 @@ test_that("plot_bw_bins_scatter with no density has no tile layer", {
   expect_true("GeomPoint" %in% sapply(p$layers, function(x) class(x$geom)[1]))
 })
 
-test_that("plot_bw_bins_scatter with bg files passes on parameters", {
-  m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_bins_scatter(bw1, bw2, bg_x = bg_bw, bg_y = bg_bw)
-  })
-
-  expect_call(m, 1,
-              bw_bins(
-                x,
-                bg_bwfiles = bg_x,
-                bin_size = bin_size,
-                genome = genome,
-                norm_mode = norm_mode_x,
-                labels = "score",
-                selection = selection
-              )
-  )
-
-  expect_args(m, 1,
-              x = bw1,
-              bg_bwfiles = bg_bw,
-              bin_size = 10000,
-              genome = "mm9",
-              norm_mode = "fc",
-              labels = "score",
-              selection = NULL
-  )
-
-  expect_args(m, 2,
-              x = bw2,
-              bg_bwfiles = bg_bw,
-              bin_size = 10000,
-              genome = "mm9",
-              norm_mode = "fc",
-              labels = "score",
-              selection = NULL
-  )
-})
-
-
 # Loci scatter tests ----------------------------------------------
 
 test_that("plot_bw_loci_scatter with defaults returns a plot", {
@@ -312,48 +272,6 @@ test_that("plot_bw_bins_violin with highlight and remove top returns a plot", {
   })
 })
 
-test_that("plot_bw_bins_violin passes on parameters", {
-  m <- mock(reduced_bins_all)
-  with_mock(bw_bins = m, {
-    p <- plot_bw_bins_violin(c(bw1, bw2),
-                             bg_bwfiles = c(bg_bw, bg_bw),
-                             labels = c("x", "y"),
-                             highlight = bed,
-                             bin_size = 5000,
-                             norm_mode = "log2fc",
-                             genome = "hg38",
-                             remove_top = 0,
-    )
-  })
-
-  expect_call(m, 1,
-              bw_bins(bwfiles,
-                      bg_bwfiles = bg_bwfiles,
-                      labels = labels,
-                      bin_size = bin_size,
-                      genome = genome,
-                      per_locus_stat = per_locus_stat,
-                      norm_mode = norm_mode,
-                      # FIXME: Remove top is done outside this function
-                      remove_top = 0,
-                      selection = selection
-              )
-  )
-
-  expect_args(m, 1,
-              bwfiles = c(bw1, bw2),
-              bg_bwfiles = c(bg_bw, bg_bw),
-              labels = c("x", "y"),
-              bin_size = 5000,
-              genome = "hg38",
-              per_locus_stat = "mean",
-              norm_mode = "log2fc",
-              remove_top = 0,
-              selection = NULL
-  )
-
-})
-
 # Summary heatmap tests -------------------------------------------
 
 test_that(
@@ -400,41 +318,6 @@ test_that("plot_bw_loci_summary_heatmap with verbose unset returns a plot withou
     expect_true(is.null(p$labels$caption))
   })
 })
-
-test_that(
-  "plot_bw_loci_summary_heatmap passes parameters on", {
-    m <- mock(summary_values)
-    with_mock(bw_loci = m, {
-      p <- plot_bw_loci_summary_heatmap(c(bw1, bw2),
-                                       loci = bed,
-                                       bg_bwfiles <- c(bg_bw, bg_bw),
-                                       aggregate_by = "median",
-                                       norm_mode = "log2fc",
-                                       labels = c("bw1", "bw2")
-      )
-    })
-
-    expect_call(m, 1,
-                bw_loci(bwfiles,
-                        loci,
-                        bg_bwfiles = bg_bwfiles,
-                        aggregate_by = aggregate_by,
-                        norm_mode = norm_mode,
-                        labels = labels,
-                        remove_top = remove_top
-                )
-    )
-
-    expect_args(m, 1,
-                bwfiles = c(bw1, bw2),
-                loci = bed,
-                bg_bwfiles = c(bg_bw, bg_bw),
-                aggregate_by = "median",
-                norm_mode = "log2fc",
-                labels = c("bw1", "bw2"),
-                remove_top = 0
-    )
-  })
 
 # Profile tests ----------------------------------------------
 
@@ -573,57 +456,6 @@ test_that(
     })
   })
 
-test_that(
-  "plot_bw_profile passes on parameters to bw_profile call", {
-    m <- mock(profile_values)
-    with_mock(bw_profile = m, {
-      p <- plot_bw_profile(c(bw1, bw2),
-                           loci = bed,
-                           bg_bwfiles = c(bg_bw, bg_bw),
-                           mode = "start",
-                           bin_size = 1000,
-                           upstream = 1500,
-                           downstream = 1500,
-                           middle = 1000,
-                           ignore_strand = TRUE,
-                           show_error = FALSE,
-                           norm_mode = "log2fc",
-                           remove_top = 0,
-                           labels = c("bw1", "bw2"),
-                           verbose = TRUE)
-    })
-
-    expect_call(m, 1,
-                bw_profile(bwfiles, loci,
-                           bg_bwfiles = bg_bwfiles,
-                           mode = mode,
-                           bin_size = bin_size,
-                           upstream = upstream,
-                           downstream = downstream,
-                           middle = middle,
-                           ignore_strand = ignore_strand,
-                           norm_mode = norm_mode,
-                           labels = labels,
-                           remove_top = remove_top
-                )
-    )
-
-    expect_args(m, 1,
-                c(bw1, bw2),
-                loci = bed,
-                bg_bwfiles = c(bg_bw, bg_bw),
-                mode = "start",
-                bin_size = 1000,
-                upstream = 1500,
-                downstream = 1500,
-                middle = 1000,
-                ignore_strand = TRUE,
-                norm_mode = "log2fc",
-                labels = c("bw1", "bw2"),
-                remove_top= 0
-    )
-  })
-
 # Heatmap tests ----------------------------------------------
 
 test_that(
@@ -688,51 +520,5 @@ test_that(
       expect_is(p, "ggplot")
       expect_true("caption" %in% names(p$labels))
     })
-  })
-
-test_that(
-  "plot_bw_heatmap passes on parameters to bw_heatmap call", {
-    m <- mock(heatmap_values)
-    with_mock(bw_heatmap = m, {
-      p <- plot_bw_heatmap(bw1,
-                           loci = bed,
-                           bg_bwfile = bg_bw,
-                           mode = "start",
-                           bin_size = 1000,
-                           upstream = 1500,
-                           downstream = 1500,
-                           middle = 1000,
-                           ignore_strand = TRUE,
-                           norm_mode = "log2fc",
-                           cmap = "Blues",
-                           max_rows_allowed = 2000,
-                           verbose = TRUE)
-    })
-
-    expect_call(m, 1,
-                bw_heatmap(bwfile, loci,
-                           bg_bwfiles = bg_bwfile,
-                           mode = mode,
-                           bin_size = bin_size,
-                           upstream = upstream,
-                           downstream = downstream,
-                           middle = middle,
-                           ignore_strand = ignore_strand,
-                           norm_mode = norm_mode
-                )
-    )
-
-    expect_args(m, 1,
-                bw1,
-                loci = bed,
-                bg_bwfile = bg_bw,
-                mode = "start",
-                bin_size = 1000,
-                upstream = 1500,
-                downstream = 1500,
-                middle = 1000,
-                ignore_strand = TRUE,
-                norm_mode = "log2fc"
-    )
   })
 

@@ -5,7 +5,7 @@
 \title{Plot a heatmap of a given bigWig file over a set of loci}
 \usage{
 plot_bw_heatmap(
-  bwfile,
+  bwfiles,
   loci,
   bg_bwfile = NULL,
   mode = "stretch",
@@ -24,7 +24,7 @@ plot_bw_heatmap(
 )
 }
 \arguments{
-\item{bwfile}{BigWig file to plot}
+\item{bwfiles}{BigWig file to plot}
 
 \item{loci}{BED file or GRanges to summarize}
 

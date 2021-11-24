@@ -14,6 +14,25 @@
     }
 }
 
+#' Get matching parameters of a target function with current context
+#'
+#' This is a helper function for wrapping functions such as plotting. It
+#' gets the formal arguments of the target function func, and gets their
+#' values from the context given in current, that will have the same name.
+#' It returns a named list argument - value that can be passed to func
+#' using do.call()
+#'
+#' @param func Target function
+#' @param current Current context as a named list
+#'
+#' @return Named list argument - value
+.get_wrapper_parameter_values <- function(func, current){
+    f <- names(formals(func))
+    n <- names(current)
+    par <- n[n %in% f]
+    par
+}
+
 #' GRanges cbind-like operation
 #'
 #' Perform a cbind operation on a GRanges list, appending scores to mcols.
@@ -103,17 +122,21 @@
 #'
 #' @param params Named list with relevant parameters and their values
 #' @param outcome Named values with relevant outcomes and their values
+#' @param verbose Logical. If TRUE all information is printed. If FALSE returns
+#'   a blank caption.
 #' @importFrom utils packageVersion
 #' @return A caption string
-.make_caption <- function(params, outcome) {
-    verbose_params <- .limited_size_caption_line(params)
-    verbose_crop <- .limited_size_caption_line(outcome)
+.make_caption <- function(params, outcome, verbose) {
+    if (verbose) {
+        verbose_params <- .limited_size_caption_line(params)
+        verbose_crop <- .limited_size_caption_line(outcome)
 
-    date <- format(Sys.time(), "%a %b %d %X %Y")
-    pkg_version <- paste("wigglescout v.", packageVersion("wigglescout"))
-    date <- paste(date, pkg_version, sep = ' - ')
+        date <- format(Sys.time(), "%a %b %d %X %Y")
+        pkg_version <- paste("wigglescout v.", packageVersion("wigglescout"))
+        date <- paste(date, pkg_version, sep = ' - ')
 
-    paste(verbose_params, verbose_crop, date, sep = "\n\n")
+        paste(verbose_params, verbose_crop, date, sep = "\n\n")
+    }
 }
 
 
