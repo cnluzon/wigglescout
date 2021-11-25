@@ -50,6 +50,30 @@
 }
 
 
+#' Filter violin plot data with quantile threshold
+#'
+#' Removes top quantile loci from the distribution. Values are removed by mean
+#' rather than maximum.
+#'
+#' @param gr GRanges object
+#' @param remove_top (1-remove_top) quantile will be removed.
+#' @param columns mcols in GRanges to use for selection.
+#'
+#' @return A named list with ranges = GRanges object and stats a named list with
+#'   some calculated values.
+.filter_violin_data <- function(gr, remove_top, columns) {
+    clean_gr <- .remove_top_by_mean(gr, remove_top, columns)
+
+    stats <- list(
+        points = length(gr),
+        removed = clean_gr$calculated$filtered,
+        NAs = clean_gr$calculated$na,
+        quantile_cutoff = .round_ignore_null(clean_gr$calculated$quantile)
+    )
+
+    list(ranges = clean_gr$ranges, stats = stats)
+}
+
 #' Get matching parameters of a target function with current context
 #'
 #' This is a helper function for wrapping functions such as plotting. It
@@ -267,7 +291,7 @@
 #'   calculated values: quantile_value, filtered, na_values.
 .remove_top_by_mean <- function(granges, quantile, columns) {
     n_filtered <- 0
-    top_quantile <- NULL
+    top_quantile <- NA
 
     valid_columns <- data.frame(mcols(granges))
     valid_columns <- valid_columns[, columns, drop = FALSE]

@@ -136,6 +136,8 @@ plot_bw_bins_scatter <- function(x, y,
 #' bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw",
 #'                    package="wigglescout")
 #'
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#'
 #' # Sample bigWig files only have valid values on this region
 #' locus <- GenomicRanges::GRanges(
 #'   seqnames = "chr15",
@@ -143,6 +145,12 @@ plot_bw_bins_scatter <- function(x, y,
 #' )
 #'
 #' plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus)
+#'
+#' # You need to provide as many color values as bigWig files when highlighting
+#' plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus,
+#'   highlight = bed, highlight_label = "Genes",
+#'   highlight_color = c("black", "black"))
+#'
 #' @export
 plot_bw_bins_violin <- function(bwfiles,
                                 bg_bwfiles = NULL,
@@ -161,30 +169,31 @@ plot_bw_bins_violin <- function(bwfiles,
 
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_bins, mget(names(formals())))
-    bins_values <- do.call(bw_bins, mget(par))
+    values <- do.call(bw_bins, mget(par))
 
     columns <- labels
-    if (is.null(labels)) columns <- .make_label_from_object(bwfiles)
+    if (is.null(labels))
+        columns <- .make_label_from_object(bwfiles)
 
-    main_plot <- .violin_body(
-        bins_values[, columns],
+    clean_gr <- .filter_violin_data(values, remove_top, columns)
+
+    main_plot <- .violin_body(clean_gr$ranges,
         highlight = highlight,
         minoverlap = minoverlap,
         highlight_label = highlight_label,
-        highlight_colors = highlight_colors,
-        remove_top = remove_top
+        highlight_colors = highlight_colors
     )
 
     title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
     y_label <- .make_norm_label(norm_mode, bg_bwfiles)
     params <- mget(c("genome", "bin_size", "minoverlap", "remove_top"))
-    caption <- .make_caption(params, main_plot$calculated, verbose = verbose)
+    caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
     labels <- labs(title = title, x = "", y = y_label, caption = caption)
 
     rotate_x <- theme(axis.text.x = element_text(angle = 45, hjust = 1))
     no_legend <- theme(legend.position = "none")
 
-    main_plot$plot + labels + .theme_default() + rotate_x + no_legend
+    main_plot + labels + .theme_default() + rotate_x + no_legend
 }
 
 #' Plot a heatmap of a given bigWig file over a set of loci
@@ -734,7 +743,6 @@ plot_bw_profile <- function(bwfiles, loci,
 #' Internal function to plot ranges in violin plot with a highlighted GRanges.
 #'
 #' @param gr GRanges object with as many columns as samples to plot.
-#' @param remove_top Remove top threshold
 #' @inheritParams .scatterplot_body
 #'
 #' @importFrom reshape2 melt
@@ -745,13 +753,10 @@ plot_bw_profile <- function(bwfiles, loci,
                     highlight = NULL,
                     minoverlap = 0L,
                     highlight_label = NULL,
-                    highlight_colors = NULL,
-                    remove_top = 0) {
+                    highlight_colors = NULL) {
 
     bwnames <- names(mcols(gr))
-    bins_filtered <- .remove_top_by_mean(gr, remove_top, bwnames)
-
-    df <- data.frame(bins_filtered$ranges)
+    df <- data.frame(gr)
     bin_id <- c("seqnames", "start", "end")
 
     melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
@@ -765,7 +770,7 @@ plot_bw_profile <- function(bwfiles, loci,
         highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
         highlight_values <- .multi_ranges_overlap(
-            bins_filtered$ranges,
+            gr,
             highlight_data$ranges,
             highlight_data$labels,
             minoverlap
@@ -787,8 +792,7 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    p <-
-        ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
+    p <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
         geom_violin(fill = "#cccccc") +
         theme(
             legend.position = "none",
@@ -796,16 +800,7 @@ plot_bw_profile <- function(bwfiles, loci,
         ) +
         extra_plot +
         extra_colors
-
-    calculated <- list(
-        points = length(gr),
-        highlighted = n_highlighted_points,
-        removed = bins_filtered$calculated$filtered,
-        NAs = bins_filtered$calculated$na,
-        quantile_cutoff = .round_ignore_null(bins_filtered$calculated$quantile)
-    )
-
-    list(plot = p, calculated = calculated)
+    p
 }
 
 
