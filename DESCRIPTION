@@ -21,12 +21,12 @@ biocViews: Software, Visualization, Sequencing, Coverage, ChIPSeq, ATACSeq
 Imports:
   rtracklayer,
   dplyr,
+  tidyr,
   grDevices,
   stats,
   methods,
   ggplot2,
   stringr,
-  reshape2,
   GenomeInfoDb,
   GenomicRanges,
   IRanges,

@@ -4,7 +4,7 @@
 \alias{.heatmap_body}
 \title{Helper function for matrix heatmap plot}
 \usage{
-.heatmap_body(values, zmin, zmax, cmap, max_rows_allowed, order_by)
+.heatmap_body(values, zmin, zmax, cmap)
 }
 \arguments{
 \item{values}{Matrix with values}
@@ -16,17 +16,6 @@ this to 0.01 percentile of the data distribution.}
 this to 0.99.}
 
 \item{cmap}{Color map. Any RColorBrewer palette name is accepted here.}
-
-\item{max_rows_allowed}{Maximum number of loci that will be allowed in the
-plot. If the amount of loci exceeds this value, the plot will be binned
-on the y axis until it fits max_rows_allowed. This speeds up plotting of
-very large matrices, where higher resolution would not be perceivable by
-eye.}
-
-\item{order_by}{Specific order to display rows. By default rows are sorted
-decreasingly by mean. Order should be an array of integers of the same
-length as number of rows. These can be obtained as a result of order()
-function, if one would want to sort one heatmap by values on another one.}
 }
 \value{
 Named list plot and calculated values

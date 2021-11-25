@@ -74,6 +74,71 @@
     list(ranges = clean_gr$ranges, stats = stats)
 }
 
+
+#' Preprocess heatmap values for plotting
+#'
+#' This includes capping on zmin / zmax values. If not provided, percentiles
+#' 0.01 and 0.99 are used, to match plotting of other similar tools.
+#' If provided, a specific order of rows is used. Otherwise, rows are sorted
+#' by rowMeans.
+#' If the number of rows in the matrix is larger than a certain max_rows_allowed
+#' value, number of rows is reduced to max_rows_allowed. Rather than subsampling
+#' each row then will represent an average of the underlying rows.
+#'
+#' @param values Matrix to preprocess
+#' @param zmin Minimum value to show in color.
+#' @param zmax Maximum value to show in color.
+#' @param order_by Row order (or NULL).
+#' @param max_rows_allowed Maximum heatmap resolution.
+#'
+#' @return A named list with values and stats calculated.
+.preprocess_heatmap_matrix <- function(values, zmin, zmax, order_by, max_rows_allowed) {
+    # Order matrix by mean and transpose it (image works flipped)
+    if (is.null(order_by)) {
+        order_by <- order(rowMeans(values), decreasing = FALSE)
+    }
+    m <- t(values[order_by, ])
+    nvalues <- nrow(m) * ncol(m)
+    n_non_finite <- length(m[!is.finite(m)])
+    m[!is.finite(m)] <- NA
+
+    zlim <- .color_limits(m, zmin, zmax)
+    zmin <- zlim[[1]]
+    zmax <- zlim[[2]]
+
+    n_bottom_capped <- length(m[m < zmin])
+    n_top_capped <- length(m[m > zmax])
+    m[m < zmin] <- zmin
+    m[m > zmax] <- zmax
+
+    df <- data.frame(m) %>%
+        mutate(x = row_number()) %>%
+        pivot_longer(!.data$x, names_to = "col", values_to = "value") %>%
+        mutate(y = as.numeric(gsub("X", "", .data$col)))
+
+    n_rows <- max(df$y)
+    downsample_factor <- NA
+    if (n_rows > max_rows_allowed) {
+        # Downsample rows only and downsample only enough to fit max_rows.
+        warning("Large matrix: ", n_rows, ". Downscaled to ", max_rows_allowed)
+        downsample_factor <- round(n_rows / max_rows_allowed)
+
+        df <- df %>% group_by(
+                x = .data$x,
+                y = ((.data$y-1) %/% downsample_factor) + 1
+            ) %>% summarise(value = mean(.data$value))
+    }
+
+    stats <- list(ncells = nvalues, zmin = zmin, zmax = zmax,
+                  top_capped_vals = n_top_capped,
+                  bottom_capped_vals = n_bottom_capped,
+                  non_finite = n_non_finite,
+                  downsample_factor = downsample_factor)
+
+    list(values = df, stats = stats)
+}
+
+
 #' Get matching parameters of a target function with current context
 #'
 #' This is a helper function for wrapping functions such as plotting. It
@@ -128,9 +193,16 @@
 #' @param named_list A named list
 #' @return A string
 .key_value_string <- function(named_list) {
-    paste(names(named_list), named_list, sep = ":", collapse = ", ")
+    paste(names(named_list), lapply(named_list, .format_value), sep = ":", collapse = ", ")
 }
 
+.format_value <- function(v) {
+    if(is.numeric(v)) {
+        v <- sprintf("%.4f", v)
+        v <- sub("\\.?0+$", "", v)
+    }
+    v
+}
 
 #' Make a string out of a named list. Split into lines if too wide.
 #'

@@ -128,7 +128,7 @@ plot_bw_bins_scatter <- function(x, y,
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @inheritParams bw_bins
 #' @import ggplot2
-#' @importFrom reshape2 melt
+#' @importFrom tidyr pivot_longer
 #' @return A ggplot object.
 #' @examples
 #' # Get the raw files
@@ -229,6 +229,11 @@ plot_bw_bins_violin <- function(bwfiles,
 #'
 #' plot_bw_heatmap(bw, loci = bed,
 #'                 mode = "center", upstream = 1000, downstream = 1500)
+#'
+#' # If resolution is lower than number of rows, rows are aggregated
+#' plot_bw_heatmap(bw, loci = bed,
+#'                 mode = "center", upstream = 1000, downstream = 1500,
+#'                 max_rows_allowed = 14)
 #' @export
 plot_bw_heatmap <- function(bwfiles, loci,
                             bg_bwfile = NULL,
@@ -245,33 +250,38 @@ plot_bw_heatmap <- function(bwfiles, loci,
                             max_rows_allowed = 10000,
                             order_by = NULL,
                             verbose = TRUE) {
-
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_heatmap, mget(names(formals())))
     values <- do.call(bw_heatmap, mget(par))
+    df <- .preprocess_heatmap_matrix(values[[1]],
+        zmin, zmax,
+        order_by,
+        max_rows_allowed
+    )
 
-    main_plot <-
-        .heatmap_body(values[[1]], zmin, zmax, cmap, max_rows_allowed, order_by)
-
+    main_plot <- .heatmap_body(df$values, df$stats$zmin, df$stats$zmax, cmap)
     params <- mget(c("mode", "bin_size", "middle", "ignore_strand",
                     "max_rows_allowed"))
-    caption <- .make_caption(params, main_plot$calculated, verbose = verbose)
-    nloci <- nrow(values[[1]])
-    y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci",
-                        sep = " ")
-    x_title <- .make_label_from_object(bwfiles)
-    title <- "Heatmap"
+    caption <- .make_caption(params, df$stats, verbose = verbose)
 
+    nloci <- nrow(values[[1]])
+    y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci")
+    x_title <- .make_label_from_object(bwfiles)
     thin_rect <- element_rect(color = "black", fill = NA, size = 0.1)
     thin_lines <- theme(axis.line = element_blank(), panel.border = thin_rect)
     plot_lines <- .heatmap_lines(nloci, ncol(values[[1]]), bin_size,
                                  upstream, downstream, mode)
-    y_scale <- scale_y_continuous(breaks = c(1, nloci), labels = c(nloci, "0"),
+    y_scale_pos <- nloci
+    if (nloci > max_rows_allowed) {
+        y_scale_pos <- max_rows_allowed
+    }
+    y_scale <- scale_y_continuous(breaks = c(1, y_scale_pos),
+                                  labels = c(nloci, "1"),
                                   expand = c(0, 0))
-    labels <- labs(title = title, x = x_title, y = y_label, caption = caption,
+    labels <- labs(title = "Heatmap", x = x_title, y = y_label,
+                   caption = caption,
                    fill = .make_norm_label(norm_mode, bg_bwfile))
-
-    main_plot$plot + .theme_default() + thin_lines + plot_lines + y_scale + labels
+    main_plot + .theme_default() + thin_lines + plot_lines + y_scale + labels
 }
 
 
@@ -395,9 +405,11 @@ plot_bw_loci_scatter <- function(x,
 #'
 #' plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed,
 #'                              labels = c("H33", "H3K9m3"))
+#'
+#' plot_bw_loci_summary_heatmap(c(bw, bw2), loci = bed, remove_top = 0.001,
+#'                              labels = c("H33", "H3K9m3"))
 #' @export
-plot_bw_loci_summary_heatmap <- function(bwfiles,
-                                        loci,
+plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
                                         bg_bwfiles = NULL,
                                         labels = NULL,
                                         aggregate_by = "true_mean",
@@ -408,24 +420,14 @@ plot_bw_loci_summary_heatmap <- function(bwfiles,
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_loci, mget(names(formals())))
     summary_values <- do.call(bw_loci, mget(par))
-
     colorscale <- .colorscale(norm_mode, bg_bwfiles)
     plot <- .summary_body(summary_values)
-
     title <- paste("Coverage per region (", aggregate_by, ")")
+    params <- mget(c("aggregate_by", "remove_top"))
+    caption <- .make_caption(params, list(), verbose = verbose)
+    labels <- labs(title = title, caption = caption, x = "", y = "")
 
-
-    params <- list( aggregate_by = aggregate_by,
-                    remove_top = remove_top)
-
-    caption <- .make_caption(params, plot$calculated, verbose = verbose)
-
-    plot$plot + colorscale + labs(
-        title = title,
-        caption = caption,
-        x = "",
-        y = ""
-    )
+    plot + colorscale + labels
 }
 
 
@@ -522,80 +524,22 @@ plot_bw_profile <- function(bwfiles, loci,
 #'
 #' @param values Matrix with values
 #' @inheritParams plot_bw_heatmap
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplyr mutate row_number `%>%` summarise group_by
+#' @importFrom ggplot2 ggplot scale_fill_gradientn geom_raster aes_string
 #'
 #' @return Named list plot and calculated values
-.heatmap_body <- function(values, zmin, zmax, cmap, max_rows_allowed,
-                        order_by) {
-    # Order matrix by mean and transpose it (image works flipped)
-    if (is.null(order_by)) {
-        order_by <- order(rowMeans(values), decreasing = FALSE)
-    }
-    m <- t(values[order_by, ])
-
-    nvalues <- nrow(m) * ncol(m)
-
-    n_non_finite <- length(m[!is.finite(m)])
-    m[!is.finite(m)] <- NA
-
-    zlim <- .color_limits(m, zmin, zmax)
-
-    zmin <- zlim[[1]]
-    zmax <- zlim[[2]]
-
-    # Cap values out of zlim
-    n_bottom_capped <- length(m[m < zmin])
-    m[m < zmin] <- zmin
-
-    n_top_capped <- length(m[m > zmax])
-    m[m > zmax] <- zmax
-
-    df <- melt(m)
-    colnames(df) <- c("x", "y", "value")
-
-    df2 <- df
-
-    downsample_factor <- NULL
-    if (ncol(m) > max_rows_allowed) {
-        # Downsample rows only and downsample only enough to fit max_rows. So
-        # we make sure we do not extremely downsample a value that only slightly
-        # exceeds our max resolution.
-        warning("Large matrix of ", ncol(m),
-                ". Downscaling to ", max_rows_allowed)
-        downsample_factor <- round(ncol(m) / max_rows_allowed)
-
-        # .data prevents R CMD Check note
-        df2 <- df %>%
-            dplyr::group_by(
-                x = .data$x,
-                y = downsample_factor * round(.data$y / downsample_factor)
-            ) %>%
-            dplyr::summarise(value = mean(.data$value))
-    }
-
+.heatmap_body <- function(values, zmin, zmax, cmap) {
     gcol <- colorRampPalette(brewer.pal(n = 8, name = cmap))
 
-    p <-
-        ggplot(df2, aes_string(x = "x", y = "y", fill = "value")) +
-        geom_raster() +
-        scale_fill_gradientn(
-            colours = gcol(100),
-            limits = c(zmin, zmax),
-            breaks = c(zmin, zmax),
-            labels = format(c(zmin, zmax), digits = 2),
-            na.value = "#cccccc"
-        )
-
-    calculated <- list(
-        ncells = nvalues,
-        zmin = .round_ignore_null(zmin, 3),
-        zmax = .round_ignore_null(zmax, 3),
-        top_capped_vals = n_top_capped,
-        bottom_capped_vals = n_bottom_capped,
-        non_finite = n_non_finite,
-        downsample_factor = downsample_factor
+    colorscale <- scale_fill_gradientn(colours = gcol(100),
+        limits = c(zmin, zmax), breaks = c(zmin, zmax),
+        labels = format(c(zmin, zmax), digits = 2),
+        na.value = "#cccccc"
     )
 
-    list(plot = p, calculated = calculated)
+    ggplot(values, aes(x = .data$x, y = .data$y, fill = .data$value)) +
+        geom_raster() + colorscale
 }
 
 #' Helper function plots a profile from a dataframe
@@ -644,7 +588,8 @@ plot_bw_profile <- function(bwfiles, loci,
 #' Helper function for plotting a summary matrix
 #' @param values Summary matrix
 #' @return A ggplot object.
-#' @importFrom reshape2 melt
+#' @importFrom tidyr pivot_longer
+#' @importFrom stringr str_sort
 .summary_body <- function(values) {
     values <- round(values, 2)
 
@@ -653,17 +598,17 @@ plot_bw_profile <- function(bwfiles, loci,
     values$type <- rownames(values)
 
     # Natural sort
-    ordered_levels <- stringr::str_sort(values$type, numeric = TRUE)
+    ordered_levels <- str_sort(values$type, numeric = TRUE)
     values$type <- factor(values$type, levels=ordered_levels)
 
-    vals_long <- melt(values, id.vars = "type")
+    vals_long <- pivot_longer(values, !.data$type,
+        values_to = "value", names_to = "variable")
     vals_long$variable <- factor(vals_long$variable, levels=sample_names)
 
     # Make sure NaN values will be written
     vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
 
-    plot <-
-        ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
+    plot <- ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
         geom_tile(color = "white", size = 0.6) +
         geom_text(aes_string(label = "text_value"), size = 4) +
         coord_fixed() +
@@ -676,7 +621,8 @@ plot_bw_profile <- function(bwfiles, loci,
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()
         )
-    list(plot = plot, calculated = list())
+
+    plot
 }
 
 
@@ -745,8 +691,9 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @param gr GRanges object with as many columns as samples to plot.
 #' @inheritParams .scatterplot_body
 #'
-#' @importFrom reshape2 melt
-#' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @importFrom ggplot2 ggplot aes_string geom_violin theme geom_jitter
+#'   scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
 .violin_body <- function(gr,
@@ -759,7 +706,8 @@ plot_bw_profile <- function(bwfiles, loci,
     df <- data.frame(gr)
     bin_id <- c("seqnames", "start", "end")
 
-    melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
+    bins_long <- pivot_longer(df[, c(bin_id, bwnames)], !bin_id, names_to = "variable", values_to = "value")
+    # melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
 
     extra_plot <- NULL
     extra_colors <- NULL
@@ -777,12 +725,14 @@ plot_bw_profile <- function(bwfiles, loci,
         )
 
         n_highlighted_points <- nrow(highlight_values)
-        bin_id <-
-            c("seqnames", "start", "end", "width", "strand", "group")
-        melted_highlight <- melt(highlight_values, id.vars = bin_id)
+        bin_id <- c("seqnames", "start", "end", "width", "strand", "group")
+        highlight_long <- pivot_longer(
+            highlight_values, !bin_id,
+            values_to = "value", names_to="variable"
+        )
 
         extra_plot <- geom_jitter(
-            data = melted_highlight,
+            data = highlight_long,
             aes_string(x = "variable", y = "value", color = "variable"),
             alpha = 0.7
         )
@@ -792,12 +742,8 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    p <- ggplot(melted_bins, aes_string(x = "variable", y = "value")) +
+    p <- ggplot(bins_long, aes_string(x = "variable", y = "value")) +
         geom_violin(fill = "#cccccc") +
-        theme(
-            legend.position = "none",
-            axis.text.x = element_text(angle = 45, hjust = 1)
-        ) +
         extra_plot +
         extra_colors
     p
