@@ -80,6 +80,8 @@ locus <- GenomicRanges::GRanges(
 )
 
 plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus)
+
+# You need to provide as many color values as bigWig files when highlighting
 plot_bw_bins_violin(c(bw, bw2), bin_size = 50000, selection = locus,
   highlight = bed, highlight_label = "Genes",
   highlight_color = c("black", "black"))
