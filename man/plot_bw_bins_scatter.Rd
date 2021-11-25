@@ -86,6 +86,7 @@ be ignored and shown as warnings, as this is ggplot default behavior.
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
 bw2 <- system.file("extdata",
                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 
 # Sample bigWig files only have valid values on this region
 locus <- GenomicRanges::GRanges(
@@ -94,4 +95,9 @@ locus <- GenomicRanges::GRanges(
 )
 
 plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus)
+plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus,
+    remove_top = 0.01)
+plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus,
+    highlight = bed, highlight_color = "black")
+
 }

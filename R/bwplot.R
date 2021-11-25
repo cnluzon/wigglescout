@@ -55,6 +55,7 @@
 #' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
 #' bw2 <- system.file("extdata",
 #'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #'
 #' # Sample bigWig files only have valid values on this region
 #' locus <- GenomicRanges::GRanges(
@@ -63,6 +64,11 @@
 #' )
 #'
 #' plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus)
+#' plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus,
+#'     remove_top = 0.01)
+#' plot_bw_bins_scatter(bw, bw2, bin_size = 50000, selection = locus,
+#'     highlight = bed, highlight_color = "black")
+#'
 #' @export
 plot_bw_bins_scatter <- function(x, y,
                                 bg_x = NULL, bg_y = NULL,
@@ -89,13 +95,13 @@ plot_bw_bins_scatter <- function(x, y,
         bwfiles = y, bg_bwfiles = bg_y, norm_mode = norm_mode_y
     )
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
+    clean_gr <- .filter_scatter_data(bins_x, bins_y, remove_top)
 
-    main_plot <- .scatterplot_body(bins_x, bins_y,
+    main_plot <- .scatterplot_body(clean_gr$ranges,
         highlight = highlight_data$ranges,
         highlight_label = highlight_data$labels,
         highlight_colors = highlight_colors,
         minoverlap = minoverlap,
-        remove_top = remove_top,
         density = density
     )
 
@@ -103,10 +109,10 @@ plot_bw_bins_scatter <- function(x, y,
     x_lab <- .make_norm_file_label(norm_mode_x, x, bg_x)
     y_lab <- .make_norm_file_label(norm_mode_y, y, bg_y)
     params <- mget(c("genome", "bin_size", "minoverlap", "remove_top"))
-    caption <- .make_caption(params, main_plot$calculated, verbose = verbose)
+    caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
 
     labels <- labs(title = title, x = x_lab, y = y_lab, caption = caption)
-    main_plot$plot + labels + .theme_default()
+    main_plot + labels + .theme_default()
 }
 
 #' Bin-based violin plot of a set of bigWig files
@@ -306,6 +312,10 @@ plot_bw_heatmap <- function(bwfiles, loci,
 #' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 #'
 #' plot_bw_loci_scatter(bw, bw2, loci = bed)
+#'
+#' # It is also possible to plot from a GRanges object
+#' gr <- rtracklayer::import(bed)
+#' plot_bw_loci_scatter(bw, bw2, loci = gr)
 #' @export
 plot_bw_loci_scatter <- function(x,
                                 y,
@@ -335,29 +345,24 @@ plot_bw_loci_scatter <- function(x,
 
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
-    main_plot <- .scatterplot_body(values_x, values_y,
+    clean_gr <- .filter_scatter_data(values_x, values_y, remove_top)
+    main_plot <- .scatterplot_body(clean_gr$ranges,
                                    highlight = highlight_data$ranges,
                                    minoverlap = minoverlap,
                                    highlight_label = highlight_data$labels,
                                    highlight_colors = highlight_colors,
-                                   remove_top = remove_top
     )
 
-    # Show parameters and relevant values
-    loci_name <- "GRanges object"
-    if (is(loci, "character")) {
-        loci_name <- basename(loci)
-    }
-
+    loci_name <- .make_label_from_object(loci)
     params <- mget(c("loci_name", "minoverlap", "remove_top"))
-    caption <- .make_caption(params, main_plot$calculated, verbose = verbose)
+    caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
 
     title <- paste("Per-locus coverage (", loci_name, ")", sep = "")
     x_label <- .make_norm_file_label(norm_mode_x, x, bg_x)
     y_label <- .make_norm_file_label(norm_mode_y, y, bg_y)
     labels <- labs(title = title, x = x_label, y = y_label, caption = caption)
 
-    main_plot$plot + .theme_default() + labels
+    main_plot + .theme_default() + labels
 }
 
 #' Summary heatmap of a categorized BED or GRanges object
@@ -666,70 +671,34 @@ plot_bw_profile <- function(bwfiles, loci,
 }
 
 
-#' Scatterplot of values in GRanges objects. Loci must match.
+#' Scatterplot of values in a GRanges object with mcols x and y
 #'
-#' Plots a scatter plot from two given GRanges objects and an optional set of
-#' GRanges as highlighted annotations.
+#' Plots a scatter plot from a GRanges object that already has x and y columns.
 #'
-#' Values in x and y axis can be normalized using background.
-#'
-#' Values that are invalid (NaN, Inf, -Inf) in doing such normalization will
-#' be ignored and shown as warnings, as this is ggplot default behavior.
-#'
-#' @param x GRanges x axis
-#' @param y GRanges y axis
+#' @param gr GRanges
 #' @param highlight List of GRanges to use as highlight for subgroups.
 #' @param minoverlap Minimum overlap required for a locus to be highlighted
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, column names are used.
 #' @param highlight_colors Array of color values for the highlighting groups
-#' @param remove_top Return range 0-(1-remove_top). By default returns the
-#'     whole distribution (remove_top == 0).
 #' @param density Plot density tiles for global distribution instead of points.
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot geom_point aes_string
+#'  geom_bin2d scale_fill_gradient scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
-.scatterplot_body <- function(x, y,
-                                highlight = NULL,
+.scatterplot_body <- function(gr, highlight = NULL,
                                 minoverlap = 0L,
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
-                                remove_top = 0,
                                 density = FALSE) {
-
-    filtered_values_x <- .remove_top_by_mean(x, remove_top, c("score"))
-    filtered_values_y <- .remove_top_by_mean(y, remove_top, c("score"))
-
-    # merge both
-    df_x <- data.frame(filtered_values_x$ranges)
-    df_y <- data.frame(filtered_values_y$ranges)
-
-    bin_id <- c("seqnames", "start", "end", "strand", "width")
-    df <- merge(df_x, df_y, by = bin_id)
-    df <- df[, c(bin_id, "score.x", "score.y")]
-    colnames(df) <- c(bin_id, "x", "y")
-
-    filtered_values <- makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
-
-    calculated <-
-        list(
-            points = nrow(df),
-            NA.x = filtered_values_x$calculated$na,
-            filtered.x = filtered_values_x$calculated$filtered,
-            quant.x = .round_ignore_null(filtered_values_x$calculated$quantile),
-            NA.y = filtered_values_y$calculated$na,
-            filtered.y = filtered_values_y$calculated$filtered,
-            quant.y = .round_ignore_null(filtered_values_y$calculated$quantile)
-        )
-
-    filtered_values <- list(ranges=filtered_values, calculated=calculated)
+    df <- data.frame(gr)
 
     extra_plot <- NULL
     extra_colors <- NULL
 
     if (!is.null(highlight)) {
         highlight_values <- .multi_ranges_overlap(
-            filtered_values$ranges,
+            gr,
             highlight,
             highlight_label,
             minoverlap
@@ -746,8 +715,6 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    df <- data.frame(filtered_values$ranges)
-
     points <- geom_point(color = "#bbbbbb", alpha = 0.7)
     if (density) {
         points <- list(
@@ -761,13 +728,13 @@ plot_bw_profile <- function(bwfiles, loci,
         extra_plot +
         extra_colors
 
-    list(plot = p, calculated = calculated)
+    p
 }
-
 
 #' Internal function to plot ranges in violin plot with a highlighted GRanges.
 #'
 #' @param gr GRanges object with as many columns as samples to plot.
+#' @param remove_top Remove top threshold
 #' @inheritParams .scatterplot_body
 #'
 #' @importFrom reshape2 melt

@@ -25,8 +25,7 @@ If not provided, column names are used.}
 
 \item{highlight_colors}{Array of color values for the highlighting groups}
 
-\item{remove_top}{Return range 0-(1-remove_top). By default returns the
-whole distribution (remove_top == 0).}
+\item{remove_top}{Remove top threshold}
 }
 \value{
 A named list where plot is a ggplot object and calculated is a list

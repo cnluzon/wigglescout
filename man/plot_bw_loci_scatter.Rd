@@ -80,4 +80,8 @@ bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw",
 bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 
 plot_bw_loci_scatter(bw, bw2, loci = bed)
+
+# It is also possible to plot from a GRanges object
+gr <- rtracklayer::import(bed)
+plot_bw_loci_scatter(bw, bw2, loci = gr)
 }

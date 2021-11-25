@@ -1,3 +1,8 @@
+# wigglescout 0.13.6
+
+* Refactor plot functions to separate outlier filtering from plotting and
+reporting.
+
 # wigglescout 0.13.5
 
 * Code style fixes:

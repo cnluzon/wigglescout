@@ -14,6 +14,42 @@
     }
 }
 
+
+#' Filter scatterplot data with quantile threshold on both axes
+#'
+#' @param x GRanges for x axis
+#' @param y GRanges for y axis
+#' @param remove_top Return range 0-(1-remove_top). By default returns the
+#'     whole distribution (remove_top == 0).
+#'
+#' @return Named list, where gr is a GRanges object and stats a named list of
+#'    values: points: number of points in the figure, NA.x = Number of NA values
+#'    on the x axis. filtered.x: number of points that were higher than the
+#'    threshold on the x axis. quant.x: Quantile used as a threhsold on the x
+#'    axis. Same for the y values.
+.filter_scatter_data <- function(x, y, remove_top) {
+    clean_x <- .remove_top_by_mean(x, remove_top, c("score"))
+    clean_y <- .remove_top_by_mean(y, remove_top, c("score"))
+
+    clean_gr <- .granges_cbind(
+        list(clean_x$ranges, clean_y$ranges),
+        c("x", "y")
+    )
+
+    stats <- list(
+        points = length(clean_gr),
+        NA.x = clean_x$calculated$na,
+        filtered.x = clean_x$calculated$filtered,
+        quant.x = .round_ignore_null(clean_x$calculated$quantile),
+        NA.y = clean_y$calculated$na,
+        filtered.y = clean_y$calculated$filtered,
+        quant.y = .round_ignore_null(clean_y$calculated$quantile)
+    )
+
+    list(ranges = clean_gr, stats = stats)
+}
+
+
 #' Get matching parameters of a target function with current context
 #'
 #' This is a helper function for wrapping functions such as plotting. It
