@@ -38,6 +38,10 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
 }
+\value{
+A GRanges object with each bwfile as a metadata column named
+after labels, if provided, or after filenames otherwise.
+}
 \description{
 Build a scored GRanges object from a bigWig file list and a BED file or
 GRanges object. The aggregating function (per locus) can be min, max,
@@ -58,7 +62,8 @@ or "log2fc", values will represent log2(bigwig / bg_bigwig) per locus.
 # Get the raw files
 bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata",
+                   "sample_H3K9me3_ChIP.bw", package="wigglescout")
 bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 
 # Run single bw with single bed

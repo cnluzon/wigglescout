@@ -13,6 +13,9 @@
 
 \item{downstream}{Downstream bp. Must be positive and larger than bin size.}
 }
+\value{
+Nothing (NULL) on success.
+}
 \description{
 Validate profile and heatmap relevant parameters
 }

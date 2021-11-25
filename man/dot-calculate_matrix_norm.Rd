@@ -52,6 +52,9 @@ mode). If not provided, median length of all loci is used.}
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
 }
+\value{
+Summary matrix
+}
 \description{
 Calculate a normalized heatmap matrix for a bigWig file over a BED file
 }

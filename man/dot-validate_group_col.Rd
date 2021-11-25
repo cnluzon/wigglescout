@@ -11,6 +11,9 @@
 
 \item{group_col}{Group column name. Usually, name.}
 }
+\value{
+Nothing (NULL) on success.
+}
 \description{
 Validate that group col exists in granges
 }

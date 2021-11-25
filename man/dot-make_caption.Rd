@@ -4,12 +4,15 @@
 \alias{.make_caption}
 \title{Make a string to put as caption in verbose mode. Includes system date.}
 \usage{
-.make_caption(params, outcome)
+.make_caption(params, outcome, verbose)
 }
 \arguments{
 \item{params}{Named list with relevant parameters and their values}
 
 \item{outcome}{Named values with relevant outcomes and their values}
+
+\item{verbose}{Logical. If TRUE all information is printed. If FALSE returns
+a blank caption.}
 }
 \value{
 A caption string

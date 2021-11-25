@@ -20,7 +20,8 @@ this to 0.99.}
 \item{max_rows_allowed}{Maximum number of loci that will be allowed in the
 plot. If the amount of loci exceeds this value, the plot will be binned
 on the y axis until it fits max_rows_allowed. This speeds up plotting of
-very large matrices, where higher resolution would not be perceivable by eye.}
+very large matrices, where higher resolution would not be perceivable by
+eye.}
 
 \item{order_by}{Specific order to display rows. By default rows are sorted
 decreasingly by mean. Order should be an array of integers of the same

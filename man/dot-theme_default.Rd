@@ -6,6 +6,9 @@
 \usage{
 .theme_default()
 }
+\value{
+ggproto object
+}
 \description{
 Set default theme as classic with larger font size
 }

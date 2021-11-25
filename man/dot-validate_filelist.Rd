@@ -9,6 +9,9 @@
 \arguments{
 \item{filelist}{An array of files}
 }
+\value{
+Nothing (NULL) on success.
+}
 \description{
 Check that a list of files is valid: not empty and contents exist.
 }

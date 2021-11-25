@@ -9,6 +9,9 @@
 \arguments{
 \item{values}{Summary matrix}
 }
+\value{
+A ggplot object.
+}
 \description{
 Helper function for plotting a summary matrix
 }

@@ -16,8 +16,8 @@ needs to match with columns.}
 selected according to means.}
 }
 \value{
-A named list, fields ranges for the resulting GRanges, plus calculated
-values: quantile_value, filtered, na_values.
+A named list, fields ranges for the resulting GRanges, plus
+calculated values: quantile_value, filtered, na_values.
 }
 \description{
 Remove top loci in a GRanges column by mean of specified values

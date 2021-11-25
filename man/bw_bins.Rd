@@ -60,7 +60,8 @@ or "log2fc", values will represent log2(bigwig / bg_bigwig) per bin.
 \examples{
 # Get the raw files
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata",
+                   "sample_H3K9me3_ChIP.bw", package="wigglescout")
 bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
 
 # Sample bigWig files only have valid values on this region

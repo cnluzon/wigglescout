@@ -10,6 +10,9 @@ the parameter is otherwise a GRanges object, which is also valid.}
 \arguments{
 \item{locus_param}{Parameter to validate}
 }
+\value{
+Nothing (NULL) on success.
+}
 \description{
 Validate that a locus parameter is valid. Checks for paths and also whether
 the parameter is otherwise a GRanges object, which is also valid.

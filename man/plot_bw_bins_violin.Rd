@@ -68,7 +68,8 @@ file will be shown as a jitter plot on top of the violin plot.
 \examples{
 # Get the raw files
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
-bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata", "sample_H3K9me3_ChIP.bw",
+                   package="wigglescout")
 
 # Sample bigWig files only have valid values on this region
 locus <- GenomicRanges::GRanges(

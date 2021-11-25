@@ -1,3 +1,16 @@
+# wigglescout 0.13.5
+
+* Code style fixes:
+    - All lines under 80 characters.
+    - Replace sapply() -> vapply().
+    - Replace calls to class() to compare with is(obj, "class").
+    - Replace T/F values with TRUE/FALSE.
+    - Calls like warning(), stop() do not contain paste() calls or
+      error keywords.
+    - Indent 4 spaces all.
+    - Plotting functions now dynamically match inner parameters. Tests for 
+      inner parameter calls are hence removed.
+
 # wigglescout 0.13.4
 
 * Added a `NEWS.md` file to track changes to the package.

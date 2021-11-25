@@ -82,4 +82,7 @@ bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 
 plot_bw_profile(bw, loci = bed,
                 mode = "stretch", upstream = 1000, downstream = 1000)
+
+# It is also possible to run same bigWig across several BED files or GRanges
+plot_bw_profile(bw, loci = c(bed, bed), labels = c("A", "B"))
 }
