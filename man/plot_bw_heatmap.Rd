@@ -91,4 +91,9 @@ bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
 
 plot_bw_heatmap(bw, loci = bed,
                 mode = "center", upstream = 1000, downstream = 1500)
+
+# If resolution is lower than number of rows, rows are aggregated
+plot_bw_heatmap(bw, loci = bed,
+                mode = "center", upstream = 1000, downstream = 1500,
+                max_rows_allowed = 14)
 }
