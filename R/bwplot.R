@@ -494,16 +494,15 @@ plot_bw_profile <- function(bwfiles, loci,
         )
         value_list <- map2(loci, labels, profile_function)
         values <- do.call(rbind, value_list)
-        x_title <- "Multiple loci groups"
+        x_tit <- "Multiple loci groups"
     }
     else {
-
         values <- do.call(bw_profile, mget(par))
         nloci <- .loci_length(loci)
-        x_title <- paste(.make_label_from_object(loci),
+        x_tit <- paste(.make_label_from_object(loci),
                             "-", nloci, "loci", sep = " ")
     }
-    y_label <- .make_norm_label(norm_mode, bg_bwfiles)
+    y_lab <- .make_norm_label(norm_mode, bg_bwfiles)
     params <- mget(c("bin_size", "middle", "mode", "ignore_strand",
                      "remove_top"))
     caption <- .make_caption(params, list(), verbose = verbose)
@@ -511,8 +510,7 @@ plot_bw_profile <- function(bwfiles, loci,
         warning("Stderr estimate not available when normalizing by input")
         show_error <- FALSE
     }
-    labels <- labs(title = "Profile", x = x_title, y = y_label,
-                   caption = caption)
+    labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
     .profile_body(values, show_error, colors) +
         .heatmap_lines(nloci, max(values$index), bin_size,
                        upstream, downstream, mode, expand = FALSE) + labels

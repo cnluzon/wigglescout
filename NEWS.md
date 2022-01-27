@@ -7,7 +7,7 @@ reporting.
 * Better handling of decimal positions in verbose plots.
 * Remove soft-deprecated aes_string calls and replace with .data.
 * Row aggregation is now more precise in plot_bw_heatmap.
-* Missing tick 0 on heatmap on row aggregation fixed back. Replaced by 1 value.^
+* Missing tick 0 on heatmap on row aggregation fixed back. Replaced by 1 value.
 
 # wigglescout 0.13.5
 
