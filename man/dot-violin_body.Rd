@@ -9,8 +9,7 @@
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
-  highlight_colors = NULL,
-  remove_top = 0
+  highlight_colors = NULL
 )
 }
 \arguments{
@@ -24,9 +23,6 @@
 If not provided, column names are used.}
 
 \item{highlight_colors}{Array of color values for the highlighting groups}
-
-\item{remove_top}{Return range 0-(1-remove_top). By default returns the
-whole distribution (remove_top == 0).}
 }
 \value{
 A named list where plot is a ggplot object and calculated is a list

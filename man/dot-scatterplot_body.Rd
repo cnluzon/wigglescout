@@ -2,23 +2,19 @@
 % Please edit documentation in R/bwplot.R
 \name{.scatterplot_body}
 \alias{.scatterplot_body}
-\title{Scatterplot of values in GRanges objects. Loci must match.}
+\title{Scatterplot of values in a GRanges object with mcols x and y}
 \usage{
 .scatterplot_body(
-  x,
-  y,
+  gr,
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
   highlight_colors = NULL,
-  remove_top = 0,
   density = FALSE
 )
 }
 \arguments{
-\item{x}{GRanges x axis}
-
-\item{y}{GRanges y axis}
+\item{gr}{GRanges}
 
 \item{highlight}{List of GRanges to use as highlight for subgroups.}
 
@@ -29,9 +25,6 @@ If not provided, column names are used.}
 
 \item{highlight_colors}{Array of color values for the highlighting groups}
 
-\item{remove_top}{Return range 0-(1-remove_top). By default returns the
-whole distribution (remove_top == 0).}
-
 \item{density}{Plot density tiles for global distribution instead of points.}
 }
 \value{
@@ -39,12 +32,5 @@ A named list where plot is a ggplot object and calculated is a list
 of calculated values (for verbose mode).
 }
 \description{
-Plots a scatter plot from two given GRanges objects and an optional set of
-GRanges as highlighted annotations.
-}
-\details{
-Values in x and y axis can be normalized using background.
-
-Values that are invalid (NaN, Inf, -Inf) in doing such normalization will
-be ignored and shown as warnings, as this is ggplot default behavior.
+Plots a scatter plot from a GRanges object that already has x and y columns.
 }
