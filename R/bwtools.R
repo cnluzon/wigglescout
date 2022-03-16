@@ -853,8 +853,9 @@ utils::globalVariables("where")
     }
 
     if (remove_top > 0) {
-        top_quantile <- quantile(rowMeans(full), probs = c(1 - remove_top))
-        full <- full[rowMeans(full) <= top_quantile, ]
+        top_quantile <- quantile(rowMeans(full, na.rm = TRUE),
+                                 probs = c(1 - remove_top), na.rm = TRUE)
+        full <- full[rowMeans(full, na.rm = TRUE) <= top_quantile, ]
     }
 
     full
