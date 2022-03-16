@@ -1,3 +1,9 @@
+# wigglescout 0.13.7
+
+* bw_profile bug fix: remove_top now ignores NA values for calculating rowMeans
+and quantile.
+* Documentation fix: Removed unnecessary packages from README.
+
 # wigglescout 0.13.6
 
 * Refactor plot functions to separate outlier filtering from plotting and
