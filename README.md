@@ -50,12 +50,7 @@ you run into problems, I recommend installing manually these dependencies
 before running the installation:
 
     install.packages(('BiocManager'))
-    BiocManager::install(c('GenomeInfoDbData',
-        'GenomeInfoDb',
-        'GenomicRanges',
-        'rtracklayer',
-        'BSgenome.Mmusculus.UCSC.mm9',
-        'BSgenome.Hsapiens.UCSC.hg38'))
+    BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
 
 Then you can install directly from this GitHub repository:
 
@@ -91,10 +86,5 @@ dependencies. A workaround is installing the `BioConductor` packages manually:
     if (!requireNamespace('BiocManager', quietly = TRUE))
         install.packages('BiocManager')
 
-    BiocManager::install(c('GenomeInfoDbData',
-        'GenomeInfoDb',
-        'GenomicRanges',
-        'rtracklayer',
-        'BSgenome.Mmusculus.UCSC.mm9',
-        'BSgenome.Hsapiens.UCSC.hg38'))
+    BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
  
