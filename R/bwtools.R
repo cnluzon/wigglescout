@@ -485,21 +485,15 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 .bw_ranges <- function(bwfile, granges,
                         per_locus_stat = "mean",
                         selection = NULL) {
+    bw <- .fetch_bigwig(bwfile)
+    if (!is.null(bw)) {
+        explicit_summary <- getMethod("summary", "BigWigFile")
 
-    valid_bwfile <- bwfile
-    if (url.exists(bwfile)) {
-        valid_bwfile <- tempfile()
-        download.file(bwfile, valid_bwfile)
+        if (!is.null(selection)) {
+            granges <- subsetByOverlaps(granges, selection)
+        }
+        unlist(explicit_summary(bw, granges, type = per_locus_stat))
     }
-
-    bw <- BigWigFile(valid_bwfile)
-    explicit_summary <- getMethod("summary", "BigWigFile")
-
-    if (!is.null(selection)) {
-        granges <- subsetByOverlaps(granges, selection)
-    }
-
-    unlist(explicit_summary(bw, granges, type = per_locus_stat))
 }
 
 #' Intersect a list of bigWig files with a GRanges object
