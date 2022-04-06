@@ -1,3 +1,7 @@
+# wigglescout 0.13.8
+
+* .bw_ranges refactored to make use of .fetch_bigwig function.
+
 # wigglescout 0.13.7
 
 * bw_profile bug fix: remove_top now ignores NA values for calculating rowMeans
