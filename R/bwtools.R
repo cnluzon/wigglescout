@@ -647,7 +647,7 @@ utils::globalVariables("where")
 #' This does not pass the checks but does not break the build process either
 #' so I left it as is, so the note thrown by build is noted everytime.
 #'
-#' @importFrom dplyr group_by_at summarise across select `%>%`
+#' @importFrom dplyr group_by summarise across select if_all `%>%` everything
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
@@ -668,9 +668,14 @@ utils::globalVariables("where")
         sum_vals$width <- df$width
 
         # Summarize SUM only
+        # In this case one would expect that it's either all NAs or none,
+        # since NA's should come from non-existent values in a given experiment.
+        # We expect bw tracks to be filled with zeros.
         sum_vals <- sum_vals %>%
-            group_by_at(group_col) %>%
-            summarise(across(where(is.numeric), sum))
+            dplyr::group_by(.data[[group_col]]) %>%
+            dplyr::filter(if_all(everything(), ~ !is.na(.))) %>%
+            dplyr::summarise(across(where(is.numeric), sum))
+
 
         # Divide sum(scores) by sum(length) and keep only scores
         df <- sum_vals[, score_cols, drop = FALSE] / sum_vals$width
@@ -678,8 +683,9 @@ utils::globalVariables("where")
     } else if (aggregate_by %in% c("mean", "median")) {
         f <- get(aggregate_by)
         df <- df %>%
-            group_by_at(group_col) %>%
-            summarise(across(where(is.numeric), f))
+            dplyr::group_by(.data[[group_col]]) %>%
+            dplyr::filter(if_all(everything(), ~ !is.na(.))) %>%
+            dplyr::summarise(across(where(is.numeric), f))
     } else {
         stop("Function not implemented as aggregate_by: ", aggregate_by)
     }

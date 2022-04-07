@@ -14,6 +14,7 @@ bed_to_bw <- function(bed, bw, chromsizes) {
 bw1 <- tempfile("bigwig", fileext = ".bw")
 bw2 <- tempfile("bigwig", fileext = ".bw")
 bw3_zeros <- tempfile("bigwig", fileext = ".bw")
+bw4_nas <- tempfile("bigwig", fileext = ".bw")
 bg1 <- tempfile("bigwig_bg1", fileext = ".bw")
 bg2 <- tempfile("bigwig_bg2", fileext = ".bw")
 bg3_zeros <- tempfile("bigwig_bg3", fileext = ".bw")
@@ -34,6 +35,7 @@ setup({
   bed_to_bw(system.file("testdata", "bed1.bed", package = "wigglescout"), bw1, chromsizes)
   bed_to_bw(system.file("testdata", "bed2.bed", package = "wigglescout"), bw2, chromsizes)
   bed_to_bw(system.file("testdata", "bed3.bed", package = "wigglescout"), bw3_zeros, chromsizes)
+  bed_to_bw(system.file("testdata", "bed_na.bed", package = "wigglescout"), bw4_nas, chromsizes)
   bed_to_bw(system.file("testdata", "bg1.bed", package = "wigglescout"), bg1, chromsizes)
   bed_to_bw(system.file("testdata", "bg2.bed", package = "wigglescout"), bg2, chromsizes)
   bed_to_bw(system.file("testdata", "bg3.bed", package = "wigglescout"), bg3_zeros, chromsizes)
@@ -47,6 +49,7 @@ teardown({
   unlink(bg1)
   unlink(bg2)
   unlink(bg3_zeros)
+  unlink(bw4_nas)
   unlink(bw_special)
 })
 
@@ -466,6 +469,26 @@ test_that("bw_loci runs with 0/0 and aggregated values", {
   )
 
   expect_equal(values["typeA", "bw3_zeros"], NaN)
+})
+
+test_that("bw_loci excludes NA values from true_mean aggregation", {
+  values <- suppressWarnings(bw_loci(bw4_nas, bed_with_names,
+                    labels = "bw4_nas",
+                    per_locus_stat = "mean",
+                    aggregate_by = "true_mean"
+  ))
+
+  expect_equal(values["typeA", "bw4_nas"], 12)
+})
+
+test_that("bw_loci excludes NA values from mean aggregation", {
+  values <- suppressWarnings(bw_loci(bw4_nas, bed_with_names,
+                                     labels = "bw4_nas",
+                                     per_locus_stat = "mean",
+                                     aggregate_by = "mean"
+  ))
+
+  expect_equal(values["typeA", "bw4_nas"], 12)
 })
 
 test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
