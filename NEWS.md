@@ -1,3 +1,9 @@
+# wigglescout 0.13.9
+
+* .aggregate_scores is robust to presence of NAs. Only rows with no NA
+ values are aggregated. This affect results from plot_bw_summary_heatmap and
+ bw_loci when aggregate_by is not NULL.
+
 # wigglescout 0.13.8
 
 * .bw_ranges refactored to make use of .fetch_bigwig function.
