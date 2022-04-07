@@ -1,6 +1,6 @@
 # Summary and scope
 
-![r-cmd-check](https://github.com/cnluzon/wigglescout/workflows/r-cmd-check/badge.svg)
+![r-cmd-check](https://github.com/cnluzon/wigglescout/workflows/r-cmd-check/badge.svg) [![codecov](https://codecov.io/gh/cnluzon/wigglescout/branch/main/graph/badge.svg?token=DJJWPM3OZL)](https://codecov.io/gh/cnluzon/wigglescout)
 
 `wigglescout` is an R library that allows you to calculate summary values 
 across bigWig files and BED files and visualize them in a genomics-relevant
