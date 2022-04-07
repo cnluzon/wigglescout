@@ -68,10 +68,9 @@ jobs:
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
         shell: bash
         
-      # Enable this when repo gets public  
-      # - name: Test coverage
-      #   run: covr::codecov()
-      #   shell: Rscript {0}
+      - name: Test coverage
+        run: covr::codecov()
+        shell: Rscript {0}
 
       - name: Upload check results
         if: failure()
