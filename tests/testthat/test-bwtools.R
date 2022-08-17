@@ -21,6 +21,7 @@ bg3_zeros <- tempfile("bigwig_bg3", fileext = ".bw")
 bw_special <- tempfile("bigwig-2ñ", fileext = ".bw")
 
 bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
+bed_with_names_na <- system.file("testdata", "labeled_na.bed", package = "wigglescout")
 unnamed_bed <- system.file("testdata", "not_labeled.bed", package = "wigglescout")
 
 tiles <- tileGenome(c(chr1 = 200, chr2 = 200),
@@ -490,6 +491,19 @@ test_that("bw_loci excludes NA values from mean aggregation", {
 
   expect_equal(values["typeA", "bw4_nas"], 12)
 })
+
+test_that("bw_loci excludes NA values from single locus", {
+    # Here, exclude means that NAs are not counted as zeros, but overlapping
+    # length that has NA value is not counted as valid length.
+    # In this test, a locus 21-50 that has NA on 21-40 and 3 on 41-50 yields
+    # a mean of 3.
+    values <- suppressWarnings(bw_loci(bw4_nas, bed_with_names_na,
+                                       labels = "bw4_nas",
+                                       per_locus_stat = "mean")
+    )
+    expect_equal(values[1]$bw4_nas, 3)
+})
+
 
 test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
   expect_error({
