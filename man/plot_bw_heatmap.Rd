@@ -20,7 +20,8 @@ plot_bw_heatmap(
   zmax = NULL,
   max_rows_allowed = 10000,
   order_by = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -76,6 +77,8 @@ length as number of rows. These can be obtained as a result of order()
 function, if one would want to sort one heatmap by values on another one.}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A ggplot object

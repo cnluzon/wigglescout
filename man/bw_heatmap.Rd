@@ -15,7 +15,8 @@ bw_heatmap(
   downstream = 2500,
   middle = NULL,
   ignore_strand = FALSE,
-  norm_mode = "fc"
+  norm_mode = "fc",
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ mode). If not provided, median length of all loci is used.}
 
 \item{norm_mode}{Function to apply to normalize bin values. Default fc:
 divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A list of matrices where each element correspond to each bigWig file.

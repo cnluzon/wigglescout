@@ -165,7 +165,8 @@ plot_bw_bins_violin <- function(bwfiles,
                                 highlight_colors = NULL,
                                 remove_top = 0,
                                 verbose = TRUE,
-                                selection = NULL) {
+                                selection = NULL,
+                                default_na = NA_real_) {
 
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_bins, mget(names(formals())))
@@ -249,9 +250,11 @@ plot_bw_heatmap <- function(bwfiles, loci,
                             zmax = NULL,
                             max_rows_allowed = 10000,
                             order_by = NULL,
-                            verbose = TRUE) {
+                            verbose = TRUE,
+                            default_na = NA_real_) {
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_heatmap, mget(names(formals())))
+
     values <- do.call(bw_heatmap, mget(par))
     df <- .preprocess_heatmap_matrix(values[[1]],
         zmin, zmax,
@@ -318,6 +321,7 @@ plot_bw_heatmap <- function(bwfiles, loci,
 #' @param highlight_colors Array of color values for the highlighting groups
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
+#' @param default_na Default value for missing values
 #' @param verbose Verbose plot. Returns a plot with all relevant parameters in
 #'   a caption.
 #' @import ggplot2
@@ -348,18 +352,21 @@ plot_bw_loci_scatter <- function(x,
                                 highlight_label = NULL,
                                 highlight_colors = NULL,
                                 remove_top = 0,
-                                verbose = TRUE) {
+                                verbose = TRUE,
+                                default_na = NA_real_) {
 
     values_x <- bw_loci(x, bg_bwfiles = bg_x,
         loci = loci,
         norm_mode = norm_mode_x,
-        labels = "score"
+        labels = "score",
+        default_na = default_na
     )
 
     values_y <- bw_loci(y, bg_bwfiles = bg_y,
         loci = loci,
         norm_mode = norm_mode_y,
-        labels = "score"
+        labels = "score",
+        default_na = default_na
     )
 
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
@@ -415,7 +422,8 @@ plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
                                         aggregate_by = "true_mean",
                                         norm_mode = "fc",
                                         remove_top = 0,
-                                        verbose = TRUE) {
+                                        verbose = TRUE,
+                                        default_na = NA_real_) {
 
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_loci, mget(names(formals())))
@@ -469,7 +477,8 @@ plot_bw_profile <- function(bwfiles, loci,
                             labels = NULL,
                             colors = NULL,
                             remove_top = 0,
-                            verbose = TRUE) {
+                            verbose = TRUE,
+                            default_na = NA_real_) {
     .validate_input_numbers(bwfiles, loci)
     values <- NULL
     nloci <- NULL
@@ -490,7 +499,8 @@ plot_bw_profile <- function(bwfiles, loci,
             middle = middle,
             ignore_strand = ignore_strand,
             norm_mode = norm_mode,
-            remove_top = remove_top
+            remove_top = remove_top,
+            default_na = default_na
         )
         value_list <- map2(loci, labels, profile_function)
         values <- do.call(rbind, value_list)

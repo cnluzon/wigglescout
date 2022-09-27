@@ -69,7 +69,8 @@ bw_loci <- function(bwfiles,
                     per_locus_stat = "mean",
                     aggregate_by = NULL,
                     norm_mode = "fc",
-                    remove_top = 0) {
+                    remove_top = 0,
+                    default_na = NA_real_) {
 
     .validate_filelist(bwfiles)
     .validate_locus_parameter(loci)
@@ -91,7 +92,8 @@ bw_loci <- function(bwfiles,
                 bwfiles, labels,
                 granges = bed,
                 per_locus_stat = per_locus_stat,
-                remove_top = remove_top
+                remove_top = remove_top,
+                default_na = default_na
             )
         }
         else {
@@ -104,6 +106,7 @@ bw_loci <- function(bwfiles,
                 per_locus_stat = per_locus_stat,
                 norm_func = norm_func,
                 remove_top = remove_top,
+                default_na = default_na
             )
         }
     } else {
@@ -113,7 +116,8 @@ bw_loci <- function(bwfiles,
             granges = bed,
             per_locus_stat = per_locus_stat,
             aggregate_by = aggregate_by,
-            remove_top = remove_top
+            remove_top = remove_top,
+            default_na = default_na
         )
 
         if (!is.null(bg_bwfiles)) {
@@ -123,7 +127,8 @@ bw_loci <- function(bwfiles,
                 granges = bed,
                 per_locus_stat = per_locus_stat,
                 aggregate_by = aggregate_by,
-                remove_top = remove_top
+                remove_top = remove_top,
+                default_na = default_na
             )
 
             rows <- rownames(result)
@@ -166,6 +171,7 @@ bw_loci <- function(bwfiles,
 #'     divides bw / bg. Alternative: log2fc: returns log2(bw/bg).
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
+#' @param default_na Default value for missing values
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
@@ -203,7 +209,8 @@ bw_bins <- function(bwfiles,
                     genome = "mm9",
                     selection = NULL,
                     norm_mode = "fc",
-                    remove_top = 0) {
+                    remove_top = 0,
+                    default_na = NA_real_) {
 
     .validate_filelist(bwfiles)
     norm_func <- .process_norm_mode(norm_mode)
@@ -221,7 +228,8 @@ bw_bins <- function(bwfiles,
             tiles,
             per_locus_stat = per_locus_stat,
             selection = selection,
-            remove_top = remove_top
+            remove_top = remove_top,
+            default_na = default_na
         )
     } else {
         result <- .multi_bw_ranges_norm(
@@ -232,7 +240,8 @@ bw_bins <- function(bwfiles,
             per_locus_stat = per_locus_stat,
             selection = selection,
             norm_func = norm_func,
-            remove_top = remove_top
+            remove_top = remove_top,
+            default_na = default_na
         )
     }
     result
@@ -290,7 +299,8 @@ bw_heatmap <- function(bwfiles,
                         downstream = 2500,
                         middle = NULL,
                         ignore_strand = FALSE,
-                        norm_mode = "fc") {
+                        norm_mode = "fc",
+                        default_na = NA_real_) {
 
     .validate_filelist(bwfiles)
     .validate_locus_parameter(loci)
@@ -317,7 +327,8 @@ bw_heatmap <- function(bwfiles,
         middle = middle,
         ignore_strand = ignore_strand,
         norm_func = norm_func,
-        remove_top = 0
+        remove_top = 0,
+        default_na = default_na
     )
 
     if (is.null(bg_bwfiles)) {
@@ -403,7 +414,8 @@ bw_profile <- function(bwfiles,
                         middle = NULL,
                         ignore_strand = FALSE,
                         norm_mode = "fc",
-                        remove_top = 0) {
+                        remove_top = 0,
+                        default_na = NA_real_) {
 
     .validate_filelist(bwfiles)
     .validate_locus_parameter(loci)
@@ -428,7 +440,8 @@ bw_profile <- function(bwfiles,
         middle = middle,
         ignore_strand = ignore_strand,
         norm_func = norm_func,
-        remove_top = remove_top
+        remove_top = remove_top,
+        default_na = default_na
     )
 
     if (is.null(bg_bwfiles)) {
@@ -475,6 +488,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 #'
 #' @param bwfile Path to a single BigWig file to be summarized.
 #' @param granges GRanges object file to be summarized.
+#' @param default_na Default value for missing values
 #' @importFrom rtracklayer BigWigFile
 #' @importFrom IRanges subsetByOverlaps
 #' @importFrom methods getMethod
@@ -484,7 +498,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 #' @return GRanges with column score.
 .bw_ranges <- function(bwfile, granges,
                         per_locus_stat = "mean",
-                        selection = NULL) {
+                        selection = NULL,
+                        default_na = NA_real_) {
     bw <- .fetch_bigwig(bwfile)
     if (!is.null(bw)) {
         explicit_summary <- getMethod("summary", "BigWigFile")
@@ -492,7 +507,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
         if (!is.null(selection)) {
             granges <- subsetByOverlaps(granges, selection)
         }
-        unlist(explicit_summary(bw, granges, type = per_locus_stat))
+        unlist(explicit_summary(bw, granges, type = per_locus_stat, defaultValue = default_na))
     }
 }
 
@@ -511,7 +526,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 .multi_bw_ranges <- function(bwfiles, labels, granges,
                                 per_locus_stat = "mean",
                                 selection = NULL,
-                                remove_top = 0) {
+                                remove_top = 0,
+                                default_na = NA_real_) {
 
     if (length(bwfiles) != length(labels)) {
         stop("BigWig file list and column names must have the same length.")
@@ -522,7 +538,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
         .bw_ranges,
         granges = granges,
         per_locus_stat = per_locus_stat,
-        selection = selection
+        selection = selection,
+        default_na = default_na
     )
 
     # granges_cbind sorts each element so it's safer to merge and no need to
@@ -550,14 +567,16 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 .multi_bw_ranges_aggregated <- function(bwfiles, labels, granges,
                                         per_locus_stat,
                                         aggregate_by,
-                                        remove_top) {
+                                        remove_top,
+                                        default_na = NA_real_) {
 
     result <- .multi_bw_ranges(
         bwfiles,
         labels,
         granges = granges,
         per_locus_stat = per_locus_stat,
-        remove_top = remove_top
+        remove_top = remove_top,
+        default_na = default_na
     )
 
     df <- .aggregate_scores(
@@ -591,7 +610,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
                                     per_locus_stat = "mean",
                                     selection = NULL,
                                     norm_func = identity,
-                                    remove_top = 0) {
+                                    remove_top = 0,
+                                    default_na = NA_real_) {
     if (length(bwfilelist) != length(bg_bwfilelist)) {
         stop("Background and signal bwfile lists must have the same length.")
     }
@@ -601,7 +621,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
         labels,
         granges,
         per_locus_stat = per_locus_stat,
-        selection = selection
+        selection = selection,
+        default_na = default_na
     )
 
     bg <- .multi_bw_ranges(
@@ -609,7 +630,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
         labels,
         granges,
         per_locus_stat = per_locus_stat,
-        selection = selection
+        selection = selection,
+        default_na = default_na
     )
 
     result_df <- data.frame(result)
@@ -722,6 +744,7 @@ utils::globalVariables("where")
 #' @param bg_bw BigWig file to be used as background.
 #' @param label Name to give to the values
 #' @param norm_func Normalization function
+#' @param default_na Default value for missing values
 #' @importFrom rtracklayer BigWigFile import
 #' @importFrom utils download.file
 #' @inheritParams bw_profile
@@ -736,7 +759,8 @@ utils::globalVariables("where")
                                     middle = NULL,
                                     ignore_strand = FALSE,
                                     norm_func = identity,
-                                    remove_top = 0) {
+                                    remove_top = 0,
+                                    default_na = NA_real_) {
     if (is.null(label)) {
         label <- basename(bw)
     }
@@ -751,7 +775,8 @@ utils::globalVariables("where")
         middle = middle,
         ignore_strand = ignore_strand,
         norm_func = identity,
-        remove_top = remove_top
+        remove_top = remove_top,
+        default_na = default_na
     )
 
     fg_sum <- .summarize_matrix(fg, label)
@@ -768,7 +793,8 @@ utils::globalVariables("where")
             middle = middle,
             ignore_strand = ignore_strand,
             norm_func = identity,
-            remove_top = remove_top
+            remove_top = remove_top,
+            default_na = default_na
         )
 
         bg_sum <- .summarize_matrix(bg, "bg")
@@ -800,7 +826,8 @@ utils::globalVariables("where")
                                     middle = NULL,
                                     ignore_strand = FALSE,
                                     norm_func = identity,
-                                    remove_top = 0) {
+                                    remove_top = 0,
+                                    default_na = NA_real_) {
     if (mode == "stretch") {
         full <- .calculate_stretch_matrix(
             bw,
@@ -809,7 +836,8 @@ utils::globalVariables("where")
             upstream = upstream,
             downstream = downstream,
             middle = middle,
-            ignore_strand = ignore_strand
+            ignore_strand = ignore_strand,
+            default_na = default_na
         )
 
         if (!is.null(bg_bw)) {
@@ -819,7 +847,8 @@ utils::globalVariables("where")
                 bin_size = bin_size,
                 upstream = upstream,
                 downstream = downstream,
-                ignore_strand = ignore_strand
+                ignore_strand = ignore_strand,
+                default_na = default_na
             )
 
             full <- norm_func(full / bg)
@@ -837,7 +866,8 @@ utils::globalVariables("where")
             bw,
             granges,
             npoints = npoints,
-            ignore_strand = FALSE
+            ignore_strand = FALSE,
+            default_na = default_na
         )
 
         if (!is.null(bg_bw)) {
@@ -845,7 +875,8 @@ utils::globalVariables("where")
                 bg_bw,
                 granges,
                 npoints = npoints,
-                ignore_strand = FALSE
+                ignore_strand = FALSE,
+                default_na = default_na
             )
 
             full <- norm_func(full / bg)
@@ -869,6 +900,7 @@ utils::globalVariables("where")
 #' @param bin_size Bin size
 #' @param upstream Number of basepairs upstream
 #' @param downstream Number of basepairs downstream
+#' @param default_na Default value for missing values
 #' @param middle Number of base pairs that the middle section has. If not
 #'   provided, median is used.
 #' @param ignore_strand Ignore strand (bool)
@@ -880,7 +912,8 @@ utils::globalVariables("where")
                                         upstream = 2500,
                                         downstream = 2500,
                                         middle = NULL,
-                                        ignore_strand = FALSE) {
+                                        ignore_strand = FALSE,
+                                        default_na = NA_real_) {
 
     left_npoints <- floor(upstream / bin_size)
     right_npoints <- floor(downstream / bin_size)
@@ -896,21 +929,24 @@ utils::globalVariables("where")
         bw,
         flank(granges, upstream, start = TRUE),
         npoints = left_npoints,
-        ignore_strand = ignore_strand
+        ignore_strand = ignore_strand,
+        default_na = default_na
     )
 
     right <- .intersect_bw_and_granges(
         bw,
        flank(granges, downstream, start = FALSE),
        npoints = right_npoints,
-       ignore_strand = ignore_strand
+       ignore_strand = ignore_strand,
+       default_na = default_na
     )
 
     middle <- .intersect_bw_and_granges(
         bw,
         granges,
         npoints = middle_npoints,
-        ignore_strand = ignore_strand
+        ignore_strand = ignore_strand,
+        default_na = default_na
     )
 
     cbind(left, middle, right)
@@ -926,13 +962,15 @@ utils::globalVariables("where")
 #' @param granges GRanges object.
 #' @param npoints How many points to take (different to bin size!).
 #' @param ignore_strand Ignore strand information in granges.
+#' @param default_na Value to use as default for missing values
 #' @importFrom rtracklayer summary
 #' @importFrom GenomicRanges strand
 #' @return A value matrix of dimensions len(granges) x npoints.
 .intersect_bw_and_granges <- function(bw, granges, npoints,
-                                        ignore_strand = FALSE) {
+                                        ignore_strand = FALSE,
+                                      default_na = NA_real_) {
     bwfile <- .fetch_bigwig(bw)
-    values <- summary(bwfile, which = granges, as = "matrix", size = npoints)
+    values <- summary(bwfile, which = granges, as = "matrix", size = npoints, defaultValue = default_na)
 
     # Reverse minus strand rows
     if (!ignore_strand) {

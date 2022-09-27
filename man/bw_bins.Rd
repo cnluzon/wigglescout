@@ -13,7 +13,8 @@ bw_bins(
   genome = "mm9",
   selection = NULL,
   norm_mode = "fc",
-  remove_top = 0
+  remove_top = 0,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A GRanges object with each bwfile as a metadata column named

@@ -12,7 +12,8 @@ plot_bw_loci_summary_heatmap(
   aggregate_by = "true_mean",
   norm_mode = "fc",
   remove_top = 0,
-  verbose = TRUE
+  verbose = TRUE,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 whole distribution (remove_top == 0).}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A ggplot object

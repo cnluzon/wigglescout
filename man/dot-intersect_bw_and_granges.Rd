@@ -4,7 +4,13 @@
 \alias{.intersect_bw_and_granges}
 \title{Intersect a BigWig file over loci on a GRanges object}
 \usage{
-.intersect_bw_and_granges(bw, granges, npoints, ignore_strand = FALSE)
+.intersect_bw_and_granges(
+  bw,
+  granges,
+  npoints,
+  ignore_strand = FALSE,
+  default_na = NA_real_
+)
 }
 \arguments{
 \item{bw}{BigWigFile object (rtracklayer).}
@@ -14,6 +20,8 @@
 \item{npoints}{How many points to take (different to bin size!).}
 
 \item{ignore_strand}{Ignore strand information in granges.}
+
+\item{default_na}{Value to use as default for missing values}
 }
 \value{
 A value matrix of dimensions len(granges) x npoints.
