@@ -1,3 +1,11 @@
+# wigglescout 0.14.0
+
+* Added a default_na parameter to all the functions. This makes use of 
+ rtracklayer summary function defaultValue parameter. Bins or loci that have
+ no values are replaced by the given value instead. This is particularly useful
+ with very sparse bigWig files, where .aggregate_scores might kill majority
+ of rows due to NA values.
+
 # wigglescout 0.13.9
 
 * .aggregate_scores is robust to presence of NAs. Only rows with no NA

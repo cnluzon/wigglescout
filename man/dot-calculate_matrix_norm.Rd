@@ -15,7 +15,8 @@
   middle = NULL,
   ignore_strand = FALSE,
   norm_func = identity,
-  remove_top = 0
+  remove_top = 0,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -51,6 +52,8 @@ mode). If not provided, median length of all loci is used.}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 Summary matrix

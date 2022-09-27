@@ -11,7 +11,8 @@
   upstream = 2500,
   downstream = 2500,
   middle = NULL,
-  ignore_strand = FALSE
+  ignore_strand = FALSE,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -29,6 +30,8 @@
 provided, median is used.}
 
 \item{ignore_strand}{Ignore strand (bool)}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 Summary matrix

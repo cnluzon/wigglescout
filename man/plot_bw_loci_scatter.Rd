@@ -17,7 +17,8 @@ plot_bw_loci_scatter(
   highlight_label = NULL,
   highlight_colors = NULL,
   remove_top = 0,
-  verbose = TRUE
+  verbose = TRUE,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ whole distribution (remove_top == 0).}
 
 \item{verbose}{Verbose plot. Returns a plot with all relevant parameters in
 a caption.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A ggplot object.

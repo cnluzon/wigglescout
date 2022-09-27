@@ -11,14 +11,16 @@
 
 \item{group_col}{A column among the mcols that can be seen as a factor.}
 
-\item{aggregate_by}{Function used to aggregate: mean, median, true_mean.\preformatted{true_mean: Mean coverage taking all elements in a class as one large bin.
+\item{aggregate_by}{Function used to aggregate: mean, median, true_mean.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{true_mean: Mean coverage taking all elements in a class as one large bin.
 
 mean: mean-of-distribution approach. The mean of the aggregated value per
   locus is reported.
 
 median: median-of-distribution. The median of the aggregated value per
   locus is reported.
-}
+}\if{html}{\out{</div>}}
 
 This does not pass the checks but does not break the build process either
 so I left it as is, so the note thrown by build is noted everytime.}

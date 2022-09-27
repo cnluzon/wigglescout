@@ -10,7 +10,8 @@
   granges,
   per_locus_stat,
   aggregate_by,
-  remove_top
+  remove_top,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ not aggregated. This is the behavior by default.}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 An aggregated dataframe

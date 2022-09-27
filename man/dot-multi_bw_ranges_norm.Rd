@@ -12,7 +12,8 @@
   per_locus_stat = "mean",
   selection = NULL,
   norm_func = identity,
-  remove_top = 0
+  remove_top = 0,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ Choices: min, max, sd, mean.}
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 a sorted GRanges object

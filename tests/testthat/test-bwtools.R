@@ -505,6 +505,26 @@ test_that("bw_loci excludes NA values from single locus", {
 })
 
 
+test_that("bw_loci with default_na = 0 does NOT include NA values in mean calculation for single locus", {
+    # NOTE: This test is here as documentation of somewhat counterintuitive
+    # behavior: We could expect rtracklayer summary function to actually include
+    # values in mean calculation if a different defaultValue to NA is used, but it
+    # is not true. It still counts only the part of the sequence that has values,
+    # excluding missing values from the length of the locus, which means the result
+    # for a single loci is the same whether default_na is 0 or NA. default_na is
+    # only presented when the FULL locus is empty (and a warning is also printed)
+
+    # Here, a locus 21-50 that has NA on 21-40 and 3 on 41-50 STILL
+    # yields a mean of 3.
+    values <- suppressWarnings(bw_loci(bw4_nas, bed_with_names_na,
+                                       labels = "bw4_nas",
+                                       per_locus_stat = "mean",
+                                       default_na = 0)
+    )
+    expect_equal(values[1]$bw4_nas, 3)
+})
+
+
 test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
   expect_error({
     values <- bw_loci(bw1, unnamed_bed, bg_bwfiles = bw2,

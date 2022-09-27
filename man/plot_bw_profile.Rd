@@ -19,7 +19,8 @@ plot_bw_profile(
   labels = NULL,
   colors = NULL,
   remove_top = 0,
-  verbose = TRUE
+  verbose = TRUE,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ object. If NULL, file names are used.}
 whole distribution (remove_top == 0).}
 
 \item{verbose}{Put a caption with relevant parameters on the plot.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A ggplot object.

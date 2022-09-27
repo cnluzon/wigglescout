@@ -4,7 +4,13 @@
 \alias{.bw_ranges}
 \title{Score a GRanges object against a BigWig file}
 \usage{
-.bw_ranges(bwfile, granges, per_locus_stat = "mean", selection = NULL)
+.bw_ranges(
+  bwfile,
+  granges,
+  per_locus_stat = "mean",
+  selection = NULL,
+  default_na = NA_real_
+)
 }
 \arguments{
 \item{bwfile}{Path to a single BigWig file to be summarized.}
@@ -17,6 +23,8 @@ Choices: min, max, sd, mean.}
 \item{selection}{A GRanges object to restrict binning to a certain set of
 intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 GRanges with column score.

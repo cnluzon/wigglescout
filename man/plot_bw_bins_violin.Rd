@@ -18,7 +18,8 @@ plot_bw_bins_violin(
   highlight_colors = NULL,
   remove_top = 0,
   verbose = TRUE,
-  selection = NULL
+  selection = NULL,
+  default_na = NA_real_
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ whole distribution (remove_top == 0).}
 \item{selection}{A GRanges object to restrict binning to a certain set of
 intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
+
+\item{default_na}{Default value for missing values}
 }
 \value{
 A ggplot object.
