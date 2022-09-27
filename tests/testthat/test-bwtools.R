@@ -307,6 +307,13 @@ test_that("calculate_matrix_norm removes percentile", {
 
 # Exported functions -----------------------------------------
 
+## bw_global_coverage
+
+test_that("bw_global_coverage returns correct value", {
+    value <- bw_global_coverage(bw1)
+    expect_equal(value, 10.5)
+})
+
 ## bw_loci ---------------------------------------------------
 
 test_that("bw_loci returns correct per locus values", {

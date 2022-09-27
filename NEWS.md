@@ -1,3 +1,9 @@
+# wigglescout 0.15.0
+
+* Added bw_global_mean function. Takes a bigwig file and returns global mean
+ coverage by taking the per-contig summary from rtracklayer, multiplying by
+ contig length and dividing by global length.
+
 # wigglescout 0.14.0
 
 * Added a default_na parameter to all the functions. This makes use of 

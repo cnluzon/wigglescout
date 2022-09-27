@@ -15,6 +15,27 @@
 
 # Main functions ---------------------------------------------------
 
+#' Calculate bigWig global coverage.
+#' @param bwfile bigWig file
+#' @param default_na Value to replace missing values.
+#' @importFrom dplyr mutate select `%>%`
+#' @importFrom rtracklayer BigWigFile
+#' @export
+bw_global_coverage <- function(bwfile, default_na = NA_real_) {
+    bw <- .fetch_bigwig(bwfile)
+    if (!is.null(bw)) {
+        explicit_summary <- getMethod("summary", "BigWigFile")
+        df <- data.frame(
+            unlist(explicit_summary(bw, type="mean", default_na = default_na))
+        )
+        result <- sum(df %>%
+                          mutate(weighted=.data[["score"]]*.data[["width"]]) %>%
+                          select(weighted)) / sum(df$width)
+        result
+    }
+}
+
+
 #' Score a bigWig file list and a BED file or GRanges object.
 #'
 #' Build a scored GRanges object from a bigWig file list and a BED file or

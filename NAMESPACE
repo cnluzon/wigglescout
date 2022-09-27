@@ -2,6 +2,7 @@
 
 export(build_bins)
 export(bw_bins)
+export(bw_global_coverage)
 export(bw_heatmap)
 export(bw_loci)
 export(bw_profile)
