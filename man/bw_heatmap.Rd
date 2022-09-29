@@ -16,7 +16,8 @@ bw_heatmap(
   middle = NULL,
   ignore_strand = FALSE,
   norm_mode = "fc",
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -56,6 +57,10 @@ mode). If not provided, median length of all loci is used.}
 divides bw / bg. Alternative: log2fc: returns log2(bw/bg).}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{Whether to use the bigWig values as they are (none - default)
+or calculate relative enrichment (relative) by dividing values by global
+average.}
 }
 \value{
 A list of matrices where each element correspond to each bigWig file.

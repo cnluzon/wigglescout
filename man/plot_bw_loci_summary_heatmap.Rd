@@ -13,7 +13,8 @@ plot_bw_loci_summary_heatmap(
   norm_mode = "fc",
   remove_top = 0,
   verbose = TRUE,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -38,6 +39,9 @@ whole distribution (remove_top == 0).}
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 A ggplot object

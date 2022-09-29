@@ -21,6 +21,7 @@ bg3_zeros <- tempfile("bigwig_bg3", fileext = ".bw")
 bw_special <- tempfile("bigwig-2ñ", fileext = ".bw")
 
 bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
+bed_with_names_shuffled <- system.file("testdata", "labeled_shuffled.bed", package = "wigglescout")
 bed_with_names_na <- system.file("testdata", "labeled_na.bed", package = "wigglescout")
 unnamed_bed <- system.file("testdata", "not_labeled.bed", package = "wigglescout")
 
@@ -29,6 +30,7 @@ tiles <- tileGenome(c(chr1 = 200, chr2 = 200),
                     cut.last.tile.in.chrom = TRUE)
 
 granges <- import(bed_with_names)
+granges_shuffled <- import(bed_with_names_shuffled)
 
 setup({
   chromsizes <- c(200, 200)
@@ -63,6 +65,7 @@ test_that("Setup files exist", {
   expect_true(file_test("-f", bg3_zeros))
   expect_true(file_test("-f", bed_with_names))
   expect_true(file_test("-f", bw_special))
+  expect_true(file_test("-f", bed_with_names_shuffled))
 })
 
 # Core functions -----------------------------------------------
@@ -104,6 +107,33 @@ test_that(".multi_bw_ranges returns correct values", {
   expect_equal(values[1]$bw2, 20)
   expect_equal(values[2]$bw1, 2)
   expect_equal(values[2]$bw2, 19)
+})
+
+test_that(".multi_bw_ranges with sorted ranges same as shuffled ranges", {
+    values_shuffled <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges_shuffled)
+    values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges)
+
+    expect_is(values, "GRanges")
+    expect_equal(values, values_shuffled)
+})
+
+
+test_that(".multi_bw_ranges with names returns sorted, correct values", {
+    values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges_shuffled)
+
+    expect_is(values, "GRanges")
+    expect_equal(values[1]$bw1, 2)
+    # 1-based
+    expect_equal(start(ranges(values[1])), 21)
+    expect_equal(end(ranges(values[1])), 40)
+    expect_true(data.frame(values)[1, "seqnames"] == "chr1")
+    expect_equal(values[1]$name, "typeA")
+
+    expect_equal(values[2]$bw1, 4.5)
+    expect_equal(start(ranges(values[2])), 61)
+    expect_equal(end(ranges(values[2])), 100)
+    expect_true(data.frame(values)[2, "seqnames"] == "chr1")
+    expect_equal(values[2]$name, "typeB")
 })
 
 test_that(".multi_bw_ranges with zeros returns correct values", {
@@ -402,6 +432,19 @@ test_that("bw_loci returns correct true_mean aggregated values", {
   expect_equal(values["typeA", "bw1"], 7)
   expect_equal(values["typeB", "bw1"], 11.125)
 })
+
+test_that("bw_loci returns correct true_mean aggregated values shuffled", {
+    values <- bw_loci(bw1, bed_with_names_shuffled,
+                      labels = "bw1",
+                      per_locus_stat = "mean",
+                      aggregate_by = "true_mean"
+    )
+
+    expect_is(values, "data.frame")
+    expect_equal(values["typeA", "bw1"], 7)
+    expect_equal(values["typeB", "bw1"], 11.125)
+})
+
 
 test_that("bw_loci on an empty list throws an error", {
   expect_error({

@@ -21,7 +21,8 @@ plot_bw_heatmap(
   max_rows_allowed = 10000,
   order_by = NULL,
   verbose = TRUE,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -79,6 +80,10 @@ function, if one would want to sort one heatmap by values on another one.}
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{Whether to use the bigWig values as they are (none - default)
+or calculate relative enrichment (relative) by dividing values by global
+average.}
 }
 \value{
 A ggplot object

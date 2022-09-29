@@ -9,7 +9,8 @@
   granges,
   npoints,
   ignore_strand = FALSE,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -22,6 +23,9 @@
 \item{ignore_strand}{Ignore strand information in granges.}
 
 \item{default_na}{Value to use as default for missing values}
+
+\item{scaling}{none if no scaling is done, relative if scaled to global
+mean of 1}
 }
 \value{
 A value matrix of dimensions len(granges) x npoints.

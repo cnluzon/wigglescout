@@ -12,7 +12,8 @@
   downstream = 2500,
   middle = NULL,
   ignore_strand = FALSE,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ provided, median is used.}
 \item{ignore_strand}{Ignore strand (bool)}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{none if no scaling is performed (default), relative if 1x
+scaling is done (divide by global coverage).}
 }
 \value{
 Summary matrix
