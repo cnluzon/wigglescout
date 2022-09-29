@@ -30,7 +30,7 @@ bw_global_coverage <- function(bwfile, default_na = NA_real_) {
         )
         result <- sum(df %>%
                           mutate(weighted=.data[["score"]]*.data[["width"]]) %>%
-                          select(weighted)) / sum(df$width)
+                          select(.data[["weighted"]])) / sum(df$width)
         result
     }
 }
