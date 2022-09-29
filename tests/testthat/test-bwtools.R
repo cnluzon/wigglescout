@@ -86,6 +86,14 @@ test_that(".bw_ranges returns correct values", {
   expect_equal(bins[10]$score, 10)
 })
 
+test_that(".bw_ranges returns correct values when scaled", {
+    bins <- .bw_ranges(bw1, tiles, per_locus_stat = "mean", scaling = "relative")
+
+    expect_equal(bins[1]$score, 0.0952381, tolerance = 0.00001)
+    expect_equal(bins[2]$score, 0.1904762, tolerance = 0.00001)
+    expect_equal(bins[10]$score, 0.952381, tolerance = 0.00001)
+})
+
 test_that("bw_ranges returns correct values on subset", {
   subset <- GRanges(seqnames = c("chr1"),
                     ranges = IRanges(10, 40))
