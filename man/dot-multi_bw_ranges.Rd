@@ -11,7 +11,8 @@
   per_locus_stat = "mean",
   selection = NULL,
   remove_top = 0,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -33,6 +34,9 @@ locus specific analyses.}
 whole distribution (remove_top == 0).}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 A sorted GRanges object.

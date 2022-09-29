@@ -19,7 +19,8 @@ plot_bw_bins_violin(
   remove_top = 0,
   verbose = TRUE,
   selection = NULL,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -59,6 +60,9 @@ intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 A ggplot object.

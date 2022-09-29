@@ -1,3 +1,17 @@
+# wigglescout 0.15.0
+
+* Added bw_global_mean function. Takes a bigwig file and returns global mean
+ coverage by taking the per-contig summary from rtracklayer, multiplying by
+ contig length and dividing the sum by global length.
+* Added a scaling parameter that divides results by global mean calculated by
+ bw_global_mean function, to simulate 1x genome coverage tracks. This affects
+ all the calculating bw_ functions and the plotting functions: plot_bw_ but it
+ is backwards compatible (default is not to do anything).
+* [BUG fix]: Added a sorting in .multi_bw_granges function to make sure names
+ are assigned correctly. This affected only instances where BED file provided
+ was not sorted. Might have been introduced recently, since older calculations
+ are still correct.
+
 # wigglescout 0.14.0
 
 * Added a default_na parameter to all the functions. This makes use of 

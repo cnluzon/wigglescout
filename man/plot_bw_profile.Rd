@@ -20,7 +20,8 @@ plot_bw_profile(
   colors = NULL,
   remove_top = 0,
   verbose = TRUE,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -70,6 +71,10 @@ whole distribution (remove_top == 0).}
 \item{verbose}{Put a caption with relevant parameters on the plot.}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{Whether to use the bigWig values as they are (none - default)
+or calculate relative enrichment (relative) by dividing values by global
+average.}
 }
 \value{
 A ggplot object.

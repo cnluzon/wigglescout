@@ -13,7 +13,8 @@
   selection = NULL,
   norm_func = identity,
   remove_top = 0,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ Choices: min, max, sd, mean.}
 whole distribution (remove_top == 0).}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 a sorted GRanges object

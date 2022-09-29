@@ -20,7 +20,9 @@ plot_bw_bins_scatter(
   remove_top = 0,
   verbose = TRUE,
   density = FALSE,
-  selection = NULL
+  selection = NULL,
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -59,6 +61,11 @@ whole distribution (remove_top == 0).}
 \item{selection}{A GRanges object to restrict binning to a certain set of
 intervals. This is useful for debugging and improving performance of
 locus specific analyses.}
+
+\item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 A ggplot object.

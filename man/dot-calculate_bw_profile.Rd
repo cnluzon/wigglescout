@@ -17,7 +17,8 @@
   ignore_strand = FALSE,
   norm_func = identity,
   remove_top = 0,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -57,6 +58,10 @@ mode). If not provided, median length of all loci is used.}
 whole distribution (remove_top == 0).}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{Whether to use the bigWig values as they are (none - default)
+or calculate relative enrichment (relative) by dividing values by global
+average.}
 }
 \value{
 A DataFrame with the aggregated scores

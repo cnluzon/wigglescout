@@ -11,7 +11,8 @@
   per_locus_stat,
   aggregate_by,
   remove_top,
-  default_na = NA_real_
+  default_na = NA_real_,
+  scaling = "none"
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ not aggregated. This is the behavior by default.}
 whole distribution (remove_top == 0).}
 
 \item{default_na}{Default value for missing values}
+
+\item{scaling}{If none, no operation is performed (default). If relative,
+values are divided by global mean (1x genome coverage).}
 }
 \value{
 An aggregated dataframe

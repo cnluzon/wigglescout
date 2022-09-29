@@ -82,11 +82,14 @@ plot_bw_bins_scatter <- function(x, y,
                                 remove_top = 0,
                                 verbose = TRUE,
                                 density = FALSE,
-                                selection = NULL) {
+                                selection = NULL,
+                                default_na = NA_real_,
+                                scaling = "none") {
 
     partial_bw_bins <- partial(
         bw_bins, bin_size = bin_size, genome = genome,
-        selection = selection, labels = "score"
+        selection = selection, labels = "score", scaling = scaling,
+        default_na = default_na
     )
     bins_x <- partial_bw_bins(
         bwfiles = x, bg_bwfiles = bg_x, norm_mode = norm_mode_x
@@ -108,7 +111,7 @@ plot_bw_bins_scatter <- function(x, y,
     title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
     x_lab <- .make_norm_file_label(norm_mode_x, x, bg_x)
     y_lab <- .make_norm_file_label(norm_mode_y, y, bg_y)
-    params <- mget(c("genome", "bin_size", "minoverlap", "remove_top"))
+    params <- mget(c("genome", "bin_size", "minoverlap", "remove_top", "scaling"))
     caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
 
     labels <- labs(title = title, x = x_lab, y = y_lab, caption = caption)
@@ -166,7 +169,8 @@ plot_bw_bins_violin <- function(bwfiles,
                                 remove_top = 0,
                                 verbose = TRUE,
                                 selection = NULL,
-                                default_na = NA_real_) {
+                                default_na = NA_real_,
+                                scaling = "none") {
 
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_bins, mget(names(formals())))
@@ -187,7 +191,7 @@ plot_bw_bins_violin <- function(bwfiles,
 
     title <- paste("Genome-wide bin distribution (", bin_size, "bp)", sep = "")
     y_label <- .make_norm_label(norm_mode, bg_bwfiles)
-    params <- mget(c("genome", "bin_size", "minoverlap", "remove_top"))
+    params <- mget(c("genome", "bin_size", "minoverlap", "remove_top", "scaling"))
     caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
     labels <- labs(title = title, x = "", y = y_label, caption = caption)
 
@@ -251,7 +255,8 @@ plot_bw_heatmap <- function(bwfiles, loci,
                             max_rows_allowed = 10000,
                             order_by = NULL,
                             verbose = TRUE,
-                            default_na = NA_real_) {
+                            default_na = NA_real_,
+                            scaling = "none") {
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_heatmap, mget(names(formals())))
 
@@ -264,7 +269,7 @@ plot_bw_heatmap <- function(bwfiles, loci,
 
     main_plot <- .heatmap_body(df$values, df$stats$zmin, df$stats$zmax, cmap)
     params <- mget(c("mode", "bin_size", "middle", "ignore_strand",
-                    "max_rows_allowed"))
+                    "max_rows_allowed", "scaling"))
     caption <- .make_caption(params, df$stats, verbose = verbose)
 
     nloci <- nrow(values[[1]])
@@ -423,7 +428,8 @@ plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
                                         norm_mode = "fc",
                                         remove_top = 0,
                                         verbose = TRUE,
-                                        default_na = NA_real_) {
+                                        default_na = NA_real_,
+                                        scaling = "none") {
 
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_loci, mget(names(formals())))
@@ -431,7 +437,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
     colorscale <- .colorscale(norm_mode, bg_bwfiles)
     plot <- .summary_body(summary_values)
     title <- paste("Coverage per region (", aggregate_by, ")")
-    params <- mget(c("aggregate_by", "remove_top"))
+    params <- mget(c("aggregate_by", "remove_top", "scaling"))
     caption <- .make_caption(params, list(), verbose = verbose)
     labels <- labs(title = title, caption = caption, x = "", y = "")
 
@@ -447,6 +453,9 @@ plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
 #' @param colors Array of colors that will  be assigned to labels or files
 #'    (in that order)
 #' @param verbose Put a caption with relevant parameters on the plot.
+#' @param scaling Whether to use the bigWig values as they are (none - default)
+#'    or calculate relative enrichment (relative) by dividing values by global
+#'    average.
 #' @inheritParams bw_profile
 #' @import ggplot2
 #' @importFrom methods is
@@ -478,7 +487,8 @@ plot_bw_profile <- function(bwfiles, loci,
                             colors = NULL,
                             remove_top = 0,
                             verbose = TRUE,
-                            default_na = NA_real_) {
+                            default_na = NA_real_,
+                            scaling = "none") {
     .validate_input_numbers(bwfiles, loci)
     values <- NULL
     nloci <- NULL
@@ -500,7 +510,8 @@ plot_bw_profile <- function(bwfiles, loci,
             ignore_strand = ignore_strand,
             norm_mode = norm_mode,
             remove_top = remove_top,
-            default_na = default_na
+            default_na = default_na,
+            scaling = scaling
         )
         value_list <- map2(loci, labels, profile_function)
         values <- do.call(rbind, value_list)
@@ -514,7 +525,7 @@ plot_bw_profile <- function(bwfiles, loci,
     }
     y_lab <- .make_norm_label(norm_mode, bg_bwfiles)
     params <- mget(c("bin_size", "middle", "mode", "ignore_strand",
-                     "remove_top"))
+                     "remove_top", "scaling"))
     caption <- .make_caption(params, list(), verbose = verbose)
     if (!is.null(bg_bwfiles) && show_error == TRUE) {
         warning("Stderr estimate not available when normalizing by input")
