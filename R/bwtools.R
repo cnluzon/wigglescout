@@ -596,14 +596,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
 
     # granges_cbind sorts each element so it's safer to merge and no need to
     # sort after
-    result <- .granges_cbind(summaries, labels)
-
-    # Include names if granges has them
-    if ("name" %in% names(mcols(granges))) {
-        granges <- sortSeqlevels(granges)
-        granges <- sort(granges)
-        result$name <- granges$name
-    }
+    result <- .granges_cbind(summaries, labels, granges)
 
     result <- .remove_top_by_mean(
         result, remove_top,

@@ -20,6 +20,7 @@ bg2 <- tempfile("bigwig_bg2", fileext = ".bw")
 bg3_zeros <- tempfile("bigwig_bg3", fileext = ".bw")
 bw_special <- tempfile("bigwig-2ñ", fileext = ".bw")
 
+bed_with_values <- system.file("testdata", "bed1.bed", package = "wigglescout")
 bed_with_names <- system.file("testdata", "labeled.bed", package = "wigglescout")
 bed_with_names_shuffled <- system.file("testdata", "labeled_shuffled.bed", package = "wigglescout")
 bed_with_names_na <- system.file("testdata", "labeled_na.bed", package = "wigglescout")
@@ -117,31 +118,35 @@ test_that(".multi_bw_ranges returns correct values", {
   expect_equal(values[2]$bw2, 19)
 })
 
-test_that(".multi_bw_ranges with sorted ranges same as shuffled ranges", {
+test_that(".multi_bw_ranges with sorted ranges same as shuffled ranges and sort after", {
     values_shuffled <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges_shuffled)
     values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges)
 
     expect_is(values, "GRanges")
-    expect_equal(values, values_shuffled)
+    re_sorted <- sortSeqlevels(values_shuffled)
+    re_sorted <- sort(re_sorted)
+    expect_equal(values, re_sorted)
 })
 
 
-test_that(".multi_bw_ranges with names returns sorted, correct values", {
+test_that(".multi_bw_ranges with names returns correct values in same order as input", {
     values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), granges_shuffled)
 
     expect_is(values, "GRanges")
-    expect_equal(values[1]$bw1, 2)
-    # 1-based
-    expect_equal(start(ranges(values[1])), 21)
-    expect_equal(end(ranges(values[1])), 40)
-    expect_true(data.frame(values)[1, "seqnames"] == "chr1")
-    expect_equal(values[1]$name, "typeA")
 
-    expect_equal(values[2]$bw1, 4.5)
-    expect_equal(start(ranges(values[2])), 61)
-    expect_equal(end(ranges(values[2])), 100)
+    expect_equal(values[1]$bw1, 4.5)
+    expect_equal(start(ranges(values[1])), 61)
+    expect_equal(end(ranges(values[1])), 100)
+    expect_true(data.frame(values)[1, "seqnames"] == "chr1")
+    expect_equal(values[1]$name, "typeB")
+
+    expect_equal(values[2]$bw1, 2)
+    # 1-based
+    expect_equal(start(ranges(values[2])), 21)
+    expect_equal(end(ranges(values[2])), 40)
     expect_true(data.frame(values)[2, "seqnames"] == "chr1")
-    expect_equal(values[2]$name, "typeB")
+    expect_equal(values[2]$name, "typeA")
+
 })
 
 test_that(".multi_bw_ranges with zeros returns correct values", {
@@ -367,6 +372,44 @@ test_that("bw_loci accepts GRanges objects", {
   expect_equal(values[1]$bw1, 2)
   expect_equal(values[2]$bw1, 4.5)
 })
+
+
+test_that("bw_loci does not crash when a scored bed file is provided as loci", {
+    values <- bw_loci(bw1, bed_with_values, labels = "bw1", per_locus_stat = "mean")
+    expect_is(values, "GRanges")
+})
+
+test_that("bw_loci with multiple columns, name and duplicated loci returns correct dimensions", {
+    gr <- rtracklayer::import(bed_with_names)
+    # repeat one value
+    gr <- append(gr, gr[length(gr)])
+    values <- bw_loci(c(bw1, bw2), gr, labels = c("bw1","bw2"), per_locus_stat = "mean")
+    expect_equal(length(values), length(gr)-1)
+    expect_equal(ncol(mcols(values)), 3)
+})
+
+test_that("bw_loci with duplicated locus returns as many rows as unique loci", {
+    gr <- rtracklayer::import(bed_with_values)
+    # repeat one value
+    gr <- append(gr, gr[length(gr)])
+    values <- bw_loci(bw1, gr, labels = "bw1", per_locus_stat = "mean")
+    expect_equal(length(values), length(gr)-1)
+})
+
+
+test_that("bw_loci with named loci and multi named locus returns as many rows as different names", {
+    gr <- rtracklayer::import(bed_with_values)
+    # repeat one value
+    gr <- append(gr, gr[length(gr)])
+    gr$name <- paste0("name", seq(1, length(gr)))
+
+    values <- bw_loci(bw1, gr, labels = "bw1", per_locus_stat = "mean")
+    expect_is(values, "GRanges")
+    expect_equal(length(gr), 21)
+    expect_equal(length(gr), length(values))
+    expect_equal(length(values), length(unique(gr$name)))
+})
+
 
 test_that("bw_loci returns correct per locus values on multiple files", {
   values <- bw_loci(c(bw1, bw2),

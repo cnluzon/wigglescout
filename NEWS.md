@@ -1,3 +1,14 @@
+# wigglescout 0.15.1
+
+* Reimplemented granges_cbind function to make use of dplyr::left_join instead,
+ improving robustness of the approach. Ranges are also deduplicated before
+ merging. In the case where a granges locus has more than one name, the final
+ granges object will have as many rows as names.
+* .loci_to_granges now does not sort the sequences, since it is not necessary
+ for having a proper merging and keeps consistency.
+* .loci_to_granges now gets rid of any column that is not a name, so it does
+ not interfere with scoring naming.
+
 # wigglescout 0.15.0
 
 * Added bw_global_mean function. Takes a bigwig file and returns global mean

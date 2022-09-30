@@ -152,7 +152,7 @@ test_that("plot_bw_bins_scatter with no density has no tile layer", {
 
 test_that("plot_bw_loci_scatter with defaults returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
+  with_mock(bw_loci = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, bed)
     expect_is(p, "ggplot")
   })
@@ -160,7 +160,7 @@ test_that("plot_bw_loci_scatter with defaults returns a plot", {
 
 test_that("plot_bw_loci_scatter with highlight set returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
+  with_mock(bw_loci = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, bed, highlight = bed)
     expect_is(p, "ggplot")
   })
@@ -168,7 +168,7 @@ test_that("plot_bw_loci_scatter with highlight set returns a plot", {
 
 test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption", {
   m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
+  with_mock(bw_loci = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE)
     expect_is(p, "ggplot")
     expect_false(is.null(p$labels$caption))
@@ -177,7 +177,7 @@ test_that("plot_bw_loci_scatter with verbose set returns a plot with a caption",
 
 test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
   m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
+  with_mock(bw_loci = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = FALSE)
     expect_is(p, "ggplot")
     expect_true(is.null(p$labels$caption))
@@ -186,7 +186,7 @@ test_that("plot_bw_loci_scatter no verbose returns a plot with no caption", {
 
 test_that("plot_bw_loci_scatter with remove_top returns a plot", {
   m <- mock(reduced_bins, reduced_bins_2)
-  with_mock(bw_bins = m, {
+  with_mock(bw_loci = m, {
     p <- plot_bw_loci_scatter(bw1, bw2, loci = bed, verbose = TRUE, remove_top=0.01)
     expect_is(p, "ggplot")
     expect_false(is.null(p$labels$caption))

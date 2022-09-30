@@ -2,8 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{.loci_to_granges}
 \alias{.loci_to_granges}
-\title{Processes a loci and returns a GRanges object, sorted and with its seqlevels
-also sorted.}
+\title{Processes a loci and returns a GRanges object. Removes anything that is not
+a name field}
 \usage{
 .loci_to_granges(loci)
 }
@@ -14,6 +14,6 @@ also sorted.}
 A GRanges object
 }
 \description{
-Processes a loci and returns a GRanges object, sorted and with its seqlevels
-also sorted.
+Processes a loci and returns a GRanges object. Removes anything that is not
+a name field
 }
