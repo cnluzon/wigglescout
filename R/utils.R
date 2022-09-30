@@ -31,8 +31,8 @@
     clean_x <- .remove_top_by_mean(x, remove_top, c("score"))
     clean_y <- .remove_top_by_mean(y, remove_top, c("score"))
 
-    clean_gr <- .granges_cbind(
-        list(clean_x$ranges, clean_y$ranges),
+    clean_gr <- .granges_left_join(
+        list(clean_x$ranges[, "score"], clean_y$ranges[, "score"]),
         c("x", "y")
     )
 
@@ -158,34 +158,53 @@
     par
 }
 
-#' GRanges cbind-like operation
+#' GRanges left join operation
 #'
-#' Perform a cbind operation on a GRanges list, appending scores to mcols.
-#' It will sort the GRanges elements in order to ensure the match is proper.
+#' Perform a left_bind operation on a GRanges list, appending scores to mcols.
 #'
-#' This assumes that you are trying to cbind things that match (bins generated
+#' This assumes that you are trying to join things that match (bins generated
 #' from the same parameters, BED intersections from the same BED.)
 #'
 #' @param grlist A list of GRanges objects that have all the same fields.
 #' @param labels Vector of names for the score columns.
+#' @param granges Optional granges with name field on it
 #' @return A Sorted GRanges object with all the columns.
 #' @importFrom GenomeInfoDb sortSeqlevels
-.granges_cbind <- function(grlist, labels) {
+.granges_left_join <- function(grlist, labels, granges = NULL) {
     fixed_fields <- c("seqnames", "start", "end", "width", "strand")
 
-    grlist[[1]] <- sortSeqlevels(grlist[[1]])
-    grlist[[1]] <- sort(grlist[[1]])
-
-    result <- data.frame(grlist[[1]])[, fixed_fields]
-    for (i in seq(1, length(grlist))) {
-        grlist[[i]] <- sortSeqlevels(grlist[[i]])
-        grlist[[i]] <- sort(grlist[[i]])
-
-        result[, labels[[i]]] <- grlist[[i]]$score
+    data_frames <- lapply(grlist, data.frame)
+    dedup_frames <- lapply(data_frames, unique)
+    result <- dedup_frames %>% purrr::reduce(dplyr::left_join, by = fixed_fields)
+    colnames(result) <- c(fixed_fields, labels)
+    # Include names if granges has them
+    if (! is.null(granges)) {
+        if ("name" %in% names(mcols(granges))) {
+            # If there were equal loci with different names, this would
+            # duplicate the corresponding entry
+            dedup_granges <- unique(data.frame(granges))
+            result <- dplyr::left_join(result, dedup_granges,
+                                       by = fixed_fields) %>%
+                dplyr::select(fixed_fields, labels, "name")
+        }
     }
 
-    result <- makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
-    result
+
+    makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
+
+    # grlist[[1]] <- sortSeqlevels(grlist[[1]])
+    # grlist[[1]] <- sort(grlist[[1]])
+    #
+    # result <- data.frame(grlist[[1]])[, fixed_fields]
+    # for (i in seq(1, length(grlist))) {
+    #     grlist[[i]] <- sortSeqlevels(grlist[[i]])
+    #     grlist[[i]] <- sort(grlist[[i]])
+    #
+    #     result[, labels[[i]]] <- grlist[[i]]$score
+    # }
+    #
+    # result <- makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
+
 }
 
 #' Make a string out of a named list.
@@ -249,12 +268,13 @@
 }
 
 
-#' Processes a loci and returns a GRanges object, sorted and with its seqlevels
-#' also sorted.
+#' Processes a loci and returns a GRanges object. Removes anything that is not
+#' a name field
 #'
 #' @param loci Either a BED file or a GRanges object
 #' @return A GRanges object
 #' @importFrom rtracklayer import
+#' @importFrom GenomicRanges `mcols<-`
 #' @importFrom methods is
 #' @importFrom GenomeInfoDb sortSeqlevels
 .loci_to_granges <- function(loci) {
@@ -262,9 +282,12 @@
     if (is(loci, "character")){
         bed <- import(loci, format = "BED")
     }
-
-    bed <- sortSeqlevels(bed)
-    bed <- sort(bed, ignore.strand = FALSE)
+    if ("name" %in% names(mcols(bed))) {
+        bed <- bed[, "name"]
+    }
+    else {
+        mcols(bed) <- NULL
+    }
     bed
 }
 
