@@ -31,7 +31,7 @@
     clean_x <- .remove_top_by_mean(x, remove_top, c("score"))
     clean_y <- .remove_top_by_mean(y, remove_top, c("score"))
 
-    clean_gr <- .granges_cbind(
+    clean_gr <- .granges_left_join(
         list(clean_x$ranges[, "score"], clean_y$ranges[, "score"]),
         c("x", "y")
     )
@@ -170,7 +170,7 @@
 #' @param granges Optional granges with name field on it
 #' @return A Sorted GRanges object with all the columns.
 #' @importFrom GenomeInfoDb sortSeqlevels
-.granges_cbind <- function(grlist, labels, granges = NULL) {
+.granges_left_join <- function(grlist, labels, granges = NULL) {
     fixed_fields <- c("seqnames", "start", "end", "width", "strand")
 
     data_frames <- lapply(grlist, data.frame)

@@ -594,9 +594,7 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
         scaling = scaling
     )
 
-    # granges_cbind sorts each element so it's safer to merge and no need to
-    # sort after
-    result <- .granges_cbind(summaries, labels, granges)
+    result <- .granges_left_join(summaries, labels, granges)
 
     result <- .remove_top_by_mean(
         result, remove_top,
