@@ -481,6 +481,11 @@ test_that("bw_loci returns correct true_mean aggregated values", {
 
   expect_is(values, "data.frame")
   expect_equal(values["typeA", "bw1"], 7)
+  # I keep forgetting why this has to be 11.125, so I write a note here:
+  # this is true mean, and the length of type b intervals affects this.
+  # It is not due to zero vs one-based systems, as BED files are nice like that
+  # they have all the good properties length = (end - start) and the intervals
+  # are square on the intervals except the ones that explicitly overlap.
   expect_equal(values["typeB", "bw1"], 11.125)
 })
 
