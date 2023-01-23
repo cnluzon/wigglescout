@@ -134,10 +134,15 @@ bw_loci <- function(bwfiles,
             )
         }
     } else {
+        labels_bg <- NULL
+        if (!is.null(bg_bwfiles)) {
+            labels_bg <- paste0("bg_", labels)
+        }
+
         result <- .multi_bw_ranges_aggregated(
-            bwfiles,
-            labels = labels,
+            c(bwfiles, bg_bwfiles),
             granges = bed,
+            labels = c(labels, labels_bg),
             per_locus_stat = per_locus_stat,
             aggregate_by = aggregate_by,
             remove_top = remove_top,
@@ -146,20 +151,9 @@ bw_loci <- function(bwfiles,
         )
 
         if (!is.null(bg_bwfiles)) {
-            bg <- .multi_bw_ranges_aggregated(
-                bg_bwfiles,
-                labels = labels,
-                granges = bed,
-                per_locus_stat = per_locus_stat,
-                aggregate_by = aggregate_by,
-                remove_top = remove_top,
-                default_na = default_na,
-                scaling = scaling
-            )
-
             rows <- rownames(result)
             result <- data.frame(
-                norm_func(result[rows, labels] / bg[rows, labels])
+                norm_func(result[rows, labels] / result[rows, labels_bg])
             )
             rownames(result) <- rows
             colnames(result) <- labels

@@ -484,6 +484,47 @@ test_that("bw_loci returns correct true_mean aggregated values", {
   expect_equal(values["typeB", "bw1"], 11.125)
 })
 
+test_that("bw_loci returns correct true_mean aggregated values with remove_top parameter", {
+    values <- bw_loci(bw1, bed_with_names,
+                      labels = "bw1",
+                      per_locus_stat = "mean",
+                      aggregate_by = "true_mean",
+                      remove_top = 0.20
+    )
+
+    expect_is(values, "data.frame")
+    # Does not change bc top 20% out of 5 values is 19 from type B
+    expect_equal(values["typeA", "bw1"], 7)
+    expect_equal(values["typeB", "bw1"], 8.5)
+})
+
+test_that("bw_loci aggregated returns 1 when fg == bg", {
+    values <- bw_loci(bw1, bed_with_names, bg_bwfiles = bw1,
+                      labels = "bw1",
+                      per_locus_stat = "mean",
+                      aggregate_by = "true_mean",
+                      norm_mode = "fc"
+    )
+
+    expect_is(values, "data.frame")
+    expect_equal(values["typeA", "bw1"], 1)
+    expect_equal(values["typeB", "bw1"], 1)
+})
+
+test_that("bw_loci aggregated returns 1 when fg == bg and remove_top != 0", {
+    values <- bw_loci(bw1, bed_with_names, bg_bwfiles = bw1,
+                      labels = "bw1",
+                      per_locus_stat = "mean",
+                      aggregate_by = "true_mean",
+                      norm_mode = "fc",
+                      remove_top = 0.40
+    )
+
+    expect_is(values, "data.frame")
+    expect_equal(values["typeA", "bw1"], 1)
+    expect_equal(values["typeB", "bw1"], 1)
+})
+
 test_that("bw_loci returns correct true_mean aggregated values shuffled", {
     values <- bw_loci(bw1, bed_with_names_shuffled,
                       labels = "bw1",
