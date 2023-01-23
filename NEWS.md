@@ -1,3 +1,24 @@
+# wigglescout 0.15.2
+
+* Fixed #96: Inconsistency when bw_loci was summarized, normalized to background
+ and remove_top > 0. Now loci selection for exclusion is done at the same time
+ to both background and main samples.
+* Fixed deprecation warnings for tidyselect 1.1.0, 1.2.0, ggplot 3.4.0:
+ aes_string replaced by aes as tidyselect now goes for strings instead of 
+ .data[["string"]], as explained on: https://github.com/tidyverse/tidyverse.org/pull/600
+ This impacts ggplot2, and there is no easy fix, since .data[[col]] is
+ also deprecated.
+ All calls for `dplyr::select` that use vectors have been replaced by the
+ relevant `tidyselect::all_of`, `tidyselect::any_of` use.
+* Extra deprecation warnings for ggplot 3.4.0: linewidth replaces size for
+ line and rectangle functions.
+* The versions of the packages where this is deprecated are added 
+ on the DESCRIPTION file, since these are breaking changes for older
+ versions.
+* Added a warning when heatmap colorscale is min == max. This can happen due
+ to extremely sparse heatmaps. For consistency, if this happens it is plotted
+ using raw colorscale (instead quantiles (0.01, 0.99), use (min, max)).
+
 # wigglescout 0.15.1
 
 * Reimplemented granges_cbind function to make use of dplyr::left_join instead,

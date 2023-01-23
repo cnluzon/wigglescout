@@ -30,7 +30,8 @@ bw_global_coverage <- function(bwfile, default_na = NA_real_) {
         )
         result <- sum(df %>%
                           mutate(weighted=.data[["score"]]*.data[["width"]]) %>%
-                          select(.data[["weighted"]])) / sum(df$width)
+                          select("weighted")
+                      ) / sum(df$width)
         result
     }
 }
@@ -714,6 +715,7 @@ utils::globalVariables("where")
 #' so I left it as is, so the note thrown by build is noted everytime.
 #'
 #' @importFrom dplyr group_by summarise across select if_all `%>%` everything
+#' @importFrom tidyselect all_of
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
@@ -723,7 +725,7 @@ utils::globalVariables("where")
     score_cols <- score_cols[!score_cols %in% c(group_col)]
 
     df <- data.frame(scored_granges) %>%
-        select(c(score_cols, group_col, .data$width))
+        select(tidyselect::all_of(c(score_cols, group_col, "width")))
 
     .validate_categories(df[, group_col])
 
