@@ -113,7 +113,7 @@
 
     df <- data.frame(m) %>%
         mutate(x = row_number()) %>%
-        pivot_longer(!.data$x, names_to = "col", values_to = "value") %>%
+        pivot_longer(!"x", names_to = "col", values_to = "value") %>%
         mutate(y = as.numeric(gsub("X", "", .data$col)))
 
     n_rows <- max(df$y)
@@ -170,6 +170,7 @@
 #' @param granges Optional granges with name field on it
 #' @return A Sorted GRanges object with all the columns.
 #' @importFrom GenomeInfoDb sortSeqlevels
+#' @importFrom tidyselect all_of
 .granges_left_join <- function(grlist, labels, granges = NULL) {
     fixed_fields <- c("seqnames", "start", "end", "width", "strand")
 
@@ -185,7 +186,7 @@
             dedup_granges <- unique(data.frame(granges))
             result <- dplyr::left_join(result, dedup_granges,
                                        by = fixed_fields) %>%
-                dplyr::select(fixed_fields, labels, "name")
+                dplyr::select(all_of(c(fixed_fields, labels, "name")))
         }
     }
 

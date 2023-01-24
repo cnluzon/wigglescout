@@ -275,7 +275,7 @@ plot_bw_heatmap <- function(bwfiles, loci,
     nloci <- nrow(values[[1]])
     y_label <- paste(.make_label_from_object(loci), "-", nloci, "loci")
     x_title <- .make_label_from_object(bwfiles)
-    thin_rect <- element_rect(color = "black", fill = NA, size = 0.1)
+    thin_rect <- element_rect(color = "black", fill = NA, linewidth = 0.1)
     thin_lines <- theme(axis.line = element_blank(), panel.border = thin_rect)
     plot_lines <- .heatmap_lines(nloci, ncol(values[[1]]), bin_size,
                                  upstream, downstream, mode)
@@ -576,7 +576,7 @@ plot_bw_profile <- function(bwfiles, loci,
     p <- ggplot(
         values,
         aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
-    ) + geom_line(size=1) + .theme_default() +
+    ) + geom_line(linewidth = 1) + .theme_default() +
         theme(
             legend.position = c(0.80, 0.90),
             legend.direction = "vertical",
@@ -620,7 +620,7 @@ plot_bw_profile <- function(bwfiles, loci,
     ordered_levels <- str_sort(values$type, numeric = TRUE)
     values$type <- factor(values$type, levels=ordered_levels)
 
-    vals_long <- pivot_longer(values, !.data$type,
+    vals_long <- pivot_longer(values, !"type",
         values_to = "value", names_to = "variable")
     vals_long$variable <- factor(vals_long$variable, levels=sample_names)
 
@@ -628,7 +628,7 @@ plot_bw_profile <- function(bwfiles, loci,
     vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
 
     plot <- ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
-        geom_tile(color = "white", size = 0.6) +
+        geom_tile(color = "white", linewidth = 0.6) +
         geom_text(aes_string(label = "text_value"), size = 4) +
         coord_fixed() +
         scale_y_discrete(position = "right") +
@@ -711,6 +711,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @inheritParams .scatterplot_body
 #'
 #' @importFrom tidyr pivot_longer
+#' @importFrom tidyselect any_of
 #' @importFrom ggplot2 ggplot aes_string geom_violin theme geom_jitter
 #'   scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
@@ -725,7 +726,7 @@ plot_bw_profile <- function(bwfiles, loci,
     df <- data.frame(gr)
     bin_id <- c("seqnames", "start", "end")
 
-    bins_long <- pivot_longer(df[, c(bin_id, bwnames)], !bin_id, names_to = "variable", values_to = "value")
+    bins_long <- pivot_longer(df[, c(bin_id, bwnames)], !any_of(bin_id), names_to = "variable", values_to = "value")
     # melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
 
     extra_plot <- NULL
@@ -746,7 +747,7 @@ plot_bw_profile <- function(bwfiles, loci,
         n_highlighted_points <- nrow(highlight_values)
         bin_id <- c("seqnames", "start", "end", "width", "strand", "group")
         highlight_long <- pivot_longer(
-            highlight_values, !bin_id,
+            highlight_values, !any_of(bin_id),
             values_to = "value", names_to="variable"
         )
 
@@ -803,7 +804,7 @@ plot_bw_profile <- function(bwfiles, loci,
         xintercept = lines,
         linetype = "dashed",
         color = "#111111",
-        size = 0.2
+        linewidth = 0.2
     )
 
     list(x, gline)
@@ -882,6 +883,13 @@ plot_bw_profile <- function(bwfiles, loci,
 .color_limits <- function(m, zmin, zmax) {
     # colorscale limits percentiles: 0.01 - 0.99
     zlim <- quantile(unlist(m), c(0.01, 0.99), na.rm = TRUE)
+
+    if (zlim[[1]] == zlim[[2]]) {
+        warning("Narrow colorscale (quantile(0.01) == quantile(0.99)). Heatmap is
+                probably full of zero values. Leaving it raw.")
+        zlim <- c(min(unlist(m), na.rm = TRUE),
+                  max(unlist(m), na.rm = TRUE))
+    }
 
     if (!is.null(zmin)) {
         zlim[[1]] <- zmin

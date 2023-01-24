@@ -30,7 +30,8 @@ bw_global_coverage <- function(bwfile, default_na = NA_real_) {
         )
         result <- sum(df %>%
                           mutate(weighted=.data[["score"]]*.data[["width"]]) %>%
-                          select(.data[["weighted"]])) / sum(df$width)
+                          select("weighted")
+                      ) / sum(df$width)
         result
     }
 }
@@ -134,10 +135,15 @@ bw_loci <- function(bwfiles,
             )
         }
     } else {
+        labels_bg <- NULL
+        if (!is.null(bg_bwfiles)) {
+            labels_bg <- paste0("bg_", labels)
+        }
+
         result <- .multi_bw_ranges_aggregated(
-            bwfiles,
-            labels = labels,
+            c(bwfiles, bg_bwfiles),
             granges = bed,
+            labels = c(labels, labels_bg),
             per_locus_stat = per_locus_stat,
             aggregate_by = aggregate_by,
             remove_top = remove_top,
@@ -146,20 +152,9 @@ bw_loci <- function(bwfiles,
         )
 
         if (!is.null(bg_bwfiles)) {
-            bg <- .multi_bw_ranges_aggregated(
-                bg_bwfiles,
-                labels = labels,
-                granges = bed,
-                per_locus_stat = per_locus_stat,
-                aggregate_by = aggregate_by,
-                remove_top = remove_top,
-                default_na = default_na,
-                scaling = scaling
-            )
-
             rows <- rownames(result)
             result <- data.frame(
-                norm_func(result[rows, labels] / bg[rows, labels])
+                norm_func(result[rows, labels] / result[rows, labels_bg])
             )
             rownames(result) <- rows
             colnames(result) <- labels
@@ -720,6 +715,7 @@ utils::globalVariables("where")
 #' so I left it as is, so the note thrown by build is noted everytime.
 #'
 #' @importFrom dplyr group_by summarise across select if_all `%>%` everything
+#' @importFrom tidyselect all_of
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
@@ -729,7 +725,7 @@ utils::globalVariables("where")
     score_cols <- score_cols[!score_cols %in% c(group_col)]
 
     df <- data.frame(scored_granges) %>%
-        select(c(score_cols, group_col, .data$width))
+        select(tidyselect::all_of(c(score_cols, group_col, "width")))
 
     .validate_categories(df[, group_col])
 

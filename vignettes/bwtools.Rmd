@@ -170,7 +170,7 @@ head(chrom_values)
 
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
-  loci = chromhmm,
+  loci = chromhmm
 )
 ```
 
