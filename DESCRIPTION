@@ -43,7 +43,8 @@ Suggests:
   knitr,
   future,
   rmarkdown,
-  prettydoc
+  prettydoc,
+  withr
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout
 BugReports: https://github.com/cnluzon/wigglescout/issues
