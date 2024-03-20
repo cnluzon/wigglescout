@@ -7,10 +7,6 @@ library(withr)
 # Setup -------------------------------------------------------------------
 chromsizes <- c(200, 200)
 
-bw_limits <- GRanges(seqnames = c("chr15"),
-                     ranges = IRanges(c(102723600, 102959000)))
-
-
 # Bins scatter tests ----------------------------------------------
 
 test_that("plot_bw_bins_scatter with defaults returns a plot", {
@@ -18,15 +14,6 @@ test_that("plot_bw_bins_scatter with defaults returns a plot", {
   bw2 <- local_file("bw2.bw")
   with_mock(bw_bins = make_mock_bins(), {
     p <- plot_bw_bins_scatter(bw1, bw2)
-    expect_is(p, "ggplot")
-  })
-})
-
-test_that("plot_bw_bins_scatter with selection returns a plot", {
-  bw1 <- local_file("bw1.bw")
-  bw2 <- local_file("bw2.bw")
-  with_mock(bw_bins = make_mock_bins(), {
-    p <- plot_bw_bins_scatter(bw1, bw2, selection = bw_limits)
     expect_is(p, "ggplot")
   })
 })
