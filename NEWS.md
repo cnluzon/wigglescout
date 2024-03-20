@@ -1,3 +1,11 @@
+# wigglescout 0.15.3
+
+* Testing refactor to exclude as much global variables as possible. Now some of
+them have been moved to fixture rds files that are loaded on demand, and also
+some of the necessary files generated on the fly per test function call and
+removed after with `withr`. This might generate a bit of overhead but improves
+legibility and maintainability of the tests.
+
 # wigglescout 0.15.2
 
 * Fixed #96: Inconsistency when bw_loci was summarized, normalized to background
