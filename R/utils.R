@@ -328,8 +328,8 @@
     label <- "RPGC"
     if (!is.null(bg)) {
         label <- switch(f,
-            "fc" = paste(label, " / background", sep = ""),
-            "log2fc" = paste("log2(", label, " / background)", sep = "")
+            "fc" = paste(label, " / bg", sep = ""),
+            "log2fc" = paste("log2(", label, " / bg)", sep = "")
         )
     }
     label
