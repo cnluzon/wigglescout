@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore and Visualize Genomics BigWig Data
-Version: 0.15.3
+Version: 0.15.4
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
@@ -26,7 +26,7 @@ Imports:
   grDevices,
   stats,
   methods,
-  ggplot2(>= 3.4.0),
+  ggplot2(>= 3.5.0),
   stringr,
   GenomeInfoDb,
   GenomicRanges,

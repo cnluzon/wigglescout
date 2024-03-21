@@ -4,14 +4,16 @@
 \alias{.profile_body}
 \title{Helper function plots a profile from a dataframe}
 \usage{
-.profile_body(values, show_error, colors)
+.profile_body(values, show_error, colors, labels)
 }
 \arguments{
 \item{values}{Values data frame in long format}
 
-\item{show_error}{Boolean wheter tho show error.}
+\item{show_error}{Boolean whether tho show error.}
 
 \item{colors}{Alternative colors to plot the lines}
+
+\item{labels}{Labels order so label-i has colors-i.}
 }
 \value{
 A ggplot object

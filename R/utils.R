@@ -305,14 +305,15 @@
 #' Get a valid label
 #'
 #' @param obj Something to convert to label
+#' @param max_length Max length allowed for a label to have (35)
 #'
 #' @return A valid label name
-.make_label_from_object <- function(obj) {
+.make_label_from_object <- function(obj, max_length = 35) {
     if (is.character(obj)) {
         filename_clean <- basename(tools::file_path_sans_ext(obj))
-        make.names(filename_clean)
+        sapply(make.names(filename_clean), .trunc_str, max_length = max_length)
     } else {
-        make.names(class(obj))
+      sapply(make.names(class(obj)), .trunc_str, max_length = max_length)
     }
 }
 
@@ -327,8 +328,8 @@
     label <- "RPGC"
     if (!is.null(bg)) {
         label <- switch(f,
-            "fc" = paste(label, " / background", sep = ""),
-            "log2fc" = paste("log2(", label, " / background)", sep = "")
+            "fc" = paste(label, " / bg", sep = ""),
+            "log2fc" = paste("log2(", label, " / bg)", sep = "")
         )
     }
     label
@@ -425,13 +426,24 @@
 }
 
 #' Set default theme as classic with larger font size
-#' @import ggplot2
+#' @importFrom ggplot2 theme_classic theme %+replace%
 #' @return ggproto object
 .theme_default <- function() {
-    theme_classic(base_size = 18) +
-        theme(plot.caption = element_text(size = 11))
+    theme_classic(base_size = 14) %+replace%
+        theme(
+          plot.caption = element_text(size = 9, hjust = 1)
+        )
 }
 
+#' Truncate a string to a max length
+#' @param s String to truncate
+#' @param max_length Length to truncate s to (35)
+.trunc_str <- function(s, max_length = 35) {
+  if(nchar(s) > max_length) {
+    s <- substr(s, 1, max_length)
+  }
+  s
+}
 
 #' Validate a category array
 #'

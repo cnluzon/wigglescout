@@ -1,3 +1,16 @@
+# wigglescout 0.15.4
+
+* Fixed warnings from deprecations in ggplot - removed all appearances of 
+aes_string and replaced those with the recommended .data$field notation instead.
+Additionally, incorporated legend.position = inside to the profile plots.
+* wigglescout now requires ggplot2 >= 3.5.0 due to these changes.
+* Look of figures improved by better positioning of legend, more adequate base
+fontsize and truncation of too long labels (>35 characters). Legend title in
+summary heatmaps is also shortened (background renamed as bg).
+* Verbose caption on heatmaps shows if the order of rows is the default 
+(decreasing by row means) or user_provided. 
+* Bug fix #68 - colors are now correctly assigned to labels in plot_bw_profile.
+
 # wigglescout 0.15.3
 
 * Testing refactor to exclude as much global variables as possible. Now some of

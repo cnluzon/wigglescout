@@ -44,3 +44,5 @@ Meta
 
 *.Rproj
 .Rhistory
+/doc/
+/Meta/
