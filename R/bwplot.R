@@ -436,7 +436,7 @@ plot_bw_loci_summary_heatmap <- function(bwfiles, loci,
     summary_values <- do.call(bw_loci, mget(par))
     colorscale <- .colorscale(norm_mode, bg_bwfiles)
     plot <- .summary_body(summary_values)
-    title <- paste("Coverage per region (", aggregate_by, ")")
+    title <- paste0("Coverage per region (", aggregate_by, ")")
     params <- mget(c("aggregate_by", "remove_top", "scaling"))
     caption <- .make_caption(params, list(), verbose = verbose)
     labels <- labs(title = title, caption = caption, x = "", y = "")
@@ -644,17 +644,20 @@ plot_bw_profile <- function(bwfiles, loci,
 
     plot <- ggplot(vals_long, aes(x = .data$type, y = .data$variable, fill = .data$value)) +
         geom_tile(color = "white", linewidth = 0.6) +
-        geom_text(aes(label = .data$text_value), size = 4) +
+        geom_text(aes(label = .data$text_value), size = 3) +
         coord_fixed() +
         scale_y_discrete(position = "right") +
-        theme_minimal(base_size = 16) +
+        theme_classic(base_size = 12) +
         theme(
             axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-            legend.position = "inside",
-            legend.position.inside = c(0.9, 1.2),
-            legend.direction = "horizontal",
+            legend.position = "left",
+            legend.justification.left = "top",
+            legend.direction = "vertical",
             panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank()
+            panel.grid.minor = element_blank(),
+            axis.line.x = element_blank(),
+            axis.line.y = element_blank(),
+            axis.ticks = element_blank()
         )
 
     plot
