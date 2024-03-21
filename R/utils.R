@@ -307,12 +307,12 @@
 #' @param obj Something to convert to label
 #'
 #' @return A valid label name
-.make_label_from_object <- function(obj) {
+.make_label_from_object <- function(obj, max_length = 35) {
     if (is.character(obj)) {
         filename_clean <- basename(tools::file_path_sans_ext(obj))
-        make.names(filename_clean)
+        .trunc_str(make.names(filename_clean), max_length = max_length)
     } else {
-        make.names(class(obj))
+      .trunc_str(make.names(class(obj)), max_length = max_length)
     }
 }
 
@@ -430,6 +430,14 @@
 .theme_default <- function() {
     theme_classic(base_size = 12) +
         theme(plot.caption = element_text(size = 8))
+}
+
+#' Truncate a string to a max length
+.trunc_str <- function(s, max_length = 35) {
+  if(nchar(s) > max_length) {
+    s <- substr(s, 1, max_length)
+  }
+  s
 }
 
 #' Validate a category array

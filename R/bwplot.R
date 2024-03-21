@@ -566,7 +566,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @param values Values data frame in long format
 #' @param colors Alternative colors to plot the lines
 #' @param labels Labels order so label[i] has colors[i].
-#' @param show_error Boolean wheter tho show error.
+#' @param show_error Boolean whether tho show error.
 #'
 #' @return A ggplot object
 .profile_body <- function(values, show_error, colors, labels) {
@@ -575,12 +575,17 @@ plot_bw_profile <- function(bwfiles, loci,
       labels <- unique(values$sample)
     }
 
+    labels_short <- sapply(labels, .trunc_str)
+
     values <- values %>%
       mutate(
         min_error = mean - sderror,
         max_error = mean + sderror,
         sample = factor(sample, levels = labels)
       )
+
+    # The first step reorders, this one renames if needed
+    levels(values$sample) <- labels_short
 
     p <- ggplot(
         values,
