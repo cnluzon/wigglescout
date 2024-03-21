@@ -689,11 +689,6 @@ build_bins <- function(bin_size = 10000, genome = "mm9") {
     result$ranges
 }
 
-# FIXME: importFrom tidyselect where does not work according to:
-# https://github.com/r-lib/tidyselect/issues/201
-# This removes the note in R CMD CHECK
-utils::globalVariables("where")
-
 #' Aggregate scores of a GRanges object on a field
 #'
 #' Aggregates scores of a GRanges object on a specific field. Used for summary
@@ -715,7 +710,7 @@ utils::globalVariables("where")
 #' so I left it as is, so the note thrown by build is noted everytime.
 #'
 #' @importFrom dplyr group_by summarise across select if_all `%>%` everything
-#' @importFrom tidyselect all_of
+#' @importFrom tidyselect all_of where
 #' @importFrom rtracklayer mcols
 #' @return A data frame with aggregated scores.
 .aggregate_scores <- function(scored_granges, group_col, aggregate_by) {
