@@ -425,11 +425,13 @@
 }
 
 #' Set default theme as classic with larger font size
-#' @import ggplot2
+#' @importFrom ggplot2 theme_classic theme %+replace%
 #' @return ggproto object
 .theme_default <- function() {
-    theme_classic(base_size = 12) +
-        theme(plot.caption = element_text(size = 8))
+    theme_classic(base_size = 12) %+replace%
+        theme(
+          plot.caption = element_text(size = 8, hjust = 1)
+        )
 }
 
 #' Truncate a string to a max length
