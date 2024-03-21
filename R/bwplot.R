@@ -532,7 +532,7 @@ plot_bw_profile <- function(bwfiles, loci,
         show_error <- FALSE
     }
     fig_labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
-    .profile_body(values, show_error, colors) +
+    .profile_body(values, show_error, colors, labels) +
         .heatmap_lines(nloci, max(values$index), bin_size,
                        upstream, downstream, mode, expand = FALSE) + fig_labels
 }
@@ -565,13 +565,22 @@ plot_bw_profile <- function(bwfiles, loci,
 #'
 #' @param values Values data frame in long format
 #' @param colors Alternative colors to plot the lines
+#' @param labels Labels order so label[i] has colors[i].
 #' @param show_error Boolean wheter tho show error.
 #'
 #' @return A ggplot object
-.profile_body <- function(values, show_error, colors) {
+.profile_body <- function(values, show_error, colors, labels) {
 
-    values$min_error <- values$mean - values$sderror
-    values$max_error <- values$mean + values$sderror
+    if (is.null(labels)) {
+      labels <- unique(values$sample)
+    }
+
+    values <- values %>%
+      mutate(
+        min_error = mean - sderror,
+        max_error = mean + sderror,
+        sample = factor(sample, levels = labels)
+      )
 
     p <- ggplot(
         values,
