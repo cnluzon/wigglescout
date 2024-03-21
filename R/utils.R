@@ -169,7 +169,6 @@
 #' @param labels Vector of names for the score columns.
 #' @param granges Optional granges with name field on it
 #' @return A Sorted GRanges object with all the columns.
-#' @importFrom GenomeInfoDb sortSeqlevels
 #' @importFrom tidyselect all_of
 .granges_left_join <- function(grlist, labels, granges = NULL) {
     fixed_fields <- c("seqnames", "start", "end", "width", "strand")
@@ -222,6 +221,17 @@
     paste(vapply(chunks, .key_value_string, character(1)), collapse="\n")
 }
 
+
+#' Check if a variable contains a list of things or array of potentially file names
+#'
+#' @param loci A list of GRanges / files / mixed (or not)
+#'
+#' @return TRUE if variable contains multiple loci, FALSE otherwise
+.is_multiple_loci <- function(loci) {
+  (is(loci, "list") && length(loci) > 1) || (is(loci, "character") && length(loci) > 1)
+}
+
+
 #' Label loci with a list of labels
 #'
 #' If some labels are duplicated, numbers are added to the end
@@ -264,7 +274,6 @@
 #' @importFrom rtracklayer import
 #' @importFrom GenomicRanges `mcols<-`
 #' @importFrom methods is
-#' @importFrom GenomeInfoDb sortSeqlevels
 .loci_to_granges <- function(loci) {
     bed <- loci
     if (is(loci, "character")){
@@ -430,9 +439,7 @@
 #' @return ggproto object
 .theme_default <- function() {
     theme_classic(base_size = 14) %+replace%
-        theme(
-          plot.caption = element_text(size = 9, hjust = 1)
-        )
+      theme(plot.caption = element_text(size = 9, hjust = 1))
 }
 
 #' Truncate a string to a max length
@@ -463,7 +470,6 @@
     }
 }
 
-
 #' Validate an array of paths
 #'
 #' Check that a list of files is valid: not empty and contents exist.
@@ -475,7 +481,6 @@
     if (length(filelist) == 0) {
         stop("File list provided is empty.")
     }
-
     existence_flag <- file.exists(filelist) | RCurl::url.exists(filelist)
     if (!all(existence_flag)) {
         msg <- paste("Files not found:", filelist[!existence_flag])

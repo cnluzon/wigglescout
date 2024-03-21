@@ -1,3 +1,8 @@
+# wigglescout 0.15.5
+
+* Minor refactoring changes.
+* Fixed issue with tidyselect::where not being exported.
+
 # wigglescout 0.15.4
 
 * Fixed warnings from deprecations in ggplot - removed all appearances of 
