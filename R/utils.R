@@ -428,10 +428,9 @@
 #' @import ggplot2
 #' @return ggproto object
 .theme_default <- function() {
-    theme_classic(base_size = 18) +
-        theme(plot.caption = element_text(size = 11))
+    theme_classic(base_size = 12) +
+        theme(plot.caption = element_text(size = 8))
 }
-
 
 #' Validate a category array
 #'
