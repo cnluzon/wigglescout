@@ -545,7 +545,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @inheritParams plot_bw_heatmap
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr mutate row_number `%>%` summarise group_by
-#' @importFrom ggplot2 ggplot scale_fill_gradientn geom_raster aes_string
+#' @importFrom ggplot2 ggplot scale_fill_gradientn geom_raster
 #'
 #' @return Named list plot and calculated values
 .heatmap_body <- function(values, zmin, zmax, cmap) {
@@ -589,10 +589,11 @@ plot_bw_profile <- function(bwfiles, loci,
 
     p <- ggplot(
         values,
-        aes_string(x = "index", y = "mean", color = "sample", fill = "sample")
+        aes(x = .data$index, y = .data$mean, color = .data$sample,  fill = .data$sample)
     ) + geom_line(linewidth = 1) + .theme_default() +
         theme(
-            legend.position = c(0.80, 0.90),
+            legend.position = "inside",
+            legend.position.inside = c(0.8, 0.9),
             legend.direction = "vertical",
             legend.title = element_blank(),
             legend.background = element_rect(fill = alpha("white", 0.3))
@@ -605,10 +606,10 @@ plot_bw_profile <- function(bwfiles, loci,
     }
 
     if (show_error) {
-        p <- p + geom_ribbon(aes_string(
-            x = "index",
-            ymin = "min_error",
-            ymax = "max_error"
+        p <- p + geom_ribbon(aes(
+            x = .data$index,
+            ymin = .data$min_error,
+            ymax = .data$max_error
         ),
         color = NA, alpha = 0.3
         )
@@ -641,15 +642,16 @@ plot_bw_profile <- function(bwfiles, loci,
     # Make sure NaN values will be written
     vals_long$text_value <- sprintf("%0.2f", round(vals_long$value, digits = 2))
 
-    plot <- ggplot(vals_long, aes_string("type", "variable", fill = "value")) +
+    plot <- ggplot(vals_long, aes(x = .data$type, y = .data$variable, fill = .data$value)) +
         geom_tile(color = "white", linewidth = 0.6) +
-        geom_text(aes_string(label = "text_value"), size = 4) +
+        geom_text(aes(label = .data$text_value), size = 4) +
         coord_fixed() +
         scale_y_discrete(position = "right") +
         theme_minimal(base_size = 16) +
         theme(
             axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-            legend.position = c(0.9, 1.2),
+            legend.position = "inside",
+            legend.position.inside = c(0.9, 1.2),
             legend.direction = "horizontal",
             panel.grid.major = element_blank(),
             panel.grid.minor = element_blank()
@@ -670,7 +672,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #'  If not provided, column names are used.
 #' @param highlight_colors Array of color values for the highlighting groups
 #' @param density Plot density tiles for global distribution instead of points.
-#' @importFrom ggplot2 ggplot geom_point aes_string
+#' @importFrom ggplot2 ggplot geom_point aes
 #'  geom_bin2d scale_fill_gradient scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
@@ -694,7 +696,7 @@ plot_bw_profile <- function(bwfiles, loci,
 
         extra_plot <- geom_point(
             data = highlight_values,
-            aes_string(x = "x", y = "y", color = "group"),
+            aes(x = .data$x, y = .data$y, color = .data$group),
             alpha = 0.8
         )
 
@@ -711,7 +713,7 @@ plot_bw_profile <- function(bwfiles, loci,
         )
     }
 
-    p <- ggplot(df, aes_string(x = "x", y = "y")) +
+    p <- ggplot(df, aes(x = .data$x, y = .data$y)) +
         points +
         extra_plot +
         extra_colors
@@ -726,7 +728,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyselect any_of
-#' @importFrom ggplot2 ggplot aes_string geom_violin theme geom_jitter
+#' @importFrom ggplot2 ggplot aes geom_violin theme geom_jitter
 #'   scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
@@ -767,7 +769,7 @@ plot_bw_profile <- function(bwfiles, loci,
 
         extra_plot <- geom_jitter(
             data = highlight_long,
-            aes_string(x = "variable", y = "value", color = "variable"),
+            aes(x = .data$variable, y = .data$value, color = .data$variable),
             alpha = 0.7
         )
 
@@ -776,7 +778,7 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    p <- ggplot(bins_long, aes_string(x = "variable", y = "value")) +
+    p <- ggplot(bins_long, aes(x = .data$variable, y = .data$value)) +
         geom_violin(fill = "#cccccc") +
         extra_plot +
         extra_colors
