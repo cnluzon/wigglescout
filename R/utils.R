@@ -176,6 +176,7 @@
 
     data_frames <- lapply(grlist, data.frame)
     dedup_frames <- lapply(data_frames, unique)
+
     result <- dedup_frames %>% purrr::reduce(dplyr::left_join, by = fixed_fields)
     colnames(result) <- c(fixed_fields, labels)
     # Include names if granges has them
@@ -185,27 +186,13 @@
             # duplicate the corresponding entry
             dedup_granges <- unique(data.frame(granges))
             result <- dplyr::left_join(result, dedup_granges,
-                                       by = fixed_fields) %>%
+                                       by = fixed_fields, multiple = "all") %>%
                 dplyr::select(all_of(c(fixed_fields, labels, "name")))
         }
     }
 
 
     makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
-
-    # grlist[[1]] <- sortSeqlevels(grlist[[1]])
-    # grlist[[1]] <- sort(grlist[[1]])
-    #
-    # result <- data.frame(grlist[[1]])[, fixed_fields]
-    # for (i in seq(1, length(grlist))) {
-    #     grlist[[i]] <- sortSeqlevels(grlist[[i]])
-    #     grlist[[i]] <- sort(grlist[[i]])
-    #
-    #     result[, labels[[i]]] <- grlist[[i]]$score
-    # }
-    #
-    # result <- makeGRangesFromDataFrame(result, keep.extra.columns = TRUE)
-
 }
 
 #' Make a string out of a named list.
