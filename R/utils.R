@@ -169,7 +169,6 @@
 #' @param labels Vector of names for the score columns.
 #' @param granges Optional granges with name field on it
 #' @return A Sorted GRanges object with all the columns.
-#' @importFrom GenomeInfoDb sortSeqlevels
 #' @importFrom tidyselect all_of
 .granges_left_join <- function(grlist, labels, granges = NULL) {
     fixed_fields <- c("seqnames", "start", "end", "width", "strand")
@@ -275,7 +274,6 @@
 #' @importFrom rtracklayer import
 #' @importFrom GenomicRanges `mcols<-`
 #' @importFrom methods is
-#' @importFrom GenomeInfoDb sortSeqlevels
 .loci_to_granges <- function(loci) {
     bed <- loci
     if (is(loci, "character")){
