@@ -531,10 +531,10 @@ plot_bw_profile <- function(bwfiles, loci,
         warning("Stderr estimate not available when normalizing by input")
         show_error <- FALSE
     }
-    labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
+    fig_labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
     .profile_body(values, show_error, colors) +
         .heatmap_lines(nloci, max(values$index), bin_size,
-                       upstream, downstream, mode, expand = FALSE) + labels
+                       upstream, downstream, mode, expand = FALSE) + fig_labels
 }
 
 # Helper plot functions ---------------------------------------------------
