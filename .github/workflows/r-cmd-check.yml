@@ -11,70 +11,31 @@ name: r-cmd-check
 
 jobs:
   R-CMD-check:
-    runs-on: ${{ matrix.config.os }}
-    container: ${{ matrix.config.image }}
-    
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          # At this point, just test on Ubuntu and bioconductor Devel. When public, it will be tested
-          # At every OS.
-          # - {os: windows-latest, r: 'release'}
-          # - {os: macOS-latest, r: 'release'}
-          # - {os: ubuntu-20.04, r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/focal/latest"}
-          # - { os: ubuntu-latest, r: 'devel', image: 'bioconductor/bioconductor_docker:devel'}
-          
-          # Image with preinstalled dependencies
-          - { os: ubuntu-latest, r: 'devel', image: 'cnluzon/bioconductor_devel:latest'}
+    runs-on: ubuntu-latest
+    # Docker Hub image that `R-CMD-check` executes in
+    container: cnluzon/bioconductor_devel:latest
 
     env:
-      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      # This should not be necessary with Bioconductor Devel
-      # - uses: r-lib/actions/setup-r@v1
-      #   with:
-      #     r-version: ${{ matrix.config.r }}
+      - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-pandoc@v1
-
-      - name: Session info
-        run: |
-          options(width = 100)
-          pkgs <- installed.packages()[, "Package"]
-          sessioninfo::session_info(pkgs, include_base = TRUE)
-        shell: Rscript {0}
-
-      - name: R CMD Check
-        env:
-          _R_CHECK_CRAN_INCOMING_REMOTE_: false
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "error", check_dir = "check")
-        shell: Rscript {0}
-        
-      - name: Bioconductor BiocCheck
-        run: |
-          BiocManager::install("BiocCheck")
-          BiocCheck::BiocCheck(".")
-        shell: Rscript {0}
-        
-      - name: Show testthat output
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-        
-      - name: Test coverage
-        run: covr::codecov()
-        shell: Rscript {0}
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@main
+      - uses: r-lib/actions/check-r-package@v2
         with:
-          name: ${{ runner.os }}-r${{ matrix.config.r }}-results
-          path: check
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+        shell: Rscript {0}
+
+
