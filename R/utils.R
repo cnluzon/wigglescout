@@ -429,9 +429,9 @@
 #' @importFrom ggplot2 theme_classic theme %+replace%
 #' @return ggproto object
 .theme_default <- function() {
-    theme_classic(base_size = 12) %+replace%
+    theme_classic(base_size = 14) %+replace%
         theme(
-          plot.caption = element_text(size = 8, hjust = 1)
+          plot.caption = element_text(size = 9, hjust = 1)
         )
 }
 

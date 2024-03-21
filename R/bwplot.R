@@ -644,7 +644,7 @@ plot_bw_profile <- function(bwfiles, loci,
 
     plot <- ggplot(vals_long, aes(x = .data$type, y = .data$variable, fill = .data$value)) +
         geom_tile(color = "white", linewidth = 0.6) +
-        geom_text(aes(label = .data$text_value), size = 3) +
+        geom_text(aes(label = .data$text_value), size = 4) +
         coord_fixed() +
         scale_y_discrete(position = "right") +
         theme_classic(base_size = 12) +
