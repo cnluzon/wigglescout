@@ -270,6 +270,13 @@ plot_bw_heatmap <- function(bwfiles, loci,
     main_plot <- .heatmap_body(df$values, df$stats$zmin, df$stats$zmax, cmap)
     params <- mget(c("mode", "bin_size", "middle", "ignore_strand",
                     "max_rows_allowed", "scaling"))
+
+    if (! is.null(order_by)) {
+      params$order_by = "user_defined"
+    } else {
+      params$order_by = "default"
+    }
+
     caption <- .make_caption(params, df$stats, verbose = verbose)
 
     nloci <- nrow(values[[1]])
