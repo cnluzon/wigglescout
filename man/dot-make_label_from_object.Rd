@@ -4,10 +4,12 @@
 \alias{.make_label_from_object}
 \title{Get a valid label}
 \usage{
-.make_label_from_object(obj)
+.make_label_from_object(obj, max_length = 35)
 }
 \arguments{
 \item{obj}{Something to convert to label}
+
+\item{max_length}{Max length allowed for a label to have (35)}
 }
 \value{
 A valid label name

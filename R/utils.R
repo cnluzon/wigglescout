@@ -305,6 +305,7 @@
 #' Get a valid label
 #'
 #' @param obj Something to convert to label
+#' @param max_length Max length allowed for a label to have (35)
 #'
 #' @return A valid label name
 .make_label_from_object <- function(obj, max_length = 35) {
@@ -435,6 +436,8 @@
 }
 
 #' Truncate a string to a max length
+#' @param s String to truncate
+#' @param max_length Length to truncate s to (35)
 .trunc_str <- function(s, max_length = 35) {
   if(nchar(s) > max_length) {
     s <- substr(s, 1, max_length)
