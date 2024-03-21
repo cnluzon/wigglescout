@@ -222,6 +222,17 @@
     paste(vapply(chunks, .key_value_string, character(1)), collapse="\n")
 }
 
+
+#' Check if a variable contains a list of things or array of potentially file names
+#'
+#' @param loci A list of GRanges / files / mixed (or not)
+#'
+#' @return TRUE if variable contains multiple loci, FALSE otherwise
+.is_multiple_loci <- function(loci) {
+  (is(loci, "list") && length(loci) > 1) || (is(loci, "character") && length(loci) > 1)
+}
+
+
 #' Label loci with a list of labels
 #'
 #' If some labels are duplicated, numbers are added to the end
@@ -430,9 +441,7 @@
 #' @return ggproto object
 .theme_default <- function() {
     theme_classic(base_size = 14) %+replace%
-        theme(
-          plot.caption = element_text(size = 9, hjust = 1)
-        )
+      theme(plot.caption = element_text(size = 9, hjust = 1))
 }
 
 #' Truncate a string to a max length
@@ -463,7 +472,6 @@
     }
 }
 
-
 #' Validate an array of paths
 #'
 #' Check that a list of files is valid: not empty and contents exist.
@@ -475,7 +483,6 @@
     if (length(filelist) == 0) {
         stop("File list provided is empty.")
     }
-
     existence_flag <- file.exists(filelist) | RCurl::url.exists(filelist)
     if (!all(existence_flag)) {
         msg <- paste("Files not found:", filelist[!existence_flag])

@@ -502,9 +502,7 @@ plot_bw_profile <- function(bwfiles, loci,
     x_label <- ""
     # Get parameter values that are relevant to the underlying function
     par <- .get_wrapper_parameter_values(bw_profile, mget(names(formals())))
-
-    if ((is(loci, "list") && length(loci) > 1) ||
-        (is(loci, "character") && length(loci) > 1)) {
+    if (.is_multiple_loci(loci)) {
         labels <- .label_multiple_loci(loci, labels)
 
         profile_function <- partial(bw_profile, bwfile = bwfiles,
@@ -527,8 +525,10 @@ plot_bw_profile <- function(bwfiles, loci,
     else {
         values <- do.call(bw_profile, mget(par))
         nloci <- .loci_length(loci)
-        x_tit <- paste(.make_label_from_object(loci),
-                            "-", nloci, "loci", sep = " ")
+        x_tit <- paste(
+          .make_label_from_object(loci), "-", nloci, "loci",
+          sep = " "
+        )
     }
     y_lab <- .make_norm_label(norm_mode, bg_bwfiles)
     params <- mget(c("bin_size", "middle", "mode", "ignore_strand",
@@ -540,8 +540,16 @@ plot_bw_profile <- function(bwfiles, loci,
     }
     fig_labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
     .profile_body(values, show_error, colors, labels) +
-        .heatmap_lines(nloci, max(values$index), bin_size,
-                       upstream, downstream, mode, expand = FALSE) + fig_labels
+        .heatmap_lines(
+          nloci,
+          max(values$index),
+          bin_size,
+          upstream,
+          downstream,
+          mode,
+          expand = FALSE
+        ) +
+        fig_labels
 }
 
 # Helper plot functions ---------------------------------------------------
