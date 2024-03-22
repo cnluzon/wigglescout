@@ -824,7 +824,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @return A ggplot object
 .density_body <- function(gr, binwidth = 0.05) {
     ggplot(data.frame(gr), aes(x = .data$x, y = .data$y)) +
-      geom_bin_2d(aes(fill = after_stat(log2(.data$count))), binwidth=binwidth) +
+      rasterise(geom_bin_2d(aes(fill = after_stat(log2(.data$count))), binwidth=binwidth), dpi = 300) +
       scale_fill_distiller(palette = "Spectral", direction = -1)
 }
 

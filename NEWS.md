@@ -5,6 +5,7 @@
 * `plot_bw_bins_density` function introduced to separate this type of figure
 from `plot_bw_bins_scatter` functionality. Use of `density = TRUE` in
 `plot_bw_bins_scatter` is soft-deprecated and will throw a warning. 
+* Density plots tile layer is rastered to a resolution of 300dpi.
 
 ## Other
 
