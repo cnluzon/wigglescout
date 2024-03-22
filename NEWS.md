@@ -1,3 +1,10 @@
+# wigglescout 0.15.6
+
+* Now scatterplots and jitterplots on violins are raster layers, with enough
+resolution for prints (300dpi). This considerably reduces the size of the 
+figures and makes them more tractable on editing.
+* ggrastr is now a dependency.
+
 # wigglescout 0.15.5
 
 * Minor refactoring changes.

@@ -692,6 +692,7 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @param density Plot density tiles for global distribution instead of points.
 #' @importFrom ggplot2 ggplot geom_point aes
 #'  geom_bin2d scale_fill_gradient scale_color_manual
+#' @importFrom ggrastr rasterise
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
 .scatterplot_body <- function(gr, highlight = NULL,
@@ -712,10 +713,12 @@ plot_bw_profile <- function(bwfiles, loci,
             minoverlap
         )
 
-        extra_plot <- geom_point(
+        extra_plot <- rasterise(
+          geom_point(
             data = highlight_values,
             aes(x = .data$x, y = .data$y, color = .data$group),
             alpha = 0.8
+          ), dpi = 300
         )
 
         if (!is.null(highlight_colors)) {
@@ -723,7 +726,7 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    points <- geom_point(color = "#bbbbbb", alpha = 0.7)
+    points <-  rasterise(geom_point(color = "#bbbbbb", alpha = 0.7), dpi = 300)
     if (density) {
         points <- list(
             geom_bin2d(binwidth=0.05),
@@ -761,7 +764,6 @@ plot_bw_profile <- function(bwfiles, loci,
     bin_id <- c("seqnames", "start", "end")
 
     bins_long <- pivot_longer(df[, c(bin_id, bwnames)], !any_of(bin_id), names_to = "variable", values_to = "value")
-    # melted_bins <- melt(df[, c(bin_id, bwnames)], id.vars = bin_id)
 
     extra_plot <- NULL
     extra_colors <- NULL
@@ -785,10 +787,12 @@ plot_bw_profile <- function(bwfiles, loci,
             values_to = "value", names_to="variable"
         )
 
-        extra_plot <- geom_jitter(
+        extra_plot <- rasterise(
+          geom_jitter(
             data = highlight_long,
             aes(x = .data$variable, y = .data$value, color = .data$variable),
             alpha = 0.7
+          ), dpi = 300
         )
 
         if (!is.null(highlight_colors)) {
