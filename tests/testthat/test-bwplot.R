@@ -102,6 +102,19 @@ test_that("plot_bw_bins_scatter with GRanges and no label crashes", {
     "GRanges used as highlight loci but no labels provided")
 })
 
+test_that("plot_bw_bins_scatter with density prints a deprecation message", {
+  bw1 <- local_file("bw1.bw")
+  bw2 <- local_file("bw2.bw")
+  with_mock(bw_bins = make_mock_bins(), {
+    expect_message(
+      p <- plot_bw_bins_scatter(bw1, bw2, density = TRUE),
+      paste("plot_bw_bins_scatter with density = TRUE is deprecated.",
+            "Please use plot_bw_bins_density instead."
+      )
+    )
+  })
+})
+
 # Bins density tests ---------------------------------------------
 
 test_that("plot_bw_bins_density with defaults returns a plot with tile layer", {

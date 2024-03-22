@@ -21,7 +21,8 @@ plot_bw_bins_scatter(
   verbose = TRUE,
   selection = NULL,
   default_na = NA_real_,
-  scaling = "none"
+  scaling = "none",
+  density = FALSE
 )
 }
 \arguments{
@@ -63,6 +64,9 @@ locus specific analyses.}
 
 \item{scaling}{If none, no operation is performed (default). If relative,
 values are divided by global mean (1x genome coverage).}
+
+\item{density}{Plot 2d histogram instead
+(deprecated - use plot_bw_bins_density instead)}
 }
 \value{
 A ggplot object.

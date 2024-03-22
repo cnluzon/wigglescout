@@ -44,6 +44,8 @@
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, filenames are used.
 #' @param highlight_colors Array of color values for the highlighting groups
+#' @param density Plot 2d histogram instead
+#'   (deprecated - use plot_bw_bins_density instead)
 #' @param verbose Put a caption with relevant parameters on the plot.
 #' @import ggplot2
 #' @importFrom purrr partial
@@ -82,7 +84,9 @@ plot_bw_bins_scatter <- function(x, y,
                                 verbose = TRUE,
                                 selection = NULL,
                                 default_na = NA_real_,
-                                scaling = "none") {
+                                scaling = "none",
+                                density = FALSE) {
+
 
     partial_bw_bins <- partial(
         bw_bins, bin_size = bin_size, genome = genome,
@@ -98,12 +102,25 @@ plot_bw_bins_scatter <- function(x, y,
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
     clean_gr <- .filter_scatter_data(bins_x, bins_y, remove_top)
 
-    main_plot <- .scatterplot_body(clean_gr$ranges,
+    main_plot <- NULL
+    if (density == TRUE) {
+      msg <- paste(
+        "plot_bw_bins_scatter with density = TRUE is deprecated.",
+        "Please use plot_bw_bins_density instead."
+      )
+      message(msg)
+      main_plot <- .density_body(clean_gr$ranges)
+    }
+    else {
+      main_plot <- .scatterplot_body(
+        clean_gr$ranges,
         highlight = highlight_data$ranges,
         highlight_label = highlight_data$labels,
         highlight_colors = highlight_colors,
         minoverlap = minoverlap
-    )
+      )
+    }
+
 
     title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
     x_lab <- .make_norm_file_label(norm_mode_x, x, bg_x)
