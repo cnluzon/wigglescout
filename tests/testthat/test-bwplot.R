@@ -102,25 +102,41 @@ test_that("plot_bw_bins_scatter with GRanges and no label crashes", {
     "GRanges used as highlight loci but no labels provided")
 })
 
-test_that("plot_bw_bins_scatter with density has a tile layer", {
+test_that("plot_bw_bins_scatter with density prints a deprecation message", {
   bw1 <- local_file("bw1.bw")
   bw2 <- local_file("bw2.bw")
   with_mock(bw_bins = make_mock_bins(), {
-    p <- plot_bw_bins_scatter(bw1, bw2, bg_x = bw1, bg_y = bw2, density = TRUE)
+    expect_message(
+      p <- plot_bw_bins_scatter(bw1, bw2, density = TRUE),
+      paste("plot_bw_bins_scatter with density = TRUE is deprecated.",
+            "Please use plot_bw_bins_density instead."
+      )
+    )
   })
-  expect_is(p, "ggplot")
-  expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
 })
 
-test_that("plot_bw_bins_scatter with no density has no tile layer", {
+# Bins density tests ---------------------------------------------
+
+test_that("plot_bw_bins_density with defaults returns a plot with tile layer", {
   bw1 <- local_file("bw1.bw")
   bw2 <- local_file("bw2.bw")
   with_mock(bw_bins = make_mock_bins(), {
-    p <- plot_bw_bins_scatter(bw1, bw2, density = FALSE)
+    p <- plot_bw_bins_density(bw1, bw2)
+    expect_is(p, "ggplot")
+    expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
   })
-  expect_is(p, "ggplot")
-  expect_false("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
-  expect_true("GeomPoint" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+})
+
+test_that("plot_bw_bins_density with verbose set to false returns a plot with no caption", {
+  bw1 <- local_file("bw1.bw")
+  bw2 <- local_file("bw2.bw")
+  bed <- local_file("bed.bed")
+  with_mock(bw_bins = make_mock_bins(), {
+    p <- plot_bw_bins_density(bw1, bw2, verbose = FALSE)
+    expect_is(p, "ggplot")
+    expect_true(is.null(p$labels$caption))
+    expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+  })
 })
 
 # Loci scatter tests ----------------------------------------------

@@ -9,8 +9,7 @@
   highlight = NULL,
   minoverlap = 0L,
   highlight_label = NULL,
-  highlight_colors = NULL,
-  density = FALSE
+  highlight_colors = NULL
 )
 }
 \arguments{
@@ -24,8 +23,6 @@
 If not provided, column names are used.}
 
 \item{highlight_colors}{Array of color values for the highlighting groups}
-
-\item{density}{Plot density tiles for global distribution instead of points.}
 }
 \value{
 A named list where plot is a ggplot object and calculated is a list

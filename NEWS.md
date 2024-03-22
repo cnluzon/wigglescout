@@ -1,3 +1,17 @@
+# wigglescout 0.16.0
+
+## Features
+
+* `plot_bw_bins_density` function introduced to separate this type of figure
+from `plot_bw_bins_scatter` functionality. Use of `density = TRUE` in
+`plot_bw_bins_scatter` is soft-deprecated and will throw a warning. 
+* Density plots tile layer is rastered to a resolution of 300dpi.
+
+## Other
+
+* Vignettes now include an example of a density plot.
+
+
 # wigglescout 0.15.6
 
 * Now scatterplots and jitterplots on violins are raster layers, with enough

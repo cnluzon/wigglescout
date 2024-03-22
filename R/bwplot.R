@@ -44,8 +44,9 @@
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, filenames are used.
 #' @param highlight_colors Array of color values for the highlighting groups
+#' @param density Plot 2d histogram instead
+#'   (deprecated - use plot_bw_bins_density instead)
 #' @param verbose Put a caption with relevant parameters on the plot.
-#' @param density Plot density tiles for global distribution instead of points.
 #' @import ggplot2
 #' @importFrom purrr partial
 #' @inheritParams bw_bins
@@ -81,10 +82,11 @@ plot_bw_bins_scatter <- function(x, y,
                                 highlight_colors = NULL,
                                 remove_top = 0,
                                 verbose = TRUE,
-                                density = FALSE,
                                 selection = NULL,
                                 default_na = NA_real_,
-                                scaling = "none") {
+                                scaling = "none",
+                                density = FALSE) {
+
 
     partial_bw_bins <- partial(
         bw_bins, bin_size = bin_size, genome = genome,
@@ -100,18 +102,98 @@ plot_bw_bins_scatter <- function(x, y,
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
     clean_gr <- .filter_scatter_data(bins_x, bins_y, remove_top)
 
-    main_plot <- .scatterplot_body(clean_gr$ranges,
+    main_plot <- NULL
+    if (density == TRUE) {
+      msg <- paste(
+        "plot_bw_bins_scatter with density = TRUE is deprecated.",
+        "Please use plot_bw_bins_density instead."
+      )
+      message(msg)
+      main_plot <- .density_body(clean_gr$ranges)
+    }
+    else {
+      main_plot <- .scatterplot_body(
+        clean_gr$ranges,
         highlight = highlight_data$ranges,
         highlight_label = highlight_data$labels,
         highlight_colors = highlight_colors,
-        minoverlap = minoverlap,
-        density = density
-    )
+        minoverlap = minoverlap
+      )
+    }
+
 
     title <- paste("Genome-wide bin coverage (", bin_size, "bp)", sep = "")
     x_lab <- .make_norm_file_label(norm_mode_x, x, bg_x)
     y_lab <- .make_norm_file_label(norm_mode_y, y, bg_y)
     params <- mget(c("genome", "bin_size", "minoverlap", "remove_top", "scaling"))
+    caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+
+    labels <- labs(title = title, x = x_lab, y = y_lab, caption = caption)
+    main_plot + labels + .theme_default()
+}
+
+#' Bin-based 2d histogram of a pair of bigWig files
+#'
+#' Plots a 2d  binned histogram plot from two given bigWig files
+#'
+#' Values in x and y axis can be normalized using background bigWig files
+#' (usually input files). By default, the value shown will be x / bg_x per bin.
+#' If norm_func_x or norm_func_y are provided, this can be changed to any given
+#' function, for instance, if norm_func_x = log2, values on the x axis will
+#' represent log2(x / bg_x) for each bin.
+#'
+#' Values that are invalid (NaN, Inf, -Inf) in doing such normalization will
+#' be ignored and shown as warnings, as this is ggplot default behavior.
+#'
+#' @param plot_binwidth Resolution of the bins in the density histogram
+#'   (different to genomic bin size)
+#' @import ggplot2
+#' @importFrom purrr partial
+#' @inheritParams plot_bw_bins_scatter
+#' @return A ggplot object.
+#' @examples
+#' # Get the raw files
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' bw2 <- system.file("extdata",
+#'                    "sample_H3K9me3_ChIP.bw", package="wigglescout")
+#' bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+#'
+#' # Sample bigWig files only have valid values on this region
+#' locus <- GenomicRanges::GRanges(
+#'   seqnames = "chr15",
+#'   IRanges::IRanges(102600000, 103100000)
+#' )
+#'
+#' plot_bw_bins_density(bw, bw2, bin_size = 50000, selection = locus)
+#' plot_bw_bins_density(bw, bw2, bin_size = 50000, selection = locus,
+#'     remove_top = 0.01)
+#' @export
+plot_bw_bins_density <- function(x, y,
+                                 bg_x = NULL, bg_y = NULL,
+                                 norm_mode_x = "fc", norm_mode_y = "fc",
+                                 bin_size = 10000,
+                                 genome = "mm9",
+                                 plot_binwidth = 0.05,
+                                 highlight = NULL,
+                                 remove_top = 0,
+                                 verbose = TRUE,
+                                 selection = NULL,
+                                 default_na = NA_real_,
+                                 scaling = "none") {
+    bw_bins_f <- partial(
+      bw_bins, bin_size = bin_size, genome = genome,
+      selection = selection, labels = "score", scaling = scaling,
+      default_na = default_na
+    )
+    bins_x <- bw_bins_f(bwfiles = x, bg_bwfiles = bg_x, norm_mode = norm_mode_x)
+    bins_y <- bw_bins_f(bwfiles = y, bg_bwfiles = bg_y, norm_mode = norm_mode_y)
+    clean_gr <- .filter_scatter_data(bins_x, bins_y, remove_top)
+    main_plot <- .density_body(clean_gr$ranges, binwidth = plot_binwidth)
+
+    title <- paste0("Genome-wide bin coverage (", bin_size, "bp)")
+    x_lab <- .make_norm_file_label(norm_mode_x, x, bg_x)
+    y_lab <- .make_norm_file_label(norm_mode_y, y, bg_y)
+    params <- mget(c("genome", "bin_size", "remove_top", "scaling", "plot_binwidth"))
     caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
 
     labels <- labs(title = title, x = x_lab, y = y_lab, caption = caption)
@@ -384,11 +466,12 @@ plot_bw_loci_scatter <- function(x,
     highlight_data <- .convert_and_label_loci(highlight, highlight_label)
 
     clean_gr <- .filter_scatter_data(values_x, values_y, remove_top)
-    main_plot <- .scatterplot_body(clean_gr$ranges,
-                                   highlight = highlight_data$ranges,
-                                   minoverlap = minoverlap,
-                                   highlight_label = highlight_data$labels,
-                                   highlight_colors = highlight_colors,
+    main_plot <- .scatterplot_body(
+      clean_gr$ranges,
+      highlight = highlight_data$ranges,
+      minoverlap = minoverlap,
+      highlight_label = highlight_data$labels,
+      highlight_colors = highlight_colors
     )
 
     loci_name <- .make_label_from_object(loci)
@@ -689,7 +772,6 @@ plot_bw_profile <- function(bwfiles, loci,
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, column names are used.
 #' @param highlight_colors Array of color values for the highlighting groups
-#' @param density Plot density tiles for global distribution instead of points.
 #' @importFrom ggplot2 ggplot geom_point aes
 #'  geom_bin2d scale_fill_gradient scale_color_manual
 #' @importFrom ggrastr rasterise
@@ -698,10 +780,8 @@ plot_bw_profile <- function(bwfiles, loci,
 .scatterplot_body <- function(gr, highlight = NULL,
                                 minoverlap = 0L,
                                 highlight_label = NULL,
-                                highlight_colors = NULL,
-                                density = FALSE) {
+                                highlight_colors = NULL) {
     df <- data.frame(gr)
-
     extra_plot <- NULL
     extra_colors <- NULL
 
@@ -726,20 +806,26 @@ plot_bw_profile <- function(bwfiles, loci,
         }
     }
 
-    points <-  rasterise(geom_point(color = "#bbbbbb", alpha = 0.7), dpi = 300)
-    if (density) {
-        points <- list(
-            geom_bin2d(binwidth=0.05),
-            scale_fill_gradient(low="#dddddd", high="#B22222")
-        )
-    }
-
-    p <- ggplot(df, aes(x = .data$x, y = .data$y)) +
-        points +
+    ggplot(df, aes(x = .data$x, y = .data$y)) +
+        rasterise(geom_point(color = "#bbbbbb", alpha = 0.7), dpi = 300) +
         extra_plot +
         extra_colors
+}
 
-    p
+#' Density 2d histogram plot
+#'
+#' Plots a 2d histogramfrom a GRanges object that already has x and y columns.
+#'
+#' @param gr GRanges
+#' @param binwidth Size of the bin in histogram (resolution of the plot)
+#' @importFrom ggplot2 ggplot geom_bin_2d aes
+#'  geom_bin2d scale_fill_distiller scale_color_manual after_stat
+#' @importFrom ggrastr rasterise
+#' @return A ggplot object
+.density_body <- function(gr, binwidth = 0.05) {
+    ggplot(data.frame(gr), aes(x = .data$x, y = .data$y)) +
+      rasterise(geom_bin_2d(aes(fill = after_stat(log2(.data$count))), binwidth=binwidth), dpi = 300) +
+      scale_fill_distiller(palette = "Spectral", direction = -1)
 }
 
 #' Internal function to plot ranges in violin plot with a highlighted GRanges.

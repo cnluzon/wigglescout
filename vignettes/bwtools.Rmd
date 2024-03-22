@@ -150,7 +150,22 @@ plot_bw_bins_scatter(
 )
 ```
 
-In fact, you may be interested in looking at the signal just at the genes instead:
+In real cases where you are plotting the full genome-wide set of bins, which can
+be in the tens or hundreds of thousands data points, there can be a lot of 
+overplotting and it might be difficult to see where the majority of those are.
+For this, you can just plot a 2d histogram instead:
+
+```{r}
+plot_bw_bins_density(
+  h33_chip,
+  h3k9me3_chip,
+  bin_size = 20000,
+  plot_binwidth = 0.05
+)
+```
+
+
+You may be interested in looking at the signal just at the genes instead:
 
 ```{r}
 plot_bw_loci_scatter(
