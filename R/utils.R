@@ -259,7 +259,7 @@
 #' @return An integer
 .loci_length <- function(loci) {
     if (is.character(loci)) {
-        length(rtracklayer::import(loci, format="BED"))
+        length(rtracklayer::import(loci))
     } else {
         length(loci)
     }
@@ -277,7 +277,7 @@
 .loci_to_granges <- function(loci) {
     bed <- loci
     if (is(loci, "character")){
-        bed <- import(loci, format = "BED")
+        bed <- import(loci)
     }
     if ("name" %in% names(mcols(bed))) {
         bed <- bed[, "name"]
