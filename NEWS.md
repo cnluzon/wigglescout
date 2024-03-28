@@ -1,3 +1,10 @@
+# wigglescout 0.16.1
+
+## Bug fixes
+
+* Fixed issue importing formats different to BED files. Now the format guessing
+is left to rtracklayer and narrowPeak files are accepted. Fixes issue #98.
+
 # wigglescout 0.16.0
 
 ## Features
