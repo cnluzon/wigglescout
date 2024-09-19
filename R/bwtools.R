@@ -499,6 +499,7 @@ bw_profile <- function(bwfiles,
 #'
 #' @param bin_size Bin size.
 #' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
+#' @param canonical Use only canonical chromosomes (default: FALSE)
 #' @importFrom GenomicRanges tileGenome
 #' @importFrom GenomeInfoDb Seqinfo seqlengths
 #' @return A GRanges object with a tiled genome
@@ -508,9 +509,14 @@ bw_profile <- function(bwfiles,
 #' build_bins(bin_size = 50000, genome = "mm9")
 #' build_bins(bin_size = 50000, genome = "hg38")
 #' build_bins(bin_size = 50000, genome = "mm10")
-build_bins <- function(bin_size = 10000, genome = "mm9") {
-    seqinfo <- seqlengths(Seqinfo(genome = genome))
-    tileGenome(seqinfo, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
+build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
+    seqinfo <- Seqinfo(genome = genome)
+    if (canonical == TRUE) {
+      seqn <- seqnames(seqinfo)
+      seqn <- seqn[!grepl("_random", seqn) & !grepl("chrUn_", seqn)]
+      seqinfo <- seqinfo[seqn]
+    }
+    tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
 }
 
 # Helpers ---------------------------------------------------
