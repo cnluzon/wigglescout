@@ -517,7 +517,8 @@ build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
     seqinfo <- Seqinfo(genome = genome)
     if (canonical == TRUE) {
       seqn <- seqnames(seqinfo)
-      seqn <- seqn[!grepl("_random", seqn) & !grepl("chrUn_", seqn)]
+      # Remove all alternative, fixes, unknown location contigs
+      seqn <- seqn[!grepl("_random$", seqn) & !grepl("^chrUn_", seqn) & !grepl("_alt$", seqn) & !grepl("_fix$", seqn)]
       seqinfo <- seqinfo[seqn]
     }
     tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)

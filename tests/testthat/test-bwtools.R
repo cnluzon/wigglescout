@@ -1115,3 +1115,18 @@ test_that("build_bins runs for hg38", {
   values <- build_bins(bin_size = 50000, genome = "hg38")
   expect_is(values, "GRanges")
 })
+
+test_that("build_bins returns the right amount of contigs when canonical == TRUE", {
+  values <- build_bins(bin_size = 500000, genome = "hg38", canonical = TRUE)
+  chr_names <- seqnames(seqinfo(values))
+  chr_expected <- paste0("chr", c(1:22, "M", "X", "Y"))
+  expect_equal(sort(chr_names), sort(chr_expected))
+})
+
+test_that("build_bins returns the right amount of contigs when canonical == TRUE", {
+  values <- build_bins(bin_size = 500000, genome = "mm39", canonical = TRUE)
+  chr_names <- seqnames(seqinfo(values))
+  chr_expected <- paste0("chr", c(1:19, "M", "X", "Y"))
+  expect_equal(sort(chr_names), sort(chr_expected))
+})
+
