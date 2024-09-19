@@ -195,6 +195,7 @@ bw_loci <- function(bwfiles,
 #' @param scaling If none, no operation is performed (default). If relative,
 #'    values are divided by global mean (1x genome coverage).
 #' @param default_na Default value for missing values
+#' @param canonical Use only canonical chromosomes (default: FALSE)
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
@@ -234,7 +235,8 @@ bw_bins <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0,
                     default_na = NA_real_,
-                    scaling = "none") {
+                    scaling = "none",
+                    canonical = FALSE) {
 
     .validate_filelist(bwfiles)
     norm_func <- .process_norm_mode(norm_mode)
@@ -243,7 +245,7 @@ bw_bins <- function(bwfiles,
         labels <- .make_label_from_object(bwfiles)
     }
 
-    tiles <- build_bins(bin_size = bin_size, genome = genome)
+    tiles <- build_bins(bin_size = bin_size, genome = genome, canonical = canonical)
 
     if (is.null(bg_bwfiles)) {
         result <- .multi_bw_ranges(
