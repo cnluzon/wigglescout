@@ -500,17 +500,19 @@ bw_profile <- function(bwfiles,
 #' to work.
 #'
 #' @param bin_size Bin size.
-#' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
+#' @param genome Genome. Supported: any registered NCBI or UCSC genome
+#'    see registered_UCSC_genomes(), registered_NCBI_assemblies() from
+#'    GenomeInfoDb
 #' @param canonical Use only canonical chromosomes (default: FALSE)
 #' @importFrom GenomicRanges tileGenome
-#' @importFrom GenomeInfoDb Seqinfo seqlengths
+#' @importFrom GenomeInfoDb Seqinfo seqlengths seqnames
 #' @return A GRanges object with a tiled genome
 #' @export
 #' @examples
 #'
 #' build_bins(bin_size = 50000, genome = "mm9")
 #' build_bins(bin_size = 50000, genome = "hg38")
-#' build_bins(bin_size = 50000, genome = "mm10")
+#' build_bins(bin_size = 50000, genome = "mm10", canonical = TRUE)
 build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
     seqinfo <- Seqinfo(genome = genome)
     if (canonical == TRUE) {
