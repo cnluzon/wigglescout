@@ -15,7 +15,8 @@ bw_bins(
   norm_mode = "fc",
   remove_top = 0,
   default_na = NA_real_,
-  scaling = "none"
+  scaling = "none",
+  canonical = FALSE
 )
 }
 \arguments{
@@ -48,6 +49,8 @@ whole distribution (remove_top == 0).}
 
 \item{scaling}{If none, no operation is performed (default). If relative,
 values are divided by global mean (1x genome coverage).}
+
+\item{canonical}{Use only canonical chromosomes (default: FALSE)}
 }
 \value{
 A GRanges object with each bwfile as a metadata column named

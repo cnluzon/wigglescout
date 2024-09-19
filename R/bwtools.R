@@ -504,8 +504,8 @@ bw_profile <- function(bwfiles,
 #'    see registered_UCSC_genomes(), registered_NCBI_assemblies() from
 #'    GenomeInfoDb
 #' @param canonical Use only canonical chromosomes (default: FALSE)
-#' @importFrom GenomicRanges tileGenome
-#' @importFrom GenomeInfoDb Seqinfo seqlengths seqnames
+#' @importFrom GenomicRanges tileGenome seqnames
+#' @importFrom GenomeInfoDb Seqinfo seqlengths
 #' @return A GRanges object with a tiled genome
 #' @export
 #' @examples
