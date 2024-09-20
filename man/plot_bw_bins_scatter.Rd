@@ -22,7 +22,8 @@ plot_bw_bins_scatter(
   selection = NULL,
   default_na = NA_real_,
   scaling = "none",
-  density = FALSE
+  density = FALSE,
+  canonical = FALSE
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ values are divided by global mean (1x genome coverage).}
 
 \item{density}{Plot 2d histogram instead
 (deprecated - use plot_bw_bins_density instead)}
+
+\item{canonical}{Use only canonical chromosomes (default: FALSE)}
 }
 \value{
 A ggplot object.

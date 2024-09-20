@@ -85,13 +85,15 @@ plot_bw_bins_scatter <- function(x, y,
                                 selection = NULL,
                                 default_na = NA_real_,
                                 scaling = "none",
-                                density = FALSE) {
+                                density = FALSE,
+                                canonical = FALSE) {
 
 
     partial_bw_bins <- partial(
         bw_bins, bin_size = bin_size, genome = genome,
         selection = selection, labels = "score", scaling = scaling,
-        default_na = default_na
+        default_na = default_na,
+        canonical = canonical
     )
     bins_x <- partial_bw_bins(
         bwfiles = x, bg_bwfiles = bg_x, norm_mode = norm_mode_x
@@ -179,11 +181,13 @@ plot_bw_bins_density <- function(x, y,
                                  verbose = TRUE,
                                  selection = NULL,
                                  default_na = NA_real_,
-                                 scaling = "none") {
+                                 scaling = "none",
+                                 canonical = FALSE) {
     bw_bins_f <- partial(
       bw_bins, bin_size = bin_size, genome = genome,
       selection = selection, labels = "score", scaling = scaling,
-      default_na = default_na
+      default_na = default_na,
+      canonical = canonical
     )
     bins_x <- bw_bins_f(bwfiles = x, bg_bwfiles = bg_x, norm_mode = norm_mode_x)
     bins_y <- bw_bins_f(bwfiles = y, bg_bwfiles = bg_y, norm_mode = norm_mode_y)
