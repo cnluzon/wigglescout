@@ -552,3 +552,79 @@
         stop("bin size must be smaller than flanking regions")
     }
 }
+
+
+#' Check that a list of bigWig files have the same Seqinfo.
+#' Throws a warning if they don't.
+#'
+#' @param bwfiles List of bigWig files
+#' @param show_max Max number of references to show in the warning
+#'
+#' @return TRUE if they share all references, FALSE otherwise.
+.validate_references <- function(bwfiles, show_max = 25) {
+  seqinfos <- lapply(lapply(bwfiles, BigWigFile), GenomeInfoDb::seqinfo)
+  seqnames_all <- lapply(seqinfos, GenomicRanges::seqnames)
+  .match_seqnames(seqnames_all, show_max, 5)
+}
+
+#' Check that a list of bigWig files have the same Seqinfo as an external object
+#' (usually a pre-built tile set). Throws a warning if they don't.
+#'
+#' @param bwfiles List of bigWig files
+#' @param seqinfo Seqinfo object
+#' @param show_max Max number of shared references to show in the warning
+#'
+#' @return TRUE if they share all references, FALSE otherwise.
+.validate_references_with_external_seqinfo <- function(bwfiles, seqinfo, show_max = 25) {
+  bw_seqinfos <- lapply(lapply(bwfiles, BigWigFile), rtracklayer::seqinfo)
+  seqnames_all <- lapply(c(bw_seqinfos, seqinfo), GenomicRanges::seqnames)
+  .match_seqnames(seqnames_all, show_max, 5)
+}
+
+#' Match seqname lists and throws the relevant warning
+#'
+#' @param seqnamelist Names list to compare
+#' @param show_max_shared Maximum shared references to print
+#' @param show_max_missing Maximum missing references to print
+#'
+#' @return TRUE if they match, FALSE if they don't
+.match_seqnames <- function(seqnamelist, show_max_shared, show_max_missing) {
+  all_equal <- Reduce(
+    function(x, y) { if (base::setequal(x, y)) x else FALSE
+    }, seqnamelist
+  )
+
+  if (isFALSE(all_equal)) {
+    common_refs <- Reduce(intersect, seqnamelist)
+    n_missing <- purrr::partial(setdiff, y = common_refs)
+    missing <- lapply(seqnamelist, n_missing)
+    missing_any <- Reduce(union, missing)
+    ellipsis <- ""
+    ellipsis_missing <- ""
+    if(length(common_refs) > show_max_shared) {
+      ellipsis <- "..."
+    }
+    if(length(missing_any) > show_max_missing) {
+      ellipsis_missing <- "..."
+    }
+
+    msg <- paste(
+      "Not all bigWig files or the genome tiling provided share the same sequence info. \n   Common to all",
+      paste0("(",length(common_refs),"):"),
+      paste(common_refs[1:min(length(common_refs), show_max_shared)], collapse = ", "),
+      ellipsis,
+      "\n  ",
+      "Missing in some of the files:",
+      paste(missing_any[1:min(length(missing_any), show_max_missing)], collapse = ", "),
+      ellipsis_missing,
+      "\n  ",
+      "This can be due to different versions of the same reference genome, or",
+      "to completely different organisms. Make sure these match!"
+    )
+
+    warning(msg)
+    return(FALSE)
+  }
+
+  return(TRUE)
+}

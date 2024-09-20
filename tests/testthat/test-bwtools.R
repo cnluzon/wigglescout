@@ -709,10 +709,14 @@ test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
 
 test_that("bw_bins returns correct per locus values", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  values <- bw_bins(bw1,
-                    selection = import(get_testfile("labeled.bed")),
-                    labels = "bw1",
-                    per_locus_stat = "mean"
+  # Matching the tiles to any genome will generate warnings with the test example
+  expect_warning(
+    values <- bw_bins(bw1,
+                      selection = import(get_testfile("labeled.bed")),
+                      labels = "bw1",
+                      per_locus_stat = "mean"
+    ),
+    "Not all bigWig "
   )
 
   expect_is(values, "GRanges")
@@ -722,11 +726,16 @@ test_that("bw_bins returns correct per locus values", {
 
 test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  values <- bw_bins(bw1,
-                    bg_bwfiles = bw1,
-                    selection = import(get_testfile("labeled.bed")),
-                    labels = "bw1",
-                    per_locus_stat = "mean"
+
+  # Matching the tiles to any genome will generate warnings with the test example
+  expect_warning(
+    values <- bw_bins(bw1,
+                      bg_bwfiles = bw1,
+                      selection = import(get_testfile("labeled.bed")),
+                      labels = "bw1",
+                      per_locus_stat = "mean"
+    ),
+    "Not all bigWig "
   )
 
   expect_is(values, 'GRanges')

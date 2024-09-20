@@ -196,6 +196,7 @@ bw_loci <- function(bwfiles,
 #'    values are divided by global mean (1x genome coverage).
 #' @param default_na Default value for missing values
 #' @param canonical Use only canonical chromosomes (default: FALSE)
+#' @importFrom GenomeInfoDb seqinfo
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
@@ -239,6 +240,7 @@ bw_bins <- function(bwfiles,
                     canonical = FALSE) {
 
     .validate_filelist(bwfiles)
+
     norm_func <- .process_norm_mode(norm_mode)
 
     if (is.null(labels)) {
@@ -246,8 +248,10 @@ bw_bins <- function(bwfiles,
     }
 
     tiles <- build_bins(bin_size = bin_size, genome = genome, canonical = canonical)
+    references_match <- .validate_references_with_external_seqinfo(c(bwfiles, bg_bwfiles), seqinfo(tiles))
 
     if (is.null(bg_bwfiles)) {
+      suppressWarnings(
         result <- .multi_bw_ranges(
             bwfiles,
             labels,
@@ -258,7 +262,9 @@ bw_bins <- function(bwfiles,
             default_na = default_na,
             scaling = scaling
         )
+      )
     } else {
+      suppressWarnings(
         result <- .multi_bw_ranges_norm(
             bwfiles,
             bg_bwfiles,
@@ -271,6 +277,7 @@ bw_bins <- function(bwfiles,
             default_na = default_na,
             scaling = scaling
         )
+      )
     }
     result
 }
