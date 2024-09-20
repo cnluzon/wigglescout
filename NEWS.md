@@ -1,3 +1,16 @@
+# wigglescout 0.17.0
+
+## Features
+
+* Extra `canonical` parameter on `bw_bins` and `plot_bw_bins_density`,
+`plot_bw_bins_scatter` which allows to exclude all extra contigs on a reference
+genome.
+
+* `bw_bins` related functions now check if bigWig file references match to each
+other and to the tile genome provided, giving a, initial warning about potential 
+references missing, but suppressing all the individual "Unable to summarize range"
+warning messages from rtracklayer summary calculation.
+
 # wigglescout 0.16.1
 
 ## Bug fixes
