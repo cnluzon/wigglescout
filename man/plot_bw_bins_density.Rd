@@ -19,7 +19,8 @@ plot_bw_bins_density(
   verbose = TRUE,
   selection = NULL,
   default_na = NA_real_,
-  scaling = "none"
+  scaling = "none",
+  canonical = FALSE
 )
 }
 \arguments{
@@ -57,6 +58,8 @@ locus specific analyses.}
 
 \item{scaling}{If none, no operation is performed (default). If relative,
 values are divided by global mean (1x genome coverage).}
+
+\item{canonical}{Use only canonical chromosomes (default: FALSE)}
 }
 \value{
 A ggplot object.

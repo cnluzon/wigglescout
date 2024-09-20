@@ -195,6 +195,8 @@ bw_loci <- function(bwfiles,
 #' @param scaling If none, no operation is performed (default). If relative,
 #'    values are divided by global mean (1x genome coverage).
 #' @param default_na Default value for missing values
+#' @param canonical Use only canonical chromosomes (default: FALSE)
+#' @importFrom GenomeInfoDb seqinfo
 #' @return A GRanges object with each bwfile as a metadata column named
 #'     after labels, if provided, or after filenames otherwise.
 #' @export
@@ -234,18 +236,22 @@ bw_bins <- function(bwfiles,
                     norm_mode = "fc",
                     remove_top = 0,
                     default_na = NA_real_,
-                    scaling = "none") {
+                    scaling = "none",
+                    canonical = FALSE) {
 
     .validate_filelist(bwfiles)
+
     norm_func <- .process_norm_mode(norm_mode)
 
     if (is.null(labels)) {
         labels <- .make_label_from_object(bwfiles)
     }
 
-    tiles <- build_bins(bin_size = bin_size, genome = genome)
+    tiles <- build_bins(bin_size = bin_size, genome = genome, canonical = canonical)
+    references_match <- .validate_references_with_external_seqinfo(c(bwfiles, bg_bwfiles), seqinfo(tiles))
 
     if (is.null(bg_bwfiles)) {
+      suppressWarnings(
         result <- .multi_bw_ranges(
             bwfiles,
             labels,
@@ -256,7 +262,9 @@ bw_bins <- function(bwfiles,
             default_na = default_na,
             scaling = scaling
         )
+      )
     } else {
+      suppressWarnings(
         result <- .multi_bw_ranges_norm(
             bwfiles,
             bg_bwfiles,
@@ -269,6 +277,7 @@ bw_bins <- function(bwfiles,
             default_na = default_na,
             scaling = scaling
         )
+      )
     }
     result
 }
@@ -498,8 +507,11 @@ bw_profile <- function(bwfiles,
 #' to work.
 #'
 #' @param bin_size Bin size.
-#' @param genome Genome. Supported: mm9, mm10, hg38, hg38_latest.
-#' @importFrom GenomicRanges tileGenome
+#' @param genome Genome. Supported: any registered NCBI or UCSC genome
+#'    see registered_UCSC_genomes(), registered_NCBI_assemblies() from
+#'    GenomeInfoDb
+#' @param canonical Use only canonical chromosomes (default: FALSE)
+#' @importFrom GenomicRanges tileGenome seqnames
 #' @importFrom GenomeInfoDb Seqinfo seqlengths
 #' @return A GRanges object with a tiled genome
 #' @export
@@ -507,10 +519,59 @@ bw_profile <- function(bwfiles,
 #'
 #' build_bins(bin_size = 50000, genome = "mm9")
 #' build_bins(bin_size = 50000, genome = "hg38")
-#' build_bins(bin_size = 50000, genome = "mm10")
-build_bins <- function(bin_size = 10000, genome = "mm9") {
-    seqinfo <- seqlengths(Seqinfo(genome = genome))
-    tileGenome(seqinfo, tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
+#' build_bins(bin_size = 50000, genome = "mm10", canonical = TRUE)
+build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
+    seqinfo <- Seqinfo(genome = genome)
+    if (canonical == TRUE) {
+      seqn <- seqnames(seqinfo)
+      # Remove all alternative, fixes, unknown location contigs
+      seqn <- seqn[!grepl("_random$", seqn) & !grepl("^chrUn_", seqn) & !grepl("_alt$", seqn) & !grepl("_fix$", seqn)]
+      seqinfo <- seqinfo[seqn]
+    }
+    tile_seqinfo(seqinfo, bin_size)
+}
+
+#' Build a tiles GRanges out of a bigWig file on a given bin size.
+#'
+#' It does not need the reference genome as that information can be parsed from
+#' the bigwig file
+#'
+#' @param bwfile File to tile
+#' @param bin_size Size of the tile in basepairs
+#'
+#' @importFrom rtracklayer BigWigFile
+#' @importFrom GenomeInfoDb seqinfo
+#' @return A GRanges object with bins of bin_size bins matching the genome the
+#' bigWig file was mapped to.
+#' @export
+#'
+#' @examples
+#'
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' build_bins_bw(bw, 50000)
+build_bins_bw <- function(bwfile, bin_size) {
+  tile_seqinfo(seqinfo(BigWigFile(bwfile)), bin_size)
+}
+
+#' Build a tiles GRanges out of a bigWig file on a given bin size.
+#'
+#' It does not need the reference genome as that information can be parsed from
+#' the bigwig file
+#'
+#' @param seqinfo A Seqinfo object
+#' @param bin_size Size of the tile in basepairs
+#'
+#' @importFrom GenomeInfoDb seqlengths
+#' @importFrom GenomicRanges tileGenome
+#' @return A GRanges object with bins of bin_size bins matching the genome the
+#' bigWig file was mapped to.
+#' @export
+#'
+#' @examples
+#'
+#' tile_seqinfo(GenomeInfoDb::Seqinfo(genome = "mm9"), 50000)
+tile_seqinfo <- function(seqinfo, bin_size) {
+  tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
 }
 
 # Helpers ---------------------------------------------------

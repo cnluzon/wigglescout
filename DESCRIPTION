@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore and Visualize Genomics BigWig Data
-Version: 0.16.1
+Version: 0.17.0
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
@@ -15,7 +15,7 @@ Description: A set of tools to easily extract, summarize and visualize coverage
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Depends: R (>= 4.2)
 biocViews: Software, Visualization, Sequencing, Coverage, ChIPSeq, ATACSeq
 Imports:

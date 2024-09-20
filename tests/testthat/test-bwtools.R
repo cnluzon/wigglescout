@@ -709,10 +709,14 @@ test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
 
 test_that("bw_bins returns correct per locus values", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  values <- bw_bins(bw1,
-                    selection = import(get_testfile("labeled.bed")),
-                    labels = "bw1",
-                    per_locus_stat = "mean"
+  # Matching the tiles to any genome will generate warnings with the test example
+  expect_warning(
+    values <- bw_bins(bw1,
+                      selection = import(get_testfile("labeled.bed")),
+                      labels = "bw1",
+                      per_locus_stat = "mean"
+    ),
+    "Not all bigWig "
   )
 
   expect_is(values, "GRanges")
@@ -722,11 +726,16 @@ test_that("bw_bins returns correct per locus values", {
 
 test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  values <- bw_bins(bw1,
-                    bg_bwfiles = bw1,
-                    selection = import(get_testfile("labeled.bed")),
-                    labels = "bw1",
-                    per_locus_stat = "mean"
+
+  # Matching the tiles to any genome will generate warnings with the test example
+  expect_warning(
+    values <- bw_bins(bw1,
+                      bg_bwfiles = bw1,
+                      selection = import(get_testfile("labeled.bed")),
+                      labels = "bw1",
+                      per_locus_stat = "mean"
+    ),
+    "Not all bigWig "
   )
 
   expect_is(values, 'GRanges')
@@ -1114,4 +1123,48 @@ test_that("build_bins creates bins of correct size", {
 test_that("build_bins runs for hg38", {
   values <- build_bins(bin_size = 50000, genome = "hg38")
   expect_is(values, "GRanges")
+})
+
+test_that("build_bins returns the right amount of contigs when canonical == TRUE", {
+  values <- build_bins(bin_size = 500000, genome = "hg38", canonical = TRUE)
+  chr_names <- seqnames(seqinfo(values))
+  chr_expected <- paste0("chr", c(1:22, "M", "X", "Y"))
+  expect_equal(sort(chr_names), sort(chr_expected))
+})
+
+test_that("build_bins returns the right amount of contigs when canonical == TRUE", {
+  values <- build_bins(bin_size = 500000, genome = "mm39", canonical = TRUE)
+  chr_names <- seqnames(seqinfo(values))
+  chr_expected <- paste0("chr", c(1:19, "M", "X", "Y"))
+  expect_equal(sort(chr_names), sort(chr_expected))
+})
+
+## build_bins_bw --------------------------------------------
+
+test_that("build_bins_bw works on a bigWig file", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  gr <- build_bins_bw(bw1, bin_size = 200)
+  gr_result <- GenomicRanges::GRanges(
+    c("chr1:1-200", "chr2:1-200"),
+    seqinfo = GenomeInfoDb::Seqinfo(
+      seqnames=c("chr1", "chr2"),
+      seqlengths = c(200, 200)
+    )
+  )
+  expect_equal(gr, gr_result)
+})
+
+## tile_seqinfo --------------------------------------------
+
+test_that("tile_seqinfo returns correct bins", {
+  seqinfo <- GenomeInfoDb::Seqinfo(
+    seqnames=c("chr1", "chr2"),
+    seqlengths = c(200, 200)
+  )
+  gr <- tile_seqinfo(seqinfo, bin_size = 100)
+  gr_result <- GenomicRanges::GRanges(
+    c("chr1:1-100", "chr1:101-200", "chr2:1-100", "chr2:101-200"),
+    seqinfo = seqinfo
+  )
+  expect_equal(gr, gr_result)
 })

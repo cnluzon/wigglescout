@@ -4,12 +4,16 @@
 \alias{build_bins}
 \title{Build a unscored bins GRanges object.}
 \usage{
-build_bins(bin_size = 10000, genome = "mm9")
+build_bins(bin_size = 10000, genome = "mm9", canonical = FALSE)
 }
 \arguments{
 \item{bin_size}{Bin size.}
 
-\item{genome}{Genome. Supported: mm9, mm10, hg38, hg38_latest.}
+\item{genome}{Genome. Supported: any registered NCBI or UCSC genome
+see registered_UCSC_genomes(), registered_NCBI_assemblies() from
+GenomeInfoDb}
+
+\item{canonical}{Use only canonical chromosomes (default: FALSE)}
 }
 \value{
 A GRanges object with a tiled genome
@@ -23,5 +27,5 @@ to work.
 
 build_bins(bin_size = 50000, genome = "mm9")
 build_bins(bin_size = 50000, genome = "hg38")
-build_bins(bin_size = 50000, genome = "mm10")
+build_bins(bin_size = 50000, genome = "mm10", canonical = TRUE)
 }
