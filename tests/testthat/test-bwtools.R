@@ -1130,3 +1130,32 @@ test_that("build_bins returns the right amount of contigs when canonical == TRUE
   expect_equal(sort(chr_names), sort(chr_expected))
 })
 
+## build_bins_bw --------------------------------------------
+
+test_that("build_bins_bw works on a bigWig file", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  gr <- build_bins_bw(bw1, bin_size = 200)
+  gr_result <- GenomicRanges::GRanges(
+    c("chr1:1-200", "chr2:1-200"),
+    seqinfo = GenomeInfoDb::Seqinfo(
+      seqnames=c("chr1", "chr2"),
+      seqlengths = c(200, 200)
+    )
+  )
+  expect_equal(gr, gr_result)
+})
+
+## tile_seqinfo --------------------------------------------
+
+test_that("tile_seqinfo returns correct bins", {
+  seqinfo <- GenomeInfoDb::Seqinfo(
+    seqnames=c("chr1", "chr2"),
+    seqlengths = c(200, 200)
+  )
+  gr <- tile_seqinfo(seqinfo, bin_size = 100)
+  gr_result <- GenomicRanges::GRanges(
+    c("chr1:1-100", "chr1:101-200", "chr2:1-100", "chr2:101-200"),
+    seqinfo = seqinfo
+  )
+  expect_equal(gr, gr_result)
+})

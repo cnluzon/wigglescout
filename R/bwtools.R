@@ -521,7 +521,50 @@ build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
       seqn <- seqn[!grepl("_random$", seqn) & !grepl("^chrUn_", seqn) & !grepl("_alt$", seqn) & !grepl("_fix$", seqn)]
       seqinfo <- seqinfo[seqn]
     }
-    tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
+    tile_seqinfo(seqinfo, bin_size)
+}
+
+#' Build a tiles GRanges out of a bigWig file on a given bin size.
+#'
+#' It does not need the reference genome as that information can be parsed from
+#' the bigwig file
+#'
+#' @param bwfile File to tile
+#' @param bin_size Size of the tile in basepairs
+#'
+#' @importFrom rtracklayer BigWigFile
+#' @importFrom GenomeInfoDb seqinfo
+#' @return A GRanges object with bins of bin_size bins matching the genome the
+#' bigWig file was mapped to.
+#' @export
+#'
+#' @examples
+#'
+#' bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+#' build_bins_bw(bw, 50000)
+build_bins_bw <- function(bwfile, bin_size) {
+  tile_seqinfo(seqinfo(BigWigFile(bwfile)), bin_size)
+}
+
+#' Build a tiles GRanges out of a bigWig file on a given bin size.
+#'
+#' It does not need the reference genome as that information can be parsed from
+#' the bigwig file
+#'
+#' @param seqinfo A Seqinfo object
+#' @param bin_size Size of the tile in basepairs
+#'
+#' @importFrom GenomeInfoDb seqlengths
+#' @importFrom GenomicRanges tileGenome
+#' @return A GRanges object with bins of bin_size bins matching the genome the
+#' bigWig file was mapped to.
+#' @export
+#'
+#' @examples
+#'
+#' tile_seqinfo(GenomeInfoDb::Seqinfo(genome = "mm9"), 50000)
+tile_seqinfo <- function(seqinfo, bin_size) {
+  tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
 }
 
 # Helpers ---------------------------------------------------
