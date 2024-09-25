@@ -47,5 +47,5 @@ Suggests:
   prettydoc,
   withr
 VignetteBuilder: knitr
-URL: https://github.com/cnluzon/wigglescout
+URL: https://github.com/cnluzon/wigglescout, https://cnluzon.github.io/wigglescout/
 BugReports: https://github.com/cnluzon/wigglescout/issues
