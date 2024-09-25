@@ -1,3 +1,10 @@
+# wigglescout 0.18.0
+
+## Features
+
+* `keep_canonical` function makes use of `GenomeInfoDb` functionality and 
+exposed as utility.
+
 # wigglescout 0.17.0
 
 ## Features
