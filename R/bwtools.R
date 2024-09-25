@@ -512,7 +512,7 @@ bw_profile <- function(bwfiles,
 #'    GenomeInfoDb
 #' @param canonical Use only canonical chromosomes (default: FALSE)
 #' @importFrom GenomicRanges tileGenome seqnames
-#' @importFrom GenomeInfoDb Seqinfo seqlengths
+#' @importFrom GenomeInfoDb Seqinfo seqlengths standardChromosomes
 #' @return A GRanges object with a tiled genome
 #' @export
 #' @examples
@@ -523,10 +523,9 @@ bw_profile <- function(bwfiles,
 build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
     seqinfo <- Seqinfo(genome = genome)
     if (canonical == TRUE) {
-      seqn <- seqnames(seqinfo)
       # Remove all alternative, fixes, unknown location contigs
-      seqn <- seqn[!grepl("_random$", seqn) & !grepl("^chrUn_", seqn) & !grepl("_alt$", seqn) & !grepl("_fix$", seqn)]
-      seqinfo <- seqinfo[seqn]
+      canonical_chrs <- GenomeInfoDb::standardChromosomes(seqinfo)
+      seqinfo <- seqinfo[canonical_chrs]
     }
     tile_seqinfo(seqinfo, bin_size)
 }
@@ -572,6 +571,29 @@ build_bins_bw <- function(bwfile, bin_size) {
 #' tile_seqinfo(GenomeInfoDb::Seqinfo(genome = "mm9"), 50000)
 tile_seqinfo <- function(seqinfo, bin_size) {
   tileGenome(seqlengths(seqinfo), tilewidth = bin_size, cut.last.tile.in.chrom = TRUE)
+}
+
+
+#' Filter out unplaced contigs and uncharacterized chromosomes from a GRanges
+#' object.
+#'
+#' This utility will keep only the sequences that belong to canonical chromosomes
+#' returned by GenomeInfoDb::standardChromosomes function.
+#'
+#' @param gr A filtered GRanges object
+#'
+#' @importFrom GenomeInfoDb standardChromosomes keepSeqlevels
+#' @return A filtered GRanges object
+#' @export
+#'
+#' @examples
+#' bins_gr <- build_bins(bin_size = 50000, genome = "hg38")
+#' keep_canonical(bins_gr)
+keep_canonical <- function(gr) {
+    slevels <- GenomeInfoDb::standardChromosomes(gr)
+    # On GRanges objects this will work as coarse, where:
+    # > Remove the elements in x where the seqlevels to drop are in use.
+    GenomeInfoDb::keepSeqlevels(gr, slevels, pruning.mode = "tidy")
 }
 
 # Helpers ---------------------------------------------------
