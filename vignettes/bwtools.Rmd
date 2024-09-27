@@ -2,11 +2,7 @@
 title: "Wigglescout documentation"
 author: "Carmen Navarro"
 date: "`r Sys.Date()`"
-output:
-  prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
-    toc: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Value calculation}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,8 +17,8 @@ knitr::opts_chunk$set(
   comment = "#>",
   warning = FALSE,
   message = FALSE,
-  fig.width = 9,
-  fig.height = 7
+  fig.width = 7,
+  fig.height = 6
 )
 ```
 
@@ -189,7 +185,8 @@ head(chrom_values)
 
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
-  loci = chromhmm
+  loci = chromhmm,
+  labels = c("H33", "H3K9me3")
 )
 ```
 
@@ -579,6 +576,7 @@ head(chrom_values)
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
   loci = chromhmm,
+  labels = c("H33", "H3K9me3")
 )
 ```
 
@@ -592,7 +590,8 @@ normalization / input tracks and use them in the same way as before:
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
   bg_bwfiles = c(input_chip, input_chip),
-  loci = chromhmm
+  loci = chromhmm,
+  labels = c("H33", "H3K9me3")
 )
 ```
 
@@ -611,7 +610,8 @@ values tend to be noisy, so a median of means could be useful in some cases.
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
   bg_bwfiles = c(input_chip, input_chip),
-  loci = chromhmm,
+  loci = chromhmm,,
+  labels = c("H33", "H3K9me3"),
   aggregate_by = "median"   # Note this is a string value, not a function
 )
 ```

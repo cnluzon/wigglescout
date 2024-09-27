@@ -2,11 +2,7 @@
 title: "Test data documentation"
 author: "Carmen Navarro"
 date: "`r Sys.Date()`"
-output:
-  prettydoc::html_pretty:
-    theme: cayman
-    highlight: github
-    toc: true
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Test data}
   %\VignetteEngine{knitr::rmarkdown}
