@@ -1,4 +1,3 @@
-# Summary and scope
 
 ![r-cmd-check](https://github.com/cnluzon/wigglescout/workflows/r-cmd-check/badge.svg) [![codecov](https://codecov.io/gh/cnluzon/wigglescout/branch/main/graph/badge.svg?token=DJJWPM3OZL)](https://codecov.io/gh/cnluzon/wigglescout)
 
@@ -39,8 +38,9 @@ internal use of `bw_` functions, start with `plot_`.
 
 ## Installation
 
-`wigglescout` is a package under development. You will need `remotes` to
-install it (and `devtools` if you plan to work on it):
+`wigglescout` is a package under active development. You can install it from this
+repository. For this, you will need `remotes` to install it (and `devtools` if
+you plan to work on it):
 
     install.packages(c('devtools', 'remotes'))
     
@@ -55,21 +55,13 @@ before running the installation:
 Then you can install directly from this GitHub repository:
 
     library(remotes)
-    install_github('cnluzon/wigglescout', build_vignettes=TRUE)
+    remotes::install_github('cnluzon/wigglescout', build_vignettes = TRUE)
 
 ## Getting started
 
-The vignettes as they can give a comprehensive overview of what is
-available in the package. You can check the vignettes with
-`browseVignettes("wigglescout")`.
-
-These are the groups of functions that are included in `wigglescout`:
-
-- `bwtools`. Functionality to handle `bigWig` files. Importing, binning
-    and intersecting, aggregating `BED` files. This relies heavily on 
-    `rtracklayer` calculations.
-    
-- `bwplot`. Make plots out of `bwtools` calculations.
+The vignettes or [online documentation](https://cnluzon.github.io/wigglescout/)
+can give a comprehensive overview of what is available in the package.
+You can check the vignettes with `browseVignettes("wigglescout")`.
     
 ## Troubleshooting
 
