@@ -1,12 +1,9 @@
 ---
-title: "Wigglescout documentation"
-author: "Carmen Navarro"
-date: "`r Sys.Date()`"
+title: "Wigglescout"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Value calculation}
+  %\VignetteIndexEntry{Wigglescout}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteDepends{wigglescout}
   %\VignetteEncoding{UTF-8}
   \usepackage[utf8]{inputenc}
 ---

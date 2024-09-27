@@ -1,12 +1,9 @@
 ---
-title: "Test data documentation"
-author: "Carmen Navarro"
-date: "`r Sys.Date()`"
+title: "Test data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Test data}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteDepends{wigglescout}
   %\VignetteEncoding{UTF-8}
   \usepackage[utf8]{inputenc}
 ---
