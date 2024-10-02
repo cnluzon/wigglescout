@@ -3,8 +3,9 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   bwtools: bwtools.html
-  test-data: test-data.html
-last_built: 2024-09-25T10:50Z
+  plotting: plotting.html
+  wigglescout: wigglescout.html
+last_built: 2024-10-02T08:07Z
 urls:
   reference: https://cnluzon.github.io/wigglescout/reference
   article: https://cnluzon.github.io/wigglescout/articles

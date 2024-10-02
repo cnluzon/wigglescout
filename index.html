@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Explore and Visualize Genomics BigWig Data • wigglescout</title>
-<script src="lightswitch.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
@@ -18,11 +18,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">wigglescout</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.18.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.18.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,12 +31,13 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/wigglescout.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/bwtools.html">Wigglescout documentation</a></li>
-    <li><a class="dropdown-item" href="articles/test-data.html">Test data documentation</a></li>
+<li><a class="dropdown-item" href="articles/bwtools.html">Summarizing bigWig files</a></li>
+    <li><a class="dropdown-item" href="articles/plotting.html">Visualizing bigWig signal</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -46,14 +47,6 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/cnluzon/wigglescout/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
-  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
-<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
-    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
-    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
-  </ul>
-</li>
       </ul>
 </div>
 
@@ -61,10 +54,7 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="summary-and-scope">Summary and scope<a class="anchor" aria-label="anchor" href="#summary-and-scope"></a>
-</h1></div>
-<p><img src="https://github.com/cnluzon/wigglescout/workflows/r-cmd-check/badge.svg" alt="r-cmd-check"><a href="https://codecov.io/gh/cnluzon/wigglescout" class="external-link"><img src="https://codecov.io/gh/cnluzon/wigglescout/branch/main/graph/badge.svg?token=DJJWPM3OZL" alt="codecov"></a></p>
+  <main id="main" class="col-md-9">
 <p><code>wigglescout</code> is an R library that allows you to calculate summary values across bigWig files and BED files and visualize them in a genomics-relevant manner. It is based on broadly used libraries such as <code>rtracklayer</code> and <code>GenomicRanges</code>, among others for calculation, and mostly <code>ggplot2</code> for visualization. You can look at the <code>DESCRIPTION</code> file to get more information about all the libraries that make this one possible.</p>
 <p>There are also many other tools whose functionality overlaps a little or much with <code>wigglescout</code>, but there was no single tool that included all that I needed. The aim of this library is therefore not to replace any of those tools, or to provide a silver-bullet solution to genomics data analysis, but to provide a comprehensive, yet simple enough set of tools focused on bigWig files that can be used entirely from the R environment without switching back and forth across tools.</p>
 <p>Other tools and libraries for akin purposes that you may be looking for include: <code>deepTools</code>, <code>SeqPlots</code>, <code>bwtool</code>, <code>wiggletools</code>, and the list is endless!</p>
@@ -80,24 +70,19 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p><code>wigglescout</code> is a package under development. You will need <code>remotes</code> to install it (and <code>devtools</code> if you plan to work on it):</p>
+<p><code>wigglescout</code> is a package under active development. You can install it from this repository. For this, you will need <code>remotes</code> to install it (and <code>devtools</code> if you plan to work on it):</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">'devtools'</span>, <span class="st">'remotes'</span>))</span></code></pre></div>
 <p>Additionally, there was an issue in the past with installing dependencies that come from <code>BioConductor</code> repository. This seems to have been fixed now, but if you run into problems, I recommend installing manually these dependencies before running the installation:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">install.packages</span>((<span class="st">'BiocManager'</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">'GenomeInfoDb'</span>, <span class="st">'GenomicRanges'</span>, <span class="st">'rtracklayer'</span>))</span></code></pre></div>
 <p>Then you can install directly from this GitHub repository:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(remotes)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">'cnluzon/wigglescout'</span>, <span class="at">build_vignettes=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">'cnluzon/wigglescout'</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>The vignettes as they can give a comprehensive overview of what is available in the package. You can check the vignettes with <code>browseVignettes("wigglescout")</code>.</p>
-<p>These are the groups of functions that are included in <code>wigglescout</code>:</p>
-<ul>
-<li><p><code>bwtools</code>. Functionality to handle <code>bigWig</code> files. Importing, binning and intersecting, aggregating <code>BED</code> files. This relies heavily on <code>rtracklayer</code> calculations.</p></li>
-<li><p><code>bwplot</code>. Make plots out of <code>bwtools</code> calculations.</p></li>
-</ul>
+<p>The vignettes or <a href="https://cnluzon.github.io/wigglescout/">online documentation</a> can give a comprehensive overview of what is available in the package. You can check the vignettes with <code>browseVignettes("wigglescout")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="troubleshooting">Troubleshooting<a class="anchor" aria-label="anchor" href="#troubleshooting"></a>
@@ -113,7 +98,7 @@
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(<span class="st">'GenomeInfoDb'</span>, <span class="st">'GenomicRanges'</span>, <span class="st">'rtracklayer'</span>))</span></code></pre></div>
 </div>
-</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
@@ -146,7 +131,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://codecov.io/gh/cnluzon/wigglescout" class="external-link"><img src="https://codecov.io/gh/cnluzon/wigglescout/branch/main/graph/badge.svg?token=DJJWPM3OZL" alt="codecov"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
