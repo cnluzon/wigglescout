@@ -1,3 +1,10 @@
+# wigglescout 0.18.1
+
+## Other
+
+Restructuring of vignettes in smaller pieces of information, and deployment of
+documentation website with `pkgdown`.
+
 # wigglescout 0.18.0
 
 ## Features

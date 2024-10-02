@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore and Visualize Genomics BigWig Data
-Version: 0.18.0
+Version: 0.18.1
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
@@ -44,7 +44,6 @@ Suggests:
   knitr,
   future,
   rmarkdown,
-  prettydoc,
   withr
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout, https://cnluzon.github.io/wigglescout/
