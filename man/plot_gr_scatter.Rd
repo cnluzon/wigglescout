@@ -2,7 +2,7 @@
 % Please edit documentation in R/bwplot.R
 \name{plot_gr_scatter}
 \alias{plot_gr_scatter}
-\title{Bin-based scatterplot of a GRanges object}
+\title{Scatterplot of a precalculated GRanges object}
 \usage{
 plot_gr_scatter(
   gr,

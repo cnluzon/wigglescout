@@ -698,6 +698,36 @@ plot_gr_scatter <- function(gr, x, y,
 }
 
 
+#' Density plot of a precalculated GRanges object
+#'
+#' Plots a density plot from two mcols of a GRanges object files that were
+#' already calculated using bw_loci or bw_bins
+#'
+#' @param gr Scored GRanges object
+#' @param x Column in gr corresponding to the x axis
+#' @param y Column in gr corresponding to the y axis.
+#' @param plot_binwidth Resolution of the bins in the density histogram
+#'   (different to genomic bin size)
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @import ggplot2
+#' @importFrom purrr partial
+#' @inheritParams bw_bins
+#' @return A ggplot object.
+#' @export
+plot_gr_density <- function(gr, x, y, plot_binwidth = 0.05, remove_top = 0, verbose = TRUE, selection = NULL) {
+  clean_gr <- .filter_scatter_data(gr, gr, remove_top, x, y)
+  main_plot <- .density_body(clean_gr$ranges, binwidth = plot_binwidth)
+
+  x_lab <- .make_label_from_object(x)
+  y_lab <- .make_label_from_object(y)
+  params <- mget(c("remove_top", "plot_binwidth"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+
+  labels <- labs(x = x_lab, y = y_lab, caption = caption)
+  main_plot + labels + .theme_default()
+}
+
+
 # Helper plot functions ---------------------------------------------------
 
 #' Helper function for matrix heatmap plot
