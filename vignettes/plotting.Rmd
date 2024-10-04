@@ -380,6 +380,37 @@ Since the matrix is not subsampled only, but the underlying values averaged,
 this may result in a smoothened effect in the image. This is a similar approach
 to how image resizing works.
 
+## Plotting signal over precalculated GRanges
+
+It is possible to plot the values already calculated in a `GRanges` object by
+specifying the metadata columns used. Essentially, anything calculated by
+`bw_loci` and `bw_bins` functions can be passed to `plot_gr` functions:
+
+- `plot_gr_violin`. Makes a violin plot of one or more columns of a `GRanges`
+     object.
+- `plot_gr_scatter`. Makes a scatter plot of two different columns.
+- `plot_gr_density`. Makes a 2d histogram plot of two different columns.
+
+```{r}
+gr <- bw_bins(
+  c(h33_chip, h3k9me3_chip),
+  bin_size = 2000,
+  genome = "mm9",
+  labels = c("H33", "H3K9me3"),
+  selection = locus
+)
+
+plot_gr_scatter(gr, 
+  x = "H33",
+  y = "H3K9me3",
+  remove_top = 0.001
+)
+```
+
+This is useful if you are doing many pairwise combinations of figures, or you
+want to do custom calculations on the bigWig values, especially if the bin size
+is small and you are working with a large amount of data points.
+
 ## Customizing plots
 
 All plotting functions return a `ggplot` object. This means that essentially
