@@ -379,7 +379,7 @@ plot_bw_heatmap <- function(bwfiles, loci,
     y_scale <- scale_y_continuous(breaks = c(1, y_scale_pos),
                                   labels = c(nloci, "1"),
                                   expand = c(0, 0))
-    labels <- labs(title = "Heatmap", x = x_title, y = y_label,
+    labels <- labs(x = x_title, y = y_label,
                    caption = caption,
                    fill = .make_norm_label(norm_mode, bg_bwfile))
     main_plot + .theme_default() + thin_lines + plot_lines + y_scale + labels
@@ -625,7 +625,7 @@ plot_bw_profile <- function(bwfiles, loci,
         warning("Stderr estimate not available when normalizing by input")
         show_error <- FALSE
     }
-    fig_labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
+    fig_labels <- labs(x = x_tit, y = y_lab, caption = caption)
     .profile_body(values, show_error, colors, labels) +
         .heatmap_lines(
           nloci,
