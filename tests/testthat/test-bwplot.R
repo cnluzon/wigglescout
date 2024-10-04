@@ -21,6 +21,12 @@ test_that("plot_gr_density with defaults returns a plot", {
   expect_is(p, "ggplot")
 })
 
+test_that("plot_gr_violin with defaults returns a plot", {
+  gr <- readRDS(testthat::test_path("fixtures", "mini_bins_all.rds"))
+  p <- plot_gr_violin(gr, c("x", "y"))
+  expect_is(p, "ggplot")
+})
+
 # Bins scatter tests ----------------------------------------------
 
 test_that("plot_bw_bins_scatter with defaults returns a plot", {

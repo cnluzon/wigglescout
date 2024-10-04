@@ -727,6 +727,53 @@ plot_gr_density <- function(gr, x, y, plot_binwidth = 0.05, remove_top = 0, verb
   main_plot + labels + .theme_default()
 }
 
+#' Violin plot of a precalculated GRanges object
+#'
+#' Plots a violin plot of bin distribution of a set of bigWig files optionally
+#' overlaid with annotated bins. Bins overlapping loci of the provided BED
+#' file will be shown as a jitter plot on top of the violin plot.
+#'
+#' @param gr Scored GRanges object
+#' @param columns Columns in gr to plot
+#' @param highlight BED file to use as highlight for subgroups.
+#' @param minoverlap Minimum overlap required for a bin to be highlighted.
+#' @param highlight_label Label for the highlighted loci set
+#' @param highlight_colors Array of color values for the highlighted groups.
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @inheritParams bw_bins
+#' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @return A ggplot object.
+#' @export
+plot_gr_violin <- function(gr, columns,
+                           highlight = NULL,
+                           minoverlap = 0L,
+                           highlight_label = NULL,
+                           highlight_colors = NULL,
+                           remove_top = 0,
+                           verbose = TRUE,
+                           selection = NULL) {
+
+
+  clean_gr <- .filter_violin_data(gr, remove_top, columns)
+  main_plot <- .violin_body(clean_gr$ranges,
+                            highlight = highlight,
+                            minoverlap = minoverlap,
+                            highlight_label = highlight_label,
+                            highlight_colors = highlight_colors
+  )
+
+  y_label <- "score"
+  params <- mget(c("minoverlap", "remove_top"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+  labels <- labs(x = "", y = y_label, caption = caption)
+
+  rotate_x <- theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  no_legend <- theme(legend.position = "none")
+
+  main_plot + labels + .theme_default() + rotate_x + no_legend
+}
+
 
 # Helper plot functions ---------------------------------------------------
 
