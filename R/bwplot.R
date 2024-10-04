@@ -639,6 +639,65 @@ plot_bw_profile <- function(bwfiles, loci,
         fig_labels
 }
 
+# Pre-calculated GRanges functions ----------------------------------------
+
+
+#' Scatterplot of a precalculated GRanges object
+#'
+#' Plots a scatter plot from two mcols of a GRanges object files and an optional
+#' set of BED files as highlighted annotations. Bins are highlighted if there is
+#' at least minoverlap base pairs overlap with any loci in BED file.
+#'
+#' If specifying minoverlap, you must take into account the bin_size parameter
+#' and the size of the loci you are providing as BED file.
+#'
+#' This function does not calculate background normalization or anything, you
+#' can do that in the prior call to bw_bins or bw_loci
+#'
+#' @param gr Scored GRanges object
+#' @param x Column in gr corresponding to the x axis
+#' @param y Column in gr corresponding to the y axis.
+#' @param highlight List of bed files to use as highlight for subgroups.
+#' @param minoverlap Minimum overlap required for a bin to be highlighted
+#' @param highlight_label Labels for the highlight groups.
+#'  If not provided, filenames are used.
+#' @param highlight_colors Array of color values for the highlighting groups
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @import ggplot2
+#' @importFrom purrr partial
+#' @inheritParams bw_bins
+#' @return A ggplot object.
+#' @export
+plot_gr_scatter <- function(gr, x, y,
+                            highlight = NULL,
+                            minoverlap = 0L,
+                            highlight_label = NULL,
+                            highlight_colors = NULL,
+                            remove_top = 0,
+                            verbose = TRUE,
+                            selection = NULL) {
+
+  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
+  clean_gr <- .filter_scatter_data(gr, gr, remove_top, x, y)
+
+  main_plot <- .scatterplot_body(
+    clean_gr$ranges,
+    highlight = highlight_data$ranges,
+    highlight_label = highlight_data$labels,
+    highlight_colors = highlight_colors,
+    minoverlap = minoverlap
+  )
+
+  x_lab <- .make_label_from_object(x)
+  y_lab <- .make_label_from_object(y)
+  params <- mget(c("minoverlap", "remove_top"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+
+  labels <- labs(x = x_lab, y = y_lab, caption = caption)
+  main_plot + labels + .theme_default()
+}
+
+
 # Helper plot functions ---------------------------------------------------
 
 #' Helper function for matrix heatmap plot

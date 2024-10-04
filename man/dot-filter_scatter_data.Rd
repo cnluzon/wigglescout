@@ -4,7 +4,7 @@
 \alias{.filter_scatter_data}
 \title{Filter scatterplot data with quantile threshold on both axes}
 \usage{
-.filter_scatter_data(x, y, remove_top)
+.filter_scatter_data(x, y, remove_top, col_x = "score", col_y = "score")
 }
 \arguments{
 \item{x}{GRanges for x axis}
@@ -13,6 +13,10 @@
 
 \item{remove_top}{Return range 0-(1-remove_top). By default returns the
 whole distribution (remove_top == 0).}
+
+\item{col_x}{Name of column in x to filter}
+
+\item{col_y}{Name of column in y to filter}
 }
 \value{
 Named list, where gr is a GRanges object and stats a named list of
