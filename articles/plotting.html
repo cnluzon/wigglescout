@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wigglescout</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.18.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -437,12 +437,51 @@ works.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="plotting-signal-over-precalculated-granges">Plotting signal over precalculated GRanges<a class="anchor" aria-label="anchor" href="#plotting-signal-over-precalculated-granges"></a>
+</h2>
+<p>It is possible to plot the values already calculated in a
+<code>GRanges</code> object by specifying the metadata columns used.
+Essentially, anything calculated by <code>bw_loci</code> and
+<code>bw_bins</code> functions can be passed to <code>plot_gr</code>
+functions:</p>
+<ul>
+<li>
+<code>plot_gr_violin</code>. Makes a violin plot of one or more
+columns of a <code>GRanges</code> object.</li>
+<li>
+<code>plot_gr_scatter</code>. Makes a scatter plot of two different
+columns.</li>
+<li>
+<code>plot_gr_density</code>. Makes a 2d histogram plot of two
+different columns.</li>
+</ul>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bw_bins.html">bw_bins</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">h3k9me3_chip</span><span class="op">)</span>,</span>
+<span>  bin_size <span class="op">=</span> <span class="fl">2000</span>,</span>
+<span>  genome <span class="op">=</span> <span class="st">"mm9"</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H33"</span>, <span class="st">"H3K9me3"</span><span class="op">)</span>,</span>
+<span>  selection <span class="op">=</span> <span class="va">locus</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_gr_scatter.html">plot_gr_scatter</a></span><span class="op">(</span><span class="va">gr</span>, </span>
+<span>  x <span class="op">=</span> <span class="st">"H33"</span>,</span>
+<span>  y <span class="op">=</span> <span class="st">"H3K9me3"</span>,</span>
+<span>  remove_top <span class="op">=</span> <span class="fl">0.001</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="plotting_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
+<p>This is useful if you are doing many pairwise combinations of
+figures, or you want to do custom calculations on the bigWig values,
+especially if the bin size is small and you are working with a large
+amount of data points.</p>
+</div>
+<div class="section level2">
 <h2 id="customizing-plots">Customizing plots<a class="anchor" aria-label="anchor" href="#customizing-plots"></a>
 </h2>
 <p>All plotting functions return a <code>ggplot</code> object. This
 means that essentially you can overlay any other data you want or
 further customize the results. For example:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">profile_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_bw_profile.html">plot_bw_profile</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">h3k9me3_chip</span>, <span class="va">input_chip</span><span class="op">)</span>,</span>
 <span>  loci <span class="op">=</span> <span class="va">genes</span></span>
@@ -451,8 +490,8 @@ further customize the results. For example:</p>
 <span><span class="va">profile_plot</span> <span class="op">+</span> </span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"New title for the plot"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># Add a custom title</span></span>
 <span>  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="co"># Add a horizontal line on y=1</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<p><img src="plotting_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -476,14 +515,14 @@ further customize the results. For example:</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] purrr_1.0.2          wigglescout_0.18.1   rtracklayer_1.64.0  </span></span>
+<span><span class="co">#&gt; [1] purrr_1.0.2          wigglescout_0.19.0   rtracklayer_1.64.0  </span></span>
 <span><span class="co">#&gt; [4] GenomicRanges_1.56.1 GenomeInfoDb_1.40.1  IRanges_2.38.1      </span></span>
 <span><span class="co">#&gt; [7] S4Vectors_0.42.1     BiocGenerics_0.50.0  ggplot2_3.5.1       </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] tidyselect_1.2.1            dplyr_1.1.4                </span></span>
 <span><span class="co">#&gt;  [3] vipor_0.4.7                 farver_2.1.2               </span></span>
-<span><span class="co">#&gt;  [5] Biostrings_2.72.1           bitops_1.0-8               </span></span>
+<span><span class="co">#&gt;  [5] Biostrings_2.72.1           bitops_1.0-9               </span></span>
 <span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16            </span></span>
 <span><span class="co">#&gt;  [9] GenomicAlignments_1.40.0    XML_3.99-0.17              </span></span>
 <span><span class="co">#&gt; [11] digest_0.6.37               lifecycle_1.0.4            </span></span>
@@ -523,7 +562,7 @@ further customize the results. For example:</p>
 <span><span class="co">#&gt; [79] Biobase_2.64.0              lattice_0.22-6             </span></span>
 <span><span class="co">#&gt; [81] highr_0.11                  Rsamtools_2.20.0           </span></span>
 <span><span class="co">#&gt; [83] bslib_0.8.0                 SparseArray_1.4.8          </span></span>
-<span><span class="co">#&gt; [85] xfun_0.47                   fs_1.6.4                   </span></span>
+<span><span class="co">#&gt; [85] xfun_0.48                   fs_1.6.4                   </span></span>
 <span><span class="co">#&gt; [87] MatrixGenerics_1.16.0       pkgconfig_2.0.3</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
