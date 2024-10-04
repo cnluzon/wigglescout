@@ -1,3 +1,13 @@
+# wigglescout 0.19.0 
+
+Date: 04/10/2024
+
+## Features
+
+* New three functions `plot_gr` to plot columns on a precalculated GRanges:
+   `plot_gr_scatter`, `plot_gr_violin`, `plot_gr_density`.
+* Removed uninformative default titles in plots.
+
 # wigglescout 0.18.1
 
 ## Other

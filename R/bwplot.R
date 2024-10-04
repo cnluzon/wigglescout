@@ -379,7 +379,7 @@ plot_bw_heatmap <- function(bwfiles, loci,
     y_scale <- scale_y_continuous(breaks = c(1, y_scale_pos),
                                   labels = c(nloci, "1"),
                                   expand = c(0, 0))
-    labels <- labs(title = "Heatmap", x = x_title, y = y_label,
+    labels <- labs(x = x_title, y = y_label,
                    caption = caption,
                    fill = .make_norm_label(norm_mode, bg_bwfile))
     main_plot + .theme_default() + thin_lines + plot_lines + y_scale + labels
@@ -625,7 +625,7 @@ plot_bw_profile <- function(bwfiles, loci,
         warning("Stderr estimate not available when normalizing by input")
         show_error <- FALSE
     }
-    fig_labels <- labs(title = "Profile", x = x_tit, y = y_lab, caption = caption)
+    fig_labels <- labs(x = x_tit, y = y_lab, caption = caption)
     .profile_body(values, show_error, colors, labels) +
         .heatmap_lines(
           nloci,
@@ -638,6 +638,142 @@ plot_bw_profile <- function(bwfiles, loci,
         ) +
         fig_labels
 }
+
+# Pre-calculated GRanges functions ----------------------------------------
+
+
+#' Scatterplot of a precalculated GRanges object
+#'
+#' Plots a scatter plot from two mcols of a GRanges object files and an optional
+#' set of BED files as highlighted annotations. Bins are highlighted if there is
+#' at least minoverlap base pairs overlap with any loci in BED file.
+#'
+#' If specifying minoverlap, you must take into account the bin_size parameter
+#' and the size of the loci you are providing as BED file.
+#'
+#' This function does not calculate background normalization or anything, you
+#' can do that in the prior call to bw_bins or bw_loci
+#'
+#' @param gr Scored GRanges object
+#' @param x Column in gr corresponding to the x axis
+#' @param y Column in gr corresponding to the y axis.
+#' @param highlight List of bed files to use as highlight for subgroups.
+#' @param minoverlap Minimum overlap required for a bin to be highlighted
+#' @param highlight_label Labels for the highlight groups.
+#'  If not provided, filenames are used.
+#' @param highlight_colors Array of color values for the highlighting groups
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @import ggplot2
+#' @importFrom purrr partial
+#' @inheritParams bw_bins
+#' @return A ggplot object.
+#' @export
+plot_gr_scatter <- function(gr, x, y,
+                            highlight = NULL,
+                            minoverlap = 0L,
+                            highlight_label = NULL,
+                            highlight_colors = NULL,
+                            remove_top = 0,
+                            verbose = TRUE,
+                            selection = NULL) {
+
+  highlight_data <- .convert_and_label_loci(highlight, highlight_label)
+  clean_gr <- .filter_scatter_data(gr, gr, remove_top, x, y)
+
+  main_plot <- .scatterplot_body(
+    clean_gr$ranges,
+    highlight = highlight_data$ranges,
+    highlight_label = highlight_data$labels,
+    highlight_colors = highlight_colors,
+    minoverlap = minoverlap
+  )
+
+  x_lab <- .make_label_from_object(x)
+  y_lab <- .make_label_from_object(y)
+  params <- mget(c("minoverlap", "remove_top"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+
+  labels <- labs(x = x_lab, y = y_lab, caption = caption)
+  main_plot + labels + .theme_default()
+}
+
+
+#' Density plot of a precalculated GRanges object
+#'
+#' Plots a density plot from two mcols of a GRanges object files that were
+#' already calculated using bw_loci or bw_bins
+#'
+#' @param gr Scored GRanges object
+#' @param x Column in gr corresponding to the x axis
+#' @param y Column in gr corresponding to the y axis.
+#' @param plot_binwidth Resolution of the bins in the density histogram
+#'   (different to genomic bin size)
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @import ggplot2
+#' @importFrom purrr partial
+#' @inheritParams bw_bins
+#' @return A ggplot object.
+#' @export
+plot_gr_density <- function(gr, x, y, plot_binwidth = 0.05, remove_top = 0, verbose = TRUE, selection = NULL) {
+  clean_gr <- .filter_scatter_data(gr, gr, remove_top, x, y)
+  main_plot <- .density_body(clean_gr$ranges, binwidth = plot_binwidth)
+
+  x_lab <- .make_label_from_object(x)
+  y_lab <- .make_label_from_object(y)
+  params <- mget(c("remove_top", "plot_binwidth"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+
+  labels <- labs(x = x_lab, y = y_lab, caption = caption)
+  main_plot + labels + .theme_default()
+}
+
+#' Violin plot of a precalculated GRanges object
+#'
+#' Plots a violin plot of bin distribution of a set of bigWig files optionally
+#' overlaid with annotated bins. Bins overlapping loci of the provided BED
+#' file will be shown as a jitter plot on top of the violin plot.
+#'
+#' @param gr Scored GRanges object
+#' @param columns Columns in gr to plot
+#' @param highlight BED file to use as highlight for subgroups.
+#' @param minoverlap Minimum overlap required for a bin to be highlighted.
+#' @param highlight_label Label for the highlighted loci set
+#' @param highlight_colors Array of color values for the highlighted groups.
+#' @param verbose Put a caption with relevant parameters on the plot.
+#' @inheritParams bw_bins
+#' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @return A ggplot object.
+#' @export
+plot_gr_violin <- function(gr, columns,
+                           highlight = NULL,
+                           minoverlap = 0L,
+                           highlight_label = NULL,
+                           highlight_colors = NULL,
+                           remove_top = 0,
+                           verbose = TRUE,
+                           selection = NULL) {
+
+
+  clean_gr <- .filter_violin_data(gr, remove_top, columns)
+  main_plot <- .violin_body(clean_gr$ranges,
+                            highlight = highlight,
+                            minoverlap = minoverlap,
+                            highlight_label = highlight_label,
+                            highlight_colors = highlight_colors
+  )
+
+  y_label <- "score"
+  params <- mget(c("minoverlap", "remove_top"))
+  caption <- .make_caption(params, clean_gr$stats, verbose = verbose)
+  labels <- labs(x = "", y = y_label, caption = caption)
+
+  rotate_x <- theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  no_legend <- theme(legend.position = "none")
+
+  main_plot + labels + .theme_default() + rotate_x + no_legend
+}
+
 
 # Helper plot functions ---------------------------------------------------
 

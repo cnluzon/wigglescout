@@ -19,6 +19,8 @@
 #'
 #' @param x GRanges for x axis
 #' @param y GRanges for y axis
+#' @param col_x Name of column in x to filter
+#' @param col_y Name of column in y to filter
 #' @param remove_top Return range 0-(1-remove_top). By default returns the
 #'     whole distribution (remove_top == 0).
 #'
@@ -27,12 +29,12 @@
 #'    on the x axis. filtered.x: number of points that were higher than the
 #'    threshold on the x axis. quant.x: Quantile used as a threhsold on the x
 #'    axis. Same for the y values.
-.filter_scatter_data <- function(x, y, remove_top) {
-    clean_x <- .remove_top_by_mean(x, remove_top, c("score"))
-    clean_y <- .remove_top_by_mean(y, remove_top, c("score"))
+.filter_scatter_data <- function(x, y, remove_top, col_x = "score", col_y = "score") {
+    clean_x <- .remove_top_by_mean(x, remove_top, c(col_x))
+    clean_y <- .remove_top_by_mean(y, remove_top, c(col_y))
 
     clean_gr <- .granges_left_join(
-        list(clean_x$ranges[, "score"], clean_y$ranges[, "score"]),
+        list(clean_x$ranges[, col_x], clean_y$ranges[, col_y]),
         c("x", "y")
     )
 
