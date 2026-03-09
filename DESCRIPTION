@@ -40,7 +40,6 @@ Imports:
   ggrastr
 Suggests: 
   testthat,
-  mockery,
   knitr,
   future,
   rmarkdown,
