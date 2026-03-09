@@ -136,13 +136,13 @@ test_that("plot_bw_bins_scatter with density prints a deprecation message", {
 
 # Bins density tests ---------------------------------------------
 
-test_that("plot_bw_bins_density with defaults returns a plot with tile layer", {
+test_that("plot_bw_bins_density with defaults returns a plot with bin2d layer", {
   bw1 <- local_file("bw1.bw")
   bw2 <- local_file("bw2.bw")
   with_mocked_bindings(bw_bins = make_mock_bins(), {
     p <- plot_bw_bins_density(bw1, bw2)
     expect_is(p, "ggplot")
-    expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    expect_true("geom_bin_2d" %in% (p@layers %>% names()))
   })
 })
 
@@ -154,7 +154,7 @@ test_that("plot_bw_bins_density with verbose set to false returns a plot with no
     p <- plot_bw_bins_density(bw1, bw2, verbose = FALSE)
     expect_is(p, "ggplot")
     expect_true(is.null(p$labels$caption))
-    expect_true("GeomTile" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    expect_true("geom_bin_2d" %in% (p@layers %>% names()))
   })
 })
 
