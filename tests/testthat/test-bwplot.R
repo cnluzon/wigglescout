@@ -444,7 +444,7 @@ test_that("plot_bw_profile with defaults has a line layer", {
   with_mocked_bindings(bw_profile = make_mock_profile(), {
     p <- plot_bw_profile(c(bw1, bw2), loci = bed)
     expect_is(p, "ggplot")
-    expect_true("GeomLine" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    expect_true("geom_line" %in% (p@layers %>% names()))
   })
 })
 
@@ -457,7 +457,7 @@ test_that("plot_bw_profile with show_error has a ribbon layer", {
   with_mocked_bindings(bw_profile = make_mock_profile(), {
     p <- plot_bw_profile(c(bw1, bw2), loci = bed, show_error=TRUE)
     expect_is(p, "ggplot")
-    expect_true("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    expect_true("geom_ribbon" %in% (p@layers %>% names()))
   })
 })
 
@@ -472,7 +472,7 @@ test_that("plot_bw_profile with show_error and background does not have ribbon l
                    "Stderr estimate not available when normalizing by input")
 
     expect_is(p, "ggplot")
-    expect_false("GeomRibbon" %in% sapply(p$layers, function(x) class(x$geom)[1]))
+    expect_false("geom_ribbon" %in% (p@layers %>% names()))
   })
 })
 
