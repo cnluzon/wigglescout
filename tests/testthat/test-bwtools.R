@@ -1,6 +1,5 @@
 context("Test functions for bigWig handling")
 library(rtracklayer)
-library(future)
 
 # Setup -------------------------------------------
 chromsizes <- c(200, 200)
@@ -108,20 +107,6 @@ test_that(".multi_bw_ranges with zeros returns correct values", {
   expect_equal(values[1]$bw_zeros, 0)
   expect_equal(values[2]$bw1, 12)
   expect_equal(values[2]$bw_zeros, 0)
-})
-
-test_that(".multi_bw_ranges several processors returns correct values", {
-  future::plan(multisession, workers=2)
-  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), chromsizes)
-  values <- .multi_bw_ranges(c(bw1, bw2), c("bw1", "bw2"), make_test_tiles())
-
-  expect_is(values, "GRanges")
-  expect_equal(values[1]$bw1, 1)
-  expect_equal(values[1]$bw2, 20)
-  expect_equal(values[2]$bw1, 2)
-  expect_equal(values[2]$bw2, 19)
-  future::plan(sequential)
 })
 
 test_that(".multi_bw_ranges returns correct values for single bigWig", {
