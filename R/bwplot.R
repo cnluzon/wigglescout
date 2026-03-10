@@ -813,17 +813,12 @@ plot_gr_violin <- function(gr, columns,
       labels <- unique(values$sample)
     }
 
-    labels_short <- sapply(labels, .trunc_str)
-
     values <- values %>%
       mutate(
         min_error = .data$mean - .data$sderror,
         max_error = .data$mean + .data$sderror,
         sample = factor(.data$sample, levels = labels)
       )
-
-    # The first step reorders, this one renames if needed
-    levels(values$sample) <- labels_short
 
     p <- ggplot(
         values,
