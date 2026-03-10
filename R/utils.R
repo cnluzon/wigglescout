@@ -336,9 +336,9 @@
       )
       # This is really the only way to guarantee different labels, truncating
       # from other anchor points does not cover all possible cases
-      unique_labels_df <- data.frame(id = labels_short) |>
-        group_by(id) |>
-        mutate(label = paste(id, row_number(), sep = "_"))
+      unique_labels_df <- data.frame("id" = labels_short) |>
+        group_by(.data$id) |>
+        mutate(label = paste(.data$id, row_number(), sep = "_"))
       labels_short <- unique_labels_df$label
 
     }
@@ -347,7 +347,7 @@
 
 #' Test if an array has repeated element
 #'
-#' @param array
+#' @param array An array of char
 #'
 #' @returns TRUE if all elements in the array are unique
 .repeated_elements <- function(array) {
