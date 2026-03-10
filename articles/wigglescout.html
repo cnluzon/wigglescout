@@ -8,8 +8,8 @@
 <title>Wigglescout • wigglescout</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Wigglescout">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wigglescout</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -149,7 +149,7 @@ are distributed overall in your bigwig files, genome-wide:</p>
 <span>  remove_top <span class="op">=</span> <span class="fl">0.001</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span> <span class="co"># Plot can be subset to a certain GRanges.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
 <p>For transparency and reproducibility, plots show relevant underlying
 values by default, such as parameters used and calculated values: how
 many <code>NA</code> values were found, if any, how many points were
@@ -174,7 +174,7 @@ can do so providing a <code>highlight</code> parameter:</p>
 <span>  highlight <span class="op">=</span> <span class="va">genes</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span> <span class="co"># Plot can be subset to a certain GRanges.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
 <p>Here you see highlighted the bins that overlap with the loci in the
 <code>genes</code> file.</p>
 <p>You could also want to pairwise compare the bins. You can do so by
@@ -189,7 +189,7 @@ plotting a scatterplot:</p>
 <span>  highlight_label <span class="op">=</span> <span class="st">"Genes"</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span> <span class="co"># Plot can be subset to a certain GRanges.</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 <p>In real cases where you are plotting the full genome-wide set of
 bins, which can be in the tens or hundreds of thousands data points,
 there can be a lot of overplotting and it might be difficult to see
@@ -202,7 +202,7 @@ histogram instead:</p>
 <span>  bin_size <span class="op">=</span> <span class="fl">20000</span>,</span>
 <span>  plot_binwidth <span class="op">=</span> <span class="fl">0.05</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 <p>You may be interested in looking at the signal just at the genes
 instead:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -211,7 +211,7 @@ instead:</p>
 <span>  <span class="va">h3k9me3_chip</span>,</span>
 <span>  loci <span class="op">=</span> <span class="va">genes</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 <p>You can also check how these two signal behave globally in a more
 meaningful way, i.e. in relation with genomic annotations. You can do
 this with <code>bw_loci_summary_heatmap</code>:</p>
@@ -238,7 +238,7 @@ this with <code>bw_loci_summary_heatmap</code>:</p>
 <span>  loci <span class="op">=</span> <span class="va">chromhmm</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H33"</span>, <span class="st">"H3K9me3"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
 <p>In a more detailed way, you can look at the signal profile at the
 given genes, using <code>plot_bw_profile</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -247,7 +247,7 @@ given genes, using <code>plot_bw_profile</code>:</p>
 <span>  loci <span class="op">=</span> <span class="va">genes</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H3.3"</span>, <span class="st">"H3K9me3"</span>, <span class="st">"Input"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
 <p>Still, these profiles are an average of 28 loci. So you may be
 interested in looking at the individual profiles, which you can do with
 a heatmap view:</p>
@@ -256,7 +256,7 @@ a heatmap view:</p>
 <span>  <span class="va">h33_chip</span>,</span>
 <span>  loci <span class="op">=</span> <span class="va">genes</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wigglescout_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
+<p><img src="wigglescout_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
 <p>In a nutshell, these are the type of things you can do with
 <code>wigglescout</code>. Each of these functions have many parameters
 that allow you to fine tune the results. You can look at that in more
@@ -286,80 +286,24 @@ bins, if only of different lengths and labeled with categories. Keep
 this in mind when plotting a large set of bigWig files. It will take
 some time as well.</p>
 <div class="section level3">
-<h3 id="using-multiple-processors">Using multiple processors<a class="anchor" aria-label="anchor" href="#using-multiple-processors"></a>
+<h3 id="note-on-parallel-processing">Note on parallel processing<a class="anchor" aria-label="anchor" href="#note-on-parallel-processing"></a>
 </h3>
-<p>As of version 0.2.0, <code>wigglescout</code> core functions support
-<code>future</code> specifications using <code>furrr</code> library.
-This means you can run the code in multiple R sessions:</p>
+<p>As of version 0.20.0, <code>wigglescout</code> dropped its
+<code>future</code> and <code>furrr</code> dependencies in favor of
+<code>purrr</code> equivalents due to some issues with mapping the
+partial functions in <code>future</code> versions after 1.34.0, and the
+fact that in general this multiprocessing was not being used a lot. It
+might be reinstated if I find a better solution for the mapping of the
+functions.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># You just have to set the plan</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Then run the functions just the same</span></span>
-<span><span class="fu"><a href="../reference/bw_bins.html">bw_bins</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">input_chip</span><span class="op">)</span>,</span>
-<span>        bin_size <span class="op">=</span> <span class="fl">50000</span>,</span>
-<span>        genome <span class="op">=</span> <span class="st">"mm9"</span>,</span>
-<span>        selection <span class="op">=</span> <span class="va">locus</span>,</span>
-<span>        norm_mode <span class="op">=</span> <span class="st">"log2fc"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; GRanges object with 11 ranges and 2 metadata columns:</span></span>
-<span><span class="co">#&gt;        seqnames              ranges strand | sample_H33_ChIP sample_Input</span></span>
-<span><span class="co">#&gt;           &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; |       &lt;numeric&gt;    &lt;numeric&gt;</span></span>
-<span><span class="co">#&gt;    [1]    chr15 102550001-102600000      * |        1.423578     0.920439</span></span>
-<span><span class="co">#&gt;    [2]    chr15 102600001-102650000      * |        1.166658     1.054456</span></span>
-<span><span class="co">#&gt;    [3]    chr15 102650001-102700000      * |        0.734975     1.033551</span></span>
-<span><span class="co">#&gt;    [4]    chr15 102700001-102750000      * |        0.930566     1.028487</span></span>
-<span><span class="co">#&gt;    [5]    chr15 102750001-102800000      * |        3.198913     1.050770</span></span>
-<span><span class="co">#&gt;    [6]    chr15 102800001-102850000      * |        2.064035     1.053755</span></span>
-<span><span class="co">#&gt;    [7]    chr15 102850001-102900000      * |        2.240118     1.053838</span></span>
-<span><span class="co">#&gt;    [8]    chr15 102900001-102950000      * |        1.246168     1.140229</span></span>
-<span><span class="co">#&gt;    [9]    chr15 102950001-103000000      * |        2.212256     1.198468</span></span>
-<span><span class="co">#&gt;   [10]    chr15 103000001-103050000      * |        3.816928     1.136733</span></span>
-<span><span class="co">#&gt;   [11]    chr15 103050001-103100000      * |        3.168476     1.092466</span></span>
-<span><span class="co">#&gt;   -------</span></span>
-<span><span class="co">#&gt;   seqinfo: 35 sequences from an unspecified genome; no seqlengths</span></span></code></pre></div>
-<p>It is advised against implementing future planning within library
-function according to <a href="https://www.rdocumentation.org/packages/future/versions/1.21.0/topics/plan" class="external-link"><code>future</code>
-documentation</a>:</p>
-<blockquote>
-<p>Please refrain from modifying the future strategy inside your
-packages / functions, i.e. do not call plan() in your code. Instead,
-leave the control on what backend to use to the end user. This idea is
-part of the core philosophy of the future framework - as a developer you
-can never know what future backends the user have access to. Moreover,
-by not making any assumptions about what backends are available, your
-code will also work automatically with any new backends developed after
-you wrote your code.</p>
-</blockquote>
-</div>
-<div class="section level3">
-<h3 id="how-to-find-the-best-configuration">How to find the best configuration<a class="anchor" aria-label="anchor" href="#how-to-find-the-best-configuration"></a>
-</h3>
-<p>Parallelization in <code>wigglescout</code> setting is based on the
-fact that operations on multiple files are done separately and
-independently of each other. However, doing this requires some passing
-of data back and forth, which means that if your bigWig files are large
-(or the results you get from them, for instance, big
-<code>GRanges</code> objects), or you don’t have many, you may suffer
-the overhead without getting any benefit from it.</p>
-<p>An easy rule of thumb is: swap from <code>sequential</code> (which is
-the default) to <code>multisession</code> if you are running functions
-on multiple files at once. It seems like there is benefit to do this
-pretty much for any number of files larger than one.</p>
-<p>However, adding more sessions does not seem to help a lot. Best guess
-is going for 2 or 4 workers. With 2 workers you already see a
-considerable reduction in time.</p>
-<p>My expectation is that <code>multicore</code> may be faster. However
-I have not benchmarked it, as it does not run within Rstudio.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -375,56 +319,51 @@ I have not benchmarked it, as it does not run within Rstudio.</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] future_1.34.0        purrr_1.0.2          wigglescout_0.19.0  </span></span>
-<span><span class="co">#&gt;  [4] rtracklayer_1.64.0   GenomicRanges_1.56.1 GenomeInfoDb_1.40.1 </span></span>
-<span><span class="co">#&gt;  [7] IRanges_2.38.1       S4Vectors_0.42.1     BiocGenerics_0.50.0 </span></span>
-<span><span class="co">#&gt; [10] ggplot2_3.5.1       </span></span>
+<span><span class="co">#&gt; [1] wigglescout_0.20.0   rtracklayer_1.70.1   GenomicRanges_1.62.1</span></span>
+<span><span class="co">#&gt; [4] Seqinfo_1.0.0        IRanges_2.44.0       S4Vectors_0.48.0    </span></span>
+<span><span class="co">#&gt; [7] BiocGenerics_0.56.0  generics_0.1.4       ggplot2_4.0.2       </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] tidyselect_1.2.1            dplyr_1.1.4                </span></span>
-<span><span class="co">#&gt;  [3] vipor_0.4.7                 farver_2.1.2               </span></span>
-<span><span class="co">#&gt;  [5] Biostrings_2.72.1           bitops_1.0-9               </span></span>
-<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16            </span></span>
-<span><span class="co">#&gt;  [9] GenomicAlignments_1.40.0    XML_3.99-0.17              </span></span>
-<span><span class="co">#&gt; [11] digest_0.6.37               lifecycle_1.0.4            </span></span>
-<span><span class="co">#&gt; [13] Cairo_1.6-2                 magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt; [15] compiler_4.4.1              rlang_1.1.4                </span></span>
-<span><span class="co">#&gt; [17] sass_0.4.9                  tools_4.4.1                </span></span>
-<span><span class="co">#&gt; [19] utf8_1.2.4                  yaml_2.3.10                </span></span>
-<span><span class="co">#&gt; [21] knitr_1.48                  S4Arrays_1.4.1             </span></span>
-<span><span class="co">#&gt; [23] labeling_0.4.3              curl_5.2.3                 </span></span>
-<span><span class="co">#&gt; [25] DelayedArray_0.30.1         RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt; [27] abind_1.4-8                 BiocParallel_1.38.0        </span></span>
-<span><span class="co">#&gt; [29] withr_3.0.1                 desc_1.4.3                 </span></span>
-<span><span class="co">#&gt; [31] grid_4.4.1                  fansi_1.0.6                </span></span>
-<span><span class="co">#&gt; [33] colorspace_2.1-1            globals_0.16.3             </span></span>
-<span><span class="co">#&gt; [35] scales_1.3.0                SummarizedExperiment_1.34.0</span></span>
-<span><span class="co">#&gt; [37] cli_3.6.3                   rmarkdown_2.28             </span></span>
-<span><span class="co">#&gt; [39] crayon_1.5.3                ragg_1.3.3                 </span></span>
-<span><span class="co">#&gt; [41] generics_0.1.3              httr_1.4.7                 </span></span>
-<span><span class="co">#&gt; [43] rjson_0.2.23                ggbeeswarm_0.7.2           </span></span>
-<span><span class="co">#&gt; [45] cachem_1.1.0                stringr_1.5.1              </span></span>
-<span><span class="co">#&gt; [47] zlibbioc_1.50.0             parallel_4.4.1             </span></span>
-<span><span class="co">#&gt; [49] ggrastr_1.0.2               XVector_0.44.0             </span></span>
-<span><span class="co">#&gt; [51] restfulr_0.0.15             matrixStats_1.4.1          </span></span>
-<span><span class="co">#&gt; [53] vctrs_0.6.5                 Matrix_1.7-0               </span></span>
-<span><span class="co">#&gt; [55] jsonlite_1.8.9              beeswarm_0.4.0             </span></span>
-<span><span class="co">#&gt; [57] listenv_0.9.1               systemfonts_1.1.0          </span></span>
-<span><span class="co">#&gt; [59] jquerylib_0.1.4             tidyr_1.3.1                </span></span>
-<span><span class="co">#&gt; [61] glue_1.8.0                  parallelly_1.38.0          </span></span>
-<span><span class="co">#&gt; [63] pkgdown_2.1.1               codetools_0.2-20           </span></span>
-<span><span class="co">#&gt; [65] stringi_1.8.4               gtable_0.3.5               </span></span>
-<span><span class="co">#&gt; [67] BiocIO_1.14.0               UCSC.utils_1.0.0           </span></span>
-<span><span class="co">#&gt; [69] munsell_0.5.1               tibble_3.2.1               </span></span>
-<span><span class="co">#&gt; [71] pillar_1.9.0                furrr_0.3.1                </span></span>
-<span><span class="co">#&gt; [73] htmltools_0.5.8.1           GenomeInfoDbData_1.2.12    </span></span>
-<span><span class="co">#&gt; [75] R6_2.5.1                    textshaping_0.4.0          </span></span>
-<span><span class="co">#&gt; [77] evaluate_1.0.0              Biobase_2.64.0             </span></span>
-<span><span class="co">#&gt; [79] lattice_0.22-6              highr_0.11                 </span></span>
-<span><span class="co">#&gt; [81] Rsamtools_2.20.0            bslib_0.8.0                </span></span>
-<span><span class="co">#&gt; [83] SparseArray_1.4.8           xfun_0.48                  </span></span>
-<span><span class="co">#&gt; [85] fs_1.6.4                    MatrixGenerics_1.16.0      </span></span>
-<span><span class="co">#&gt; [87] pkgconfig_2.0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] SummarizedExperiment_1.40.0 beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt;  [3] gtable_0.3.6                rjson_0.2.23               </span></span>
+<span><span class="co">#&gt;  [5] xfun_0.56                   bslib_0.10.0               </span></span>
+<span><span class="co">#&gt;  [7] Biobase_2.70.0              lattice_0.22-7             </span></span>
+<span><span class="co">#&gt;  [9] Cairo_1.7-0                 vctrs_0.7.1                </span></span>
+<span><span class="co">#&gt; [11] tools_4.5.2                 bitops_1.0-9               </span></span>
+<span><span class="co">#&gt; [13] curl_7.0.0                  parallel_4.5.2             </span></span>
+<span><span class="co">#&gt; [15] tibble_3.3.1                pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt; [17] Matrix_1.7-4                RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt; [19] cigarillo_1.0.0             S7_0.2.1                   </span></span>
+<span><span class="co">#&gt; [21] desc_1.4.3                  lifecycle_1.0.5            </span></span>
+<span><span class="co">#&gt; [23] stringr_1.6.0               compiler_4.5.2             </span></span>
+<span><span class="co">#&gt; [25] farver_2.1.2                Rsamtools_2.26.0           </span></span>
+<span><span class="co">#&gt; [27] textshaping_1.0.5           Biostrings_2.78.0          </span></span>
+<span><span class="co">#&gt; [29] codetools_0.2-20            vipor_0.4.7                </span></span>
+<span><span class="co">#&gt; [31] GenomeInfoDb_1.46.2         htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt; [33] sass_0.4.10                 RCurl_1.98-1.17            </span></span>
+<span><span class="co">#&gt; [35] yaml_2.3.12                 tidyr_1.3.2                </span></span>
+<span><span class="co">#&gt; [37] pillar_1.11.1               pkgdown_2.2.0              </span></span>
+<span><span class="co">#&gt; [39] crayon_1.5.3                jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [41] BiocParallel_1.44.0         cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [43] DelayedArray_0.36.0         abind_1.4-8                </span></span>
+<span><span class="co">#&gt; [45] tidyselect_1.2.1            digest_0.6.39              </span></span>
+<span><span class="co">#&gt; [47] stringi_1.8.7               purrr_1.2.1                </span></span>
+<span><span class="co">#&gt; [49] dplyr_1.2.0                 restfulr_0.0.16            </span></span>
+<span><span class="co">#&gt; [51] labeling_0.4.3              fastmap_1.2.0              </span></span>
+<span><span class="co">#&gt; [53] grid_4.5.2                  SparseArray_1.10.9         </span></span>
+<span><span class="co">#&gt; [55] cli_3.6.5                   magrittr_2.0.4             </span></span>
+<span><span class="co">#&gt; [57] S4Arrays_1.10.1             XML_3.99-0.22              </span></span>
+<span><span class="co">#&gt; [59] withr_3.0.2                 UCSC.utils_1.6.1           </span></span>
+<span><span class="co">#&gt; [61] scales_1.4.0                ggbeeswarm_0.7.3           </span></span>
+<span><span class="co">#&gt; [63] rmarkdown_2.30              XVector_0.50.0             </span></span>
+<span><span class="co">#&gt; [65] httr_1.4.8                  matrixStats_1.5.0          </span></span>
+<span><span class="co">#&gt; [67] ragg_1.5.1                  evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt; [69] ggrastr_1.0.2               knitr_1.51                 </span></span>
+<span><span class="co">#&gt; [71] BiocIO_1.20.0               rlang_1.1.7                </span></span>
+<span><span class="co">#&gt; [73] glue_1.8.0                  jsonlite_2.0.0             </span></span>
+<span><span class="co">#&gt; [75] R6_2.6.1                    MatrixGenerics_1.22.0      </span></span>
+<span><span class="co">#&gt; [77] GenomicAlignments_1.46.0    systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt; [79] fs_1.6.7</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -438,7 +377,7 @@ I have not benchmarked it, as it does not run within Rstudio.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

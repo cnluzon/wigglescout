@@ -1,0 +1,290 @@
+`wigglescout` is an R library that allows you to calculate summary
+values across bigWig files and BED files and visualize them in a
+genomics-relevant manner. It is based on broadly used libraries such as
+`rtracklayer` and `GenomicRanges`, among others for calculation, and
+mostly `ggplot2` for visualization. You can look at the `DESCRIPTION`
+file to get more information about all the libraries that make this one
+possible.
+
+There are also many other tools whose functionality overlaps a little or
+much with `wigglescout`, but there was no single tool that included all
+that I needed. The aim of this library is therefore not to replace any
+of those tools, or to provide a silver-bullet solution to genomics data
+analysis, but to provide a comprehensive, yet simple enough set of tools
+focused on bigWig files that can be used entirely from the R environment
+without switching back and forth across tools.
+
+Other tools and libraries for akin purposes that you may be looking for
+include: `deepTools`, `SeqPlots`, `bwtool`, `wiggletools`, and the list
+is endless!
+
+`wigglescout` allows you to summarize and visualize the contents of
+bigWig files in two main ways:
+
+- **Genome-wide**. Genome is partitioned on equally-sized bins and their
+  aggregated value is calculated. Useful to get a general idea of the
+  signal distribution without looking at specific places.
+- **Across sets of *loci***. This can be either summarized categories,
+  or individual values, as in genome-wide analyses.
+
+`wigglescout` functionality is built in two layers. Names of functions
+that calculate values over bigWig files start with `bw_`. These return
+`GRanges` objects when possible, `data.frame` objects otherwise
+(i.e. when values are summarized over some category, genomic location is
+lost in this process).
+
+On the other hand, functions that plot such values and that usually make
+internal use of `bw_` functions, start with `plot_`.
+
+## Installation
+
+`wigglescout` is a package under active development. You can install it
+from this repository. For this, you will need `remotes` to install it
+(and `devtools` if you plan to work on it):
+
+``` R
+install.packages(c('devtools', 'remotes'))
+```
+
+Additionally, there was an issue in the past with installing
+dependencies that come from `BioConductor` repository. This seems to
+have been fixed now, but if you run into problems, I recommend
+installing manually these dependencies before running the installation:
+
+``` R
+install.packages(('BiocManager'))
+BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
+```
+
+Then you can install directly from this GitHub repository:
+
+``` R
+library(remotes)
+remotes::install_github('cnluzon/wigglescout', build_vignettes = TRUE)
+```
+
+## Getting started
+
+The vignettes or [online
+documentation](https://cnluzon.github.io/wigglescout/) can give a
+comprehensive overview of what is available in the package. You can
+check the vignettes with `browseVignettes("wigglescout")`.
+
+## Troubleshooting
+
+**Q**: When running `install_github` I get the following error:
+
+``` R
+Error: package or namespace load failed for ‘GenomeInfoDb’ in loadNamespace(i, c(lib.loc, .libPaths()), versionCheck = vI[[i]]):
+there is no package called ‘GenomeInfoDbData’
+Error: package ‘GenomeInfoDb’ could not be loaded
+Execution halted
+```
+
+**A**: This seemed to be a problem that came from installing
+`Bioconductor` dependencies. A workaround is installing the
+`BioConductor` packages manually:
+
+``` R
+if (!requireNamespace('BiocManager', quietly = TRUE))
+    install.packages('BiocManager')
+
+BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
+```
+
+# Package index
+
+## All functions
+
+- [`bed_to_bw()`](https://cnluzon.github.io/wigglescout/reference/bed_to_bw.md)
+  : Parse a scored BED file and exports a bigWig file with given
+  chromsizes
+- [`build_bins()`](https://cnluzon.github.io/wigglescout/reference/build_bins.md)
+  : Build a unscored bins GRanges object.
+- [`build_bins_bw()`](https://cnluzon.github.io/wigglescout/reference/build_bins_bw.md)
+  : Build a tiles GRanges out of a bigWig file on a given bin size.
+- [`bw_bins()`](https://cnluzon.github.io/wigglescout/reference/bw_bins.md)
+  : Build a binned-scored GRanges object from a set of bigWig files
+- [`bw_global_coverage()`](https://cnluzon.github.io/wigglescout/reference/bw_global_coverage.md)
+  : Calculate bigWig global coverage.
+- [`bw_heatmap()`](https://cnluzon.github.io/wigglescout/reference/bw_heatmap.md)
+  : Calculate heatmap matrix of a bigWig file over a GRanges or BED file
+- [`bw_loci()`](https://cnluzon.github.io/wigglescout/reference/bw_loci.md)
+  : Score a bigWig file list and a BED file or GRanges object.
+- [`bw_profile()`](https://cnluzon.github.io/wigglescout/reference/bw_profile.md)
+  : Calculate profile values of a bigWig file over a BED file.
+- [`.aggregate_scores()`](https://cnluzon.github.io/wigglescout/reference/dot-aggregate_scores.md)
+  : Aggregate scores of a GRanges object on a field
+- [`.bw_ranges()`](https://cnluzon.github.io/wigglescout/reference/dot-bw_ranges.md)
+  : Score a GRanges object against a BigWig file
+- [`.calculate_bw_profile()`](https://cnluzon.github.io/wigglescout/reference/dot-calculate_bw_profile.md)
+  : Calculate profile values of a bigWig file over GRanges object.
+- [`.calculate_matrix_norm()`](https://cnluzon.github.io/wigglescout/reference/dot-calculate_matrix_norm.md)
+  : Calculate a normalized heatmap matrix for a bigWig file over a BED
+  file
+- [`.calculate_stretch_matrix()`](https://cnluzon.github.io/wigglescout/reference/dot-calculate_stretch_matrix.md)
+  : Calculate matrix for stretch mode
+- [`.color_limits()`](https://cnluzon.github.io/wigglescout/reference/dot-color_limits.md)
+  : Calculate color limits from a value matrix and provided parameters
+- [`.colorscale()`](https://cnluzon.github.io/wigglescout/reference/dot-colorscale.md)
+  : Summary heatmap colorscale.
+- [`.convert_and_label_loci()`](https://cnluzon.github.io/wigglescout/reference/dot-convert_and_label_loci.md)
+  : Internal processing of loci sets and labels.
+- [`.density_body()`](https://cnluzon.github.io/wigglescout/reference/dot-density_body.md)
+  : Density 2d histogram plot
+- [`.fetch_bigwig()`](https://cnluzon.github.io/wigglescout/reference/dot-fetch_bigwig.md)
+  : Make a BigWigFile object out of a path or an URL
+- [`.filter_scatter_data()`](https://cnluzon.github.io/wigglescout/reference/dot-filter_scatter_data.md)
+  : Filter scatterplot data with quantile threshold on both axes
+- [`.filter_violin_data()`](https://cnluzon.github.io/wigglescout/reference/dot-filter_violin_data.md)
+  : Filter violin plot data with quantile threshold
+- [`.get_wrapper_parameter_values()`](https://cnluzon.github.io/wigglescout/reference/dot-get_wrapper_parameter_values.md)
+  : Get matching parameters of a target function with current context
+- [`.granges_left_join()`](https://cnluzon.github.io/wigglescout/reference/dot-granges_left_join.md)
+  : GRanges left join operation
+- [`.heatmap_body()`](https://cnluzon.github.io/wigglescout/reference/dot-heatmap_body.md)
+  : Helper function for matrix heatmap plot
+- [`.heatmap_lines()`](https://cnluzon.github.io/wigglescout/reference/dot-heatmap_lines.md)
+  : Helper function for calculating guide lines and labels in heatmap
+- [`.intersect_bw_and_granges()`](https://cnluzon.github.io/wigglescout/reference/dot-intersect_bw_and_granges.md)
+  : Intersect a BigWig file over loci on a GRanges object
+- [`.is_multiple_loci()`](https://cnluzon.github.io/wigglescout/reference/dot-is_multiple_loci.md)
+  : Check if a variable contains a list of things or array of
+  potentially file names
+- [`.key_value_string()`](https://cnluzon.github.io/wigglescout/reference/dot-key_value_string.md)
+  : Make a string out of a named list.
+- [`.label_multiple_loci()`](https://cnluzon.github.io/wigglescout/reference/dot-label_multiple_loci.md)
+  : Label loci with a list of labels
+- [`.limited_size_caption_line()`](https://cnluzon.github.io/wigglescout/reference/dot-limited_size_caption_line.md)
+  : Make a string out of a named list. Split into lines if too wide.
+- [`.loci_length()`](https://cnluzon.github.io/wigglescout/reference/dot-loci_length.md)
+  : Checks how many loci
+- [`.loci_to_granges()`](https://cnluzon.github.io/wigglescout/reference/dot-loci_to_granges.md)
+  : Processes a loci and returns a GRanges object. Removes anything that
+  is not a name field
+- [`.make_caption()`](https://cnluzon.github.io/wigglescout/reference/dot-make_caption.md)
+  : Make a string to put as caption in verbose mode. Includes system
+  date.
+- [`.make_label_from_object()`](https://cnluzon.github.io/wigglescout/reference/dot-make_label_from_object.md)
+  : Get a valid label
+- [`.make_norm_file_label()`](https://cnluzon.github.io/wigglescout/reference/dot-make_norm_file_label.md)
+  : Generate a human-readable normalization function string including
+- [`.make_norm_label()`](https://cnluzon.github.io/wigglescout/reference/dot-make_norm_label.md)
+  : Generate a human-readable normalization function string
+- [`.match_seqnames()`](https://cnluzon.github.io/wigglescout/reference/dot-match_seqnames.md)
+  : Match seqname lists and throws the relevant warning
+- [`.multi_bw_ranges()`](https://cnluzon.github.io/wigglescout/reference/dot-multi_bw_ranges.md)
+  : Intersect a list of bigWig files with a GRanges object
+- [`.multi_bw_ranges_aggregated()`](https://cnluzon.github.io/wigglescout/reference/dot-multi_bw_ranges_aggregated.md)
+  : Intersect a list of bigWig files with a GRanges object and aggregate
+  by name
+- [`.multi_bw_ranges_norm()`](https://cnluzon.github.io/wigglescout/reference/dot-multi_bw_ranges_norm.md)
+  : Intersect a list of bigWig files with a GRanges object (with
+  background)
+- [`.multi_ranges_overlap()`](https://cnluzon.github.io/wigglescout/reference/dot-multi_ranges_overlap.md)
+  : Calculate overlap of one GRanges with a main GRanges object
+- [`.natural_sort_by_field()`](https://cnluzon.github.io/wigglescout/reference/dot-natural_sort_by_field.md)
+  : Take a column of a data frame to use as row names, drop such column
+  and reorder the data frame so row names follow natural order.
+- [`.preprocess_heatmap_matrix()`](https://cnluzon.github.io/wigglescout/reference/dot-preprocess_heatmap_matrix.md)
+  : Preprocess heatmap values for plotting
+- [`.process_norm_mode()`](https://cnluzon.github.io/wigglescout/reference/dot-process_norm_mode.md)
+  : Get a function out of a norm mode string.
+- [`.profile_body()`](https://cnluzon.github.io/wigglescout/reference/dot-profile_body.md)
+  : Helper function plots a profile from a dataframe
+- [`.profile_breaks()`](https://cnluzon.github.io/wigglescout/reference/dot-profile_breaks.md)
+  : Compute where the break ticks go in heatmap and profile
+- [`.profile_labels()`](https://cnluzon.github.io/wigglescout/reference/dot-profile_labels.md)
+  : Make profile labels
+- [`.remove_top_by_mean()`](https://cnluzon.github.io/wigglescout/reference/dot-remove_top_by_mean.md)
+  : Remove top loci in a GRanges column by mean of specified values
+- [`.round_ignore_null()`](https://cnluzon.github.io/wigglescout/reference/dot-round_ignore_null.md)
+  : Round a value. If it's NULL, returns NULL.
+- [`.scatterplot_body()`](https://cnluzon.github.io/wigglescout/reference/dot-scatterplot_body.md)
+  : Scatterplot of values in a GRanges object with mcols x and y
+- [`.summarize_matrix()`](https://cnluzon.github.io/wigglescout/reference/dot-summarize_matrix.md)
+  : Summarize a intersect_bw_and_granges matrix
+- [`.summary_body()`](https://cnluzon.github.io/wigglescout/reference/dot-summary_body.md)
+  : Helper function for plotting a summary matrix
+- [`.theme_default()`](https://cnluzon.github.io/wigglescout/reference/dot-theme_default.md)
+  : Set default theme as classic with larger font size
+- [`.trunc_str()`](https://cnluzon.github.io/wigglescout/reference/dot-trunc_str.md)
+  : Truncate a string to a max length
+- [`.validate_categories()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_categories.md)
+  : Validate a category array
+- [`.validate_filelist()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_filelist.md)
+  : Validate an array of paths
+- [`.validate_group_col()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_group_col.md)
+  : Validate that group col exists in granges
+- [`.validate_locus_parameter()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_locus_parameter.md)
+  : Validate that a locus parameter is valid. Checks for paths and also
+  whether the parameter is otherwise a GRanges object, which is also
+  valid.
+- [`.validate_profile_parameters()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_profile_parameters.md)
+  : Validate profile and heatmap relevant parameters
+- [`.validate_references()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_references.md)
+  : Check that a list of bigWig files have the same Seqinfo. Throws a
+  warning if they don't.
+- [`.validate_references_with_external_seqinfo()`](https://cnluzon.github.io/wigglescout/reference/dot-validate_references_with_external_seqinfo.md)
+  : Check that a list of bigWig files have the same Seqinfo as an
+  external object (usually a pre-built tile set). Throws a warning if
+  they don't.
+- [`.violin_body()`](https://cnluzon.github.io/wigglescout/reference/dot-violin_body.md)
+  : Internal function to plot ranges in violin plot with a highlighted
+  GRanges.
+- [`get_datafile()`](https://cnluzon.github.io/wigglescout/reference/get_datafile.md)
+  : Return the full path of a test file in wigglescout package
+- [`get_heatmap_values()`](https://cnluzon.github.io/wigglescout/reference/get_heatmap_values.md)
+  : Get heatmap fixture from bw_heatmap for test plotting
+- [`get_testfile()`](https://cnluzon.github.io/wigglescout/reference/get_testfile.md)
+  : Return the full path of a test file in wigglescout package
+- [`keep_canonical()`](https://cnluzon.github.io/wigglescout/reference/keep_canonical.md)
+  : Filter out unplaced contigs and uncharacterized chromosomes from a
+  GRanges object.
+- [`local_create_sample_bigwig()`](https://cnluzon.github.io/wigglescout/reference/local_create_sample_bigwig.md)
+  : Create a self-destructing local temporary bigwig based on a BED file
+  and chromsizes array.
+- [`make_mock_bins()`](https://cnluzon.github.io/wigglescout/reference/make_mock_bins.md)
+  : Make a mock object that returns bins GRanges for test plotting
+- [`make_mock_bins_all()`](https://cnluzon.github.io/wigglescout/reference/make_mock_bins_all.md)
+  : Make a mock object that returns bins GRanges for test plotting
+- [`make_mock_profile()`](https://cnluzon.github.io/wigglescout/reference/make_mock_profile.md)
+  : Make a mock object from a fixture that has a profile result from
+  bw_profile for test plotting
+- [`make_mock_summary()`](https://cnluzon.github.io/wigglescout/reference/make_mock_summary.md)
+  : Make a mock object from a fixture that has a summary result from
+  bw_heatmap for test plotting
+- [`make_test_tiles()`](https://cnluzon.github.io/wigglescout/reference/make_test_tiles.md)
+  : Make example test tiles
+- [`plot_bw_bins_density()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_bins_density.md)
+  : Bin-based 2d histogram of a pair of bigWig files
+- [`plot_bw_bins_scatter()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_bins_scatter.md)
+  : Bin-based scatterplot of a pair of bigWig files
+- [`plot_bw_bins_violin()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_bins_violin.md)
+  : Bin-based violin plot of a set of bigWig files
+- [`plot_bw_heatmap()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_heatmap.md)
+  : Plot a heatmap of a given bigWig file over a set of loci
+- [`plot_bw_loci_scatter()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_loci_scatter.md)
+  : Locus-based scatterplot of a pair of bigWig files
+- [`plot_bw_loci_summary_heatmap()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_loci_summary_heatmap.md)
+  : Summary heatmap of a categorized BED or GRanges object
+- [`plot_bw_profile()`](https://cnluzon.github.io/wigglescout/reference/plot_bw_profile.md)
+  : Profile plot of a set of bigWig files
+- [`plot_gr_density()`](https://cnluzon.github.io/wigglescout/reference/plot_gr_density.md)
+  : Density plot of a precalculated GRanges object
+- [`plot_gr_scatter()`](https://cnluzon.github.io/wigglescout/reference/plot_gr_scatter.md)
+  : Scatterplot of a precalculated GRanges object
+- [`plot_gr_violin()`](https://cnluzon.github.io/wigglescout/reference/plot_gr_violin.md)
+  : Violin plot of a precalculated GRanges object
+- [`tile_seqinfo()`](https://cnluzon.github.io/wigglescout/reference/tile_seqinfo.md)
+  : Build a tiles GRanges out of a bigWig file on a given bin size.
+
+# Articles
+
+### All vignettes
+
+- [Summarizing bigWig
+  files](https://cnluzon.github.io/wigglescout/articles/bwtools.md):
+- [Visualizing bigWig
+  signal](https://cnluzon.github.io/wigglescout/articles/plotting.md):
+- [Wigglescout](https://cnluzon.github.io/wigglescout/articles/wigglescout.md):

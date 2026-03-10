@@ -1,0 +1,192 @@
+# Score a bigWig file list and a BED file or GRanges object.
+
+Build a scored GRanges object from a bigWig file list and a BED file or
+GRanges object. The aggregating function (per locus) can be min, max,
+sd, mean.
+
+## Usage
+
+``` r
+bw_loci(
+  bwfiles,
+  loci,
+  bg_bwfiles = NULL,
+  labels = NULL,
+  per_locus_stat = "mean",
+  aggregate_by = NULL,
+  norm_mode = "fc",
+  remove_top = 0,
+  default_na = NA_real_,
+  scaling = "none"
+)
+```
+
+## Arguments
+
+- bwfiles:
+
+  Path or array of paths to the bigWig files to be summarized.
+
+- loci:
+
+  GRanges or BED file to summarize the BigWig file at.
+
+- bg_bwfiles:
+
+  Path or array of paths to the bigWig files to be used as background.
+
+- labels:
+
+  List of names to give to the mcols of the returned GRanges object. If
+  NULL, file names are used.
+
+- per_locus_stat:
+
+  Aggregating function (per locus). Mean by default. Choices: min, max,
+  sd, mean.
+
+- aggregate_by:
+
+  Statistic to aggregate per group. If NULL, values are not aggregated.
+  This is the behavior by default.
+
+- norm_mode:
+
+  Function to apply to normalize bin values. Default fc: divides bw /
+  bg. Alternative: log2fc: returns log2(bw/bg).
+
+- remove_top:
+
+  Return range 0-(1-remove_top). By default returns the whole
+  distribution (remove_top == 0).
+
+- default_na:
+
+  Default value for missing values
+
+- scaling:
+
+  If none, no operation is performed (default). If relative, values are
+  divided by global mean (1x genome coverage).
+
+## Value
+
+A GRanges object with each bwfile as a metadata column named after
+labels, if provided, or after filenames otherwise.
+
+## Details
+
+Values can be normalized using background bigWig files (usually input
+files). By default, the value obtained will be bigwig / bg_bigwig per
+locus, per bigWig.
+
+bwfiles and bg_bwfiles must have the same length. If you are using same
+background for several files, then file paths must be repeated
+accordingly.
+
+norm_mode can be either "fc", where values will represent bigwig /
+bg_bigwig, or "log2fc", values will represent log2(bigwig / bg_bigwig)
+per locus.
+
+## Examples
+
+``` r
+# Get the raw files
+bed <- system.file("extdata", "sample_genes_mm9.bed", package="wigglescout")
+bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
+bw2 <- system.file("extdata",
+                   "sample_H3K9me3_ChIP.bw", package="wigglescout")
+bw_inp <- system.file("extdata", "sample_Input.bw", package="wigglescout")
+
+# Run single bw with single bed
+bw_loci(bw, bed)
+#> GRanges object with 26 ranges and 2 metadata columns:
+#>        seqnames              ranges strand | sample_H33_ChIP        name
+#>           <Rle>           <IRanges>  <Rle> |       <numeric> <character>
+#>    [1]    chr15 102751562-102759245      + |         2.91694      Hoxc13
+#>    [2]    chr15 102767284-102768948      + |         3.61492      Hoxc12
+#>    [3]    chr15 102774493-102778377      - |         3.97043      Hotair
+#>    [4]    chr15 102784957-102787132      + |         2.17507      Hoxc11
+#>    [5]    chr15 102797227-102802328      + |         1.45977      Hoxc10
+#>    ...      ...                 ...    ... .             ...         ...
+#>   [22]    chr15 103078643-103082118      - |         5.51339        Nfe2
+#>   [23]    chr15 103078643-103083241      - |         5.49223        Nfe2
+#>   [24]    chr15 103078643-103083583      - |         5.45826        Nfe2
+#>   [25]    chr15 103078643-103085870      - |         4.87355        Nfe2
+#>   [26]    chr15 103078643-103088834      - |         4.42227        Nfe2
+#>   -------
+#>   seqinfo: 1 sequence from an unspecified genome; no seqlengths
+
+# Use of some parameters
+bw_loci(bw, bed, labels = c("H33"), remove_top = 0.01)
+#> GRanges object with 25 ranges and 2 metadata columns:
+#>        seqnames              ranges strand |       H33        name
+#>           <Rle>           <IRanges>  <Rle> | <numeric> <character>
+#>    [1]    chr15 102751562-102759245      + |   2.91694      Hoxc13
+#>    [2]    chr15 102767284-102768948      + |   3.61492      Hoxc12
+#>    [3]    chr15 102774493-102778377      - |   3.97043      Hotair
+#>    [4]    chr15 102784957-102787132      + |   2.17507      Hoxc11
+#>    [5]    chr15 102797227-102802328      + |   1.45977      Hoxc10
+#>    ...      ...                 ...    ... .       ...         ...
+#>   [21]    chr15 103078643-103082118      - |   5.51339        Nfe2
+#>   [22]    chr15 103078643-103083241      - |   5.49223        Nfe2
+#>   [23]    chr15 103078643-103083583      - |   5.45826        Nfe2
+#>   [24]    chr15 103078643-103085870      - |   4.87355        Nfe2
+#>   [25]    chr15 103078643-103088834      - |   4.42227        Nfe2
+#>   -------
+#>   seqinfo: 1 sequence from an unspecified genome; no seqlengths
+
+# Log2 fold change
+bw_loci(bw, loci = bed, bg_bwfiles = bw_inp, norm_mode = "log2fc")
+#> GRanges object with 26 ranges and 2 metadata columns:
+#>        seqnames              ranges strand | sample_H33_ChIP        name
+#>           <Rle>           <IRanges>  <Rle> |       <numeric> <character>
+#>    [1]    chr15 102751562-102759245      + |        1.560373      Hoxc13
+#>    [2]    chr15 102767284-102768948      + |        1.739607      Hoxc12
+#>    [3]    chr15 102774493-102778377      - |        1.805667      Hotair
+#>    [4]    chr15 102784957-102787132      + |        0.954433      Hoxc11
+#>    [5]    chr15 102797227-102802328      + |        0.444870      Hoxc10
+#>    ...      ...                 ...    ... .             ...         ...
+#>   [22]    chr15 103078643-103082118      - |         2.16692        Nfe2
+#>   [23]    chr15 103078643-103083241      - |         2.13467        Nfe2
+#>   [24]    chr15 103078643-103083583      - |         2.12414        Nfe2
+#>   [25]    chr15 103078643-103085870      - |         1.98608        Nfe2
+#>   [26]    chr15 103078643-103088834      - |         1.87849        Nfe2
+#>   -------
+#>   seqinfo: 1 sequence from an unspecified genome; no seqlengths
+
+# Multiple bigWig
+bw_loci(c(bw, bw2),
+        loci = bed,
+        bg_bwfiles = c(bw_inp, bw_inp),
+        norm_mode = "log2fc")
+#> GRanges object with 26 ranges and 3 metadata columns:
+#>        seqnames              ranges strand | sample_H33_ChIP
+#>           <Rle>           <IRanges>  <Rle> |       <numeric>
+#>    [1]    chr15 102751562-102759245      + |        1.560373
+#>    [2]    chr15 102767284-102768948      + |        1.739607
+#>    [3]    chr15 102774493-102778377      - |        1.805667
+#>    [4]    chr15 102784957-102787132      + |        0.954433
+#>    [5]    chr15 102797227-102802328      + |        0.444870
+#>    ...      ...                 ...    ... .             ...
+#>   [22]    chr15 103078643-103082118      - |         2.16692
+#>   [23]    chr15 103078643-103083241      - |         2.13467
+#>   [24]    chr15 103078643-103083583      - |         2.12414
+#>   [25]    chr15 103078643-103085870      - |         1.98608
+#>   [26]    chr15 103078643-103088834      - |         1.87849
+#>        sample_H3K9me3_ChIP        name
+#>                  <numeric> <character>
+#>    [1]            -4.22203      Hoxc13
+#>    [2]            -3.47525      Hoxc12
+#>    [3]            -4.95146      Hotair
+#>    [4]            -3.88646      Hoxc11
+#>    [5]            -2.60497      Hoxc10
+#>    ...                 ...         ...
+#>   [22]            -3.58945        Nfe2
+#>   [23]            -3.63653        Nfe2
+#>   [24]            -3.61106        Nfe2
+#>   [25]            -2.94153        Nfe2
+#>   [26]            -3.02280        Nfe2
+#>   -------
+#>   seqinfo: 1 sequence from an unspecified genome; no seqlengths
+```

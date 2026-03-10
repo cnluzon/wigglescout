@@ -8,8 +8,8 @@
 <title>Visualizing bigWig signal • wigglescout</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Visualizing bigWig signal">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wigglescout</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.19.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,14 +124,14 @@ different bigWig files against each other.</li>
 genome-wide signal distribution. For example:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bw_bins_violin.html">plot_bw_bins_violin</a></span><span class="op">(</span><span class="va">h33_chip</span>, bin_size <span class="op">=</span> <span class="fl">2000</span>, selection <span class="op">=</span> <span class="va">locus</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-2-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note that <code>bin_size</code> parameter influences the time any of
 these functions take to run. Reasonable resolution for this is 5000 or
 10000.</p>
 <p>It is possible to plot several bigWig files at a time:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bw_bins_violin.html">plot_bw_bins_violin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">input_chip</span><span class="op">)</span>, bin_size <span class="op">=</span> <span class="fl">2000</span>, selection <span class="op">=</span> <span class="va">locus</span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-3-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="672"></p>
 <p>Additionally, one can highlight bins that overlap with a certain set
 of interest loci. This is done via the <code>highlight</code>
 parameter:</p>
@@ -143,7 +143,7 @@ parameter:</p>
 <span>  highlight_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"red"</span><span class="op">)</span>, <span class="co"># It is possible to provide different colors</span></span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-4-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="672"></p>
 <p>It is also possible to provide a list of bigWig files to be used as
 background to normalize the bin values to. For instance, in the previous
 case, one could want to use the input values to normalize the H3.3 ChIP
@@ -158,7 +158,7 @@ data:</p>
 <span>  highlight_color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red"</span><span class="op">)</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 <p>If <code>norm_mode</code> is provided, it is possible to
 log-transform these values as well:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -172,7 +172,7 @@ log-transform these values as well:</p>
 <span>  norm_mode <span class="op">=</span> <span class="st">"log2fc"</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-6-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="genome-wide-scatterplots">Genome-wide scatterplots<a class="anchor" aria-label="anchor" href="#genome-wide-scatterplots"></a>
@@ -194,7 +194,7 @@ data:</p>
 <span>  bin_size <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-7-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
 <p>This is useful to see relationships between marks. In this case, bins
 where H3.3 signal is high, H3K9me3 signal is low and viceversa.</p>
 <p>The same way as with <code>plot_bw_bins_violin</code>, it is possible
@@ -213,7 +213,7 @@ given signals:</p>
 <span>  norm_mode_x <span class="op">=</span> <span class="st">"log2fc"</span>, <span class="co"># Each norm mode is provided separately</span></span>
 <span>  selection <span class="op">=</span> <span class="va">locus</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-8-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
 <div class="section level2">
@@ -264,7 +264,7 @@ example:</p>
 <span>  loci <span class="op">=</span> <span class="va">chromhmm</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H33"</span>, <span class="st">"H3K9me3"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-9-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
 <p>Since this example is reduced to a set of HOXC genes, you can see how
 H3.3 signal is high and H3K9me3 is generally low.</p>
 <p>It is possible as in the previous types of plots to provide bigWig
@@ -277,7 +277,7 @@ before:</p>
 <span>  loci <span class="op">=</span> <span class="va">chromhmm</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H33"</span>, <span class="st">"H3K9me3"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-10-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="672"></p>
 <div class="section level4">
 <h4 id="how-the-values-are-aggregated">How the values are aggregated<a class="anchor" aria-label="anchor" href="#how-the-values-are-aggregated"></a>
 </h4>
@@ -300,7 +300,7 @@ cases.</p>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H33"</span>, <span class="st">"H3K9me3"</span><span class="op">)</span>,</span>
 <span>  aggregate_by <span class="op">=</span> <span class="st">"median"</span>   <span class="co"># Note this is a string value, not a function</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-11-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
 <div class="section level3">
@@ -315,7 +315,7 @@ the <code>plot_bw_profile</code> function:</p>
 <span>  loci <span class="op">=</span> <span class="va">genes</span>,</span>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H3.3"</span>, <span class="st">"H3K9me3"</span>, <span class="st">"Input"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-12-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="672"></p>
 <p>The default mode is called <code>stretch</code>, where start (3’ end)
 and end (5’ end) of <em>loci</em> are aligned and the length of the
 <em>locus</em> is stretched to a given pseudolength (<code>middle</code>
@@ -331,7 +331,7 @@ similarly to what formatting text alignment would do:</p>
 <span>  labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"H3.3"</span>, <span class="st">"H3K9me3"</span>, <span class="st">"Input"</span><span class="op">)</span>,</span>
 <span>  mode <span class="op">=</span> <span class="st">"start"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-13-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="672"></p>
 <p>It is also possible to specify the upstream and downstream
 lengths:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -343,7 +343,7 @@ lengths:</p>
 <span>  upstream <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  downstream <span class="op">=</span> <span class="fl">3000</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-14-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_bw_profile.html">plot_bw_profile</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">h3k9me3_chip</span>, <span class="va">input_chip</span><span class="op">)</span>,</span>
@@ -354,7 +354,7 @@ lengths:</p>
 <span>  downstream <span class="op">=</span> <span class="fl">3000</span>,</span>
 <span>  show_error <span class="op">=</span> <span class="cn">TRUE</span> <span class="co"># Turn error estimates on</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-15-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="heatmaps">Heatmaps<a class="anchor" aria-label="anchor" href="#heatmaps"></a>
@@ -366,7 +366,7 @@ lengths:</p>
 <span>  <span class="va">h33_chip</span>,</span>
 <span>  loci <span class="op">=</span> <span class="va">genes</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-16-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="672"></p>
 <p>This gene annotation includes some variants of the same genes that
 overlap a lot, so some of the rows look very similar or even like
 duplicates.</p>
@@ -382,7 +382,7 @@ possible to align them in different ways:</p>
 <span>  upstream <span class="op">=</span> <span class="fl">2500</span>,</span>
 <span>  downstream <span class="op">=</span> <span class="fl">2500</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-17-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="672"></p>
 <p>It is possible to specify <code>bin_size</code> to increase or
 decrease resolution (this can also be done on profile plots):</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -394,7 +394,7 @@ decrease resolution (this can also be done on profile plots):</p>
 <span>  downstream <span class="op">=</span> <span class="fl">2500</span>,</span>
 <span>  bin_size <span class="op">=</span> <span class="fl">20</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-18-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="672"></p>
 <p>At this point, heatmap values are shown in order from maximum mean
 value across all the beans to lowest.</p>
 <p>By default, colorscale is set to percentiles 0.01 and 0.99 of whole
@@ -412,7 +412,7 @@ example:</p>
 <span>  zmin <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  zmax <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-19-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="672"></p>
 <p>It is also possible to change the color of the heatmap using any
 <code>RColorBrewer</code> available palette:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
@@ -422,7 +422,7 @@ example:</p>
 <span>  bin_size <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  cmap <span class="op">=</span> <span class="st">"RdYlBu"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-20-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="672"></p>
 <p>There is also a <code>max_rows_allowed</code> parameter that defaults
 to 10000. This allows to plot large matrices by binning vertically the
 heatmap and plotting the underlying mean associated, provided that a
@@ -469,7 +469,7 @@ different columns.</li>
 <span>  y <span class="op">=</span> <span class="st">"H3K9me3"</span>,</span>
 <span>  remove_top <span class="op">=</span> <span class="fl">0.001</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-21-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="672"></p>
 <p>This is useful if you are doing many pairwise combinations of
 figures, or you want to do custom calculations on the bigWig values,
 especially if the bin size is small and you are working with a large
@@ -490,16 +490,16 @@ further customize the results. For example:</p>
 <span><span class="va">profile_plot</span> <span class="op">+</span> </span>
 <span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"New title for the plot"</span><span class="op">)</span> <span class="op">+</span> <span class="co"># Add a custom title</span></span>
 <span>  <span class="fu">geom_hline</span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">1</span>, linetype<span class="op">=</span><span class="st">"dashed"</span><span class="op">)</span> <span class="co"># Add a horizontal line on y=1</span></span></code></pre></div>
-<p><img src="plotting_files/figure-html/unnamed-chunk-22-1.png" width="672"></p>
+<p><img src="plotting_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -515,55 +515,51 @@ further customize the results. For example:</p>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] purrr_1.0.2          wigglescout_0.19.0   rtracklayer_1.64.0  </span></span>
-<span><span class="co">#&gt; [4] GenomicRanges_1.56.1 GenomeInfoDb_1.40.1  IRanges_2.38.1      </span></span>
-<span><span class="co">#&gt; [7] S4Vectors_0.42.1     BiocGenerics_0.50.0  ggplot2_3.5.1       </span></span>
+<span><span class="co">#&gt; [1] wigglescout_0.20.0   rtracklayer_1.70.1   GenomicRanges_1.62.1</span></span>
+<span><span class="co">#&gt; [4] Seqinfo_1.0.0        IRanges_2.44.0       S4Vectors_0.48.0    </span></span>
+<span><span class="co">#&gt; [7] BiocGenerics_0.56.0  generics_0.1.4       ggplot2_4.0.2       </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] tidyselect_1.2.1            dplyr_1.1.4                </span></span>
-<span><span class="co">#&gt;  [3] vipor_0.4.7                 farver_2.1.2               </span></span>
-<span><span class="co">#&gt;  [5] Biostrings_2.72.1           bitops_1.0-9               </span></span>
-<span><span class="co">#&gt;  [7] fastmap_1.2.0               RCurl_1.98-1.16            </span></span>
-<span><span class="co">#&gt;  [9] GenomicAlignments_1.40.0    XML_3.99-0.17              </span></span>
-<span><span class="co">#&gt; [11] digest_0.6.37               lifecycle_1.0.4            </span></span>
-<span><span class="co">#&gt; [13] Cairo_1.6-2                 magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt; [15] compiler_4.4.1              rlang_1.1.4                </span></span>
-<span><span class="co">#&gt; [17] sass_0.4.9                  tools_4.4.1                </span></span>
-<span><span class="co">#&gt; [19] utf8_1.2.4                  yaml_2.3.10                </span></span>
-<span><span class="co">#&gt; [21] knitr_1.48                  S4Arrays_1.4.1             </span></span>
-<span><span class="co">#&gt; [23] labeling_0.4.3              curl_5.2.3                 </span></span>
-<span><span class="co">#&gt; [25] DelayedArray_0.30.1         RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt; [27] abind_1.4-8                 BiocParallel_1.38.0        </span></span>
-<span><span class="co">#&gt; [29] withr_3.0.1                 desc_1.4.3                 </span></span>
-<span><span class="co">#&gt; [31] grid_4.4.1                  fansi_1.0.6                </span></span>
-<span><span class="co">#&gt; [33] colorspace_2.1-1            future_1.34.0              </span></span>
-<span><span class="co">#&gt; [35] globals_0.16.3              scales_1.3.0               </span></span>
-<span><span class="co">#&gt; [37] SummarizedExperiment_1.34.0 cli_3.6.3                  </span></span>
-<span><span class="co">#&gt; [39] rmarkdown_2.28              crayon_1.5.3               </span></span>
-<span><span class="co">#&gt; [41] ragg_1.3.3                  generics_0.1.3             </span></span>
-<span><span class="co">#&gt; [43] httr_1.4.7                  rjson_0.2.23               </span></span>
-<span><span class="co">#&gt; [45] ggbeeswarm_0.7.2            cachem_1.1.0               </span></span>
-<span><span class="co">#&gt; [47] stringr_1.5.1               zlibbioc_1.50.0            </span></span>
-<span><span class="co">#&gt; [49] parallel_4.4.1              ggrastr_1.0.2              </span></span>
-<span><span class="co">#&gt; [51] XVector_0.44.0              restfulr_0.0.15            </span></span>
-<span><span class="co">#&gt; [53] matrixStats_1.4.1           vctrs_0.6.5                </span></span>
-<span><span class="co">#&gt; [55] Matrix_1.7-0                jsonlite_1.8.9             </span></span>
-<span><span class="co">#&gt; [57] beeswarm_0.4.0              listenv_0.9.1              </span></span>
-<span><span class="co">#&gt; [59] systemfonts_1.1.0           jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt; [61] tidyr_1.3.1                 glue_1.8.0                 </span></span>
-<span><span class="co">#&gt; [63] parallelly_1.38.0           pkgdown_2.1.1              </span></span>
-<span><span class="co">#&gt; [65] codetools_0.2-20            stringi_1.8.4              </span></span>
-<span><span class="co">#&gt; [67] gtable_0.3.5                BiocIO_1.14.0              </span></span>
-<span><span class="co">#&gt; [69] UCSC.utils_1.0.0            munsell_0.5.1              </span></span>
-<span><span class="co">#&gt; [71] tibble_3.2.1                pillar_1.9.0               </span></span>
-<span><span class="co">#&gt; [73] furrr_0.3.1                 htmltools_0.5.8.1          </span></span>
-<span><span class="co">#&gt; [75] GenomeInfoDbData_1.2.12     R6_2.5.1                   </span></span>
-<span><span class="co">#&gt; [77] textshaping_0.4.0           evaluate_1.0.0             </span></span>
-<span><span class="co">#&gt; [79] Biobase_2.64.0              lattice_0.22-6             </span></span>
-<span><span class="co">#&gt; [81] highr_0.11                  Rsamtools_2.20.0           </span></span>
-<span><span class="co">#&gt; [83] bslib_0.8.0                 SparseArray_1.4.8          </span></span>
-<span><span class="co">#&gt; [85] xfun_0.48                   fs_1.6.4                   </span></span>
-<span><span class="co">#&gt; [87] MatrixGenerics_1.16.0       pkgconfig_2.0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] SummarizedExperiment_1.40.0 beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt;  [3] gtable_0.3.6                rjson_0.2.23               </span></span>
+<span><span class="co">#&gt;  [5] xfun_0.56                   bslib_0.10.0               </span></span>
+<span><span class="co">#&gt;  [7] Biobase_2.70.0              lattice_0.22-7             </span></span>
+<span><span class="co">#&gt;  [9] Cairo_1.7-0                 vctrs_0.7.1                </span></span>
+<span><span class="co">#&gt; [11] tools_4.5.2                 bitops_1.0-9               </span></span>
+<span><span class="co">#&gt; [13] curl_7.0.0                  parallel_4.5.2             </span></span>
+<span><span class="co">#&gt; [15] tibble_3.3.1                pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt; [17] Matrix_1.7-4                RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt; [19] cigarillo_1.0.0             S7_0.2.1                   </span></span>
+<span><span class="co">#&gt; [21] desc_1.4.3                  lifecycle_1.0.5            </span></span>
+<span><span class="co">#&gt; [23] stringr_1.6.0               compiler_4.5.2             </span></span>
+<span><span class="co">#&gt; [25] farver_2.1.2                Rsamtools_2.26.0           </span></span>
+<span><span class="co">#&gt; [27] textshaping_1.0.5           Biostrings_2.78.0          </span></span>
+<span><span class="co">#&gt; [29] codetools_0.2-20            vipor_0.4.7                </span></span>
+<span><span class="co">#&gt; [31] GenomeInfoDb_1.46.2         htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt; [33] sass_0.4.10                 RCurl_1.98-1.17            </span></span>
+<span><span class="co">#&gt; [35] yaml_2.3.12                 tidyr_1.3.2                </span></span>
+<span><span class="co">#&gt; [37] pillar_1.11.1               pkgdown_2.2.0              </span></span>
+<span><span class="co">#&gt; [39] crayon_1.5.3                jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [41] BiocParallel_1.44.0         cachem_1.1.0               </span></span>
+<span><span class="co">#&gt; [43] DelayedArray_0.36.0         abind_1.4-8                </span></span>
+<span><span class="co">#&gt; [45] tidyselect_1.2.1            digest_0.6.39              </span></span>
+<span><span class="co">#&gt; [47] stringi_1.8.7               purrr_1.2.1                </span></span>
+<span><span class="co">#&gt; [49] dplyr_1.2.0                 restfulr_0.0.16            </span></span>
+<span><span class="co">#&gt; [51] labeling_0.4.3              fastmap_1.2.0              </span></span>
+<span><span class="co">#&gt; [53] grid_4.5.2                  SparseArray_1.10.9         </span></span>
+<span><span class="co">#&gt; [55] cli_3.6.5                   magrittr_2.0.4             </span></span>
+<span><span class="co">#&gt; [57] S4Arrays_1.10.1             XML_3.99-0.22              </span></span>
+<span><span class="co">#&gt; [59] withr_3.0.2                 UCSC.utils_1.6.1           </span></span>
+<span><span class="co">#&gt; [61] scales_1.4.0                ggbeeswarm_0.7.3           </span></span>
+<span><span class="co">#&gt; [63] rmarkdown_2.30              XVector_0.50.0             </span></span>
+<span><span class="co">#&gt; [65] httr_1.4.8                  matrixStats_1.5.0          </span></span>
+<span><span class="co">#&gt; [67] ragg_1.5.1                  evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt; [69] ggrastr_1.0.2               knitr_1.51                 </span></span>
+<span><span class="co">#&gt; [71] BiocIO_1.20.0               rlang_1.1.7                </span></span>
+<span><span class="co">#&gt; [73] glue_1.8.0                  jsonlite_2.0.0             </span></span>
+<span><span class="co">#&gt; [75] R6_2.6.1                    MatrixGenerics_1.22.0      </span></span>
+<span><span class="co">#&gt; [77] GenomicAlignments_1.46.0    systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt; [79] fs_1.6.7</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -576,7 +572,7 @@ further customize the results. For example:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
