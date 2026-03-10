@@ -300,7 +300,7 @@ bw_bins <- function(bwfiles,
 #'
 #' - center. All loci are aligned by center.
 #' @inheritParams bw_profile
-#' @importFrom furrr future_map future_map2
+#' @importFrom purrr map map2
 #' @importFrom rtracklayer import
 #' @importFrom purrr partial
 #' @return A list of matrices where each element correspond to each bigWig file.
@@ -369,13 +369,13 @@ bw_heatmap <- function(bwfiles,
     )
 
     if (is.null(bg_bwfiles)) {
-        values_list <- future_map(
+        values_list <- map(
             bwfiles,
             calculate_matrix_norm_fixed,
             bg_bw = NULL
         )
     } else {
-        values_list <- future_map2(
+        values_list <- map2(
             bwfiles,
             bg_bwfiles,
             calculate_matrix_norm_fixed
@@ -427,8 +427,7 @@ bw_heatmap <- function(bwfiles,
 #'    average.
 #' @inheritParams bw_bins
 #' @return a data frame in long format
-#' @importFrom purrr partial
-#' @importFrom furrr future_pmap future_map2
+#' @importFrom purrr partial pmap map2
 #' @export
 #' @examples
 #' # Get the raw files
@@ -487,12 +486,12 @@ bw_profile <- function(bwfiles,
     )
 
     if (is.null(bg_bwfiles)) {
-        values_list <- future_map2(bwfiles, labels,
+        values_list <- map2(bwfiles, labels,
             calculate_bw_profile_fixed,
             bg_bw = NULL
         )
     } else {
-        values_list <- future_pmap(list(bwfiles, bg_bwfiles, labels),
+        values_list <- pmap(list(bwfiles, bg_bwfiles, labels),
             calculate_bw_profile_fixed
         )
     }
@@ -648,7 +647,7 @@ keep_canonical <- function(gr) {
 #' @importFrom GenomicRanges makeGRangesFromDataFrame
 #' @importFrom GenomeInfoDb sortSeqlevels
 #' @importFrom stats quantile
-#' @importFrom furrr future_map
+#' @importFrom purrr map
 #' @inheritParams bw_bins
 #' @return A sorted GRanges object.
 .multi_bw_ranges <- function(bwfiles, labels, granges,
@@ -662,7 +661,7 @@ keep_canonical <- function(gr) {
         stop("BigWig file list and column names must have the same length.")
     }
 
-    summaries <- future_map(
+    summaries <- map(
         bwfiles,
         .bw_ranges,
         granges = granges,

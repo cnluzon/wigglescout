@@ -1,3 +1,13 @@
+# wigglescout 0.20.0
+
+Date: 09/03/2026
+
+* `mockery` defunct functions removed from `bwplot-test` unit tests and replaced
+with the recommended `with_mocked_bindings` now available in the `testthat`
+package.
+* `future` and `furrr` dependencies for parallel processing have been temporarily
+dropped due to problems with the more recent versions of `future` (>1.34.0).
+
 # wigglescout 0.19.0 
 
 Date: 04/10/2024
