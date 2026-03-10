@@ -318,16 +318,45 @@
 #' @param obj Something to convert to label
 #' @param max_length Max length allowed for a label to have (35)
 #'
-#' @return A valid label name
+#' @return A valid set of labels
 .make_label_from_object <- function(obj, max_length = 35) {
+    labels <- NULL
     if (is.character(obj)) {
-        filename_clean <- basename(tools::file_path_sans_ext(obj))
-        sapply(make.names(filename_clean), .trunc_str, max_length = max_length)
+      labels <- basename(tools::file_path_sans_ext(obj)) |> make.names()
     } else {
-      sapply(make.names(class(obj)), .trunc_str, max_length = max_length)
+      labels <- make.names(class(obj))
     }
+
+    labels_short <- sapply(labels, .trunc_str, max_length = max_length)
+    if (.repeated_elements(labels_short)) {
+      warning(paste0(
+        "Labels must be unique. Some samples share a prefix longer than ",
+        "max label length (", max_length, "): ",
+        "Consider using the labels parameter or renaming your files.")
+      )
+      # This is really the only way to guarantee different labels, truncating
+      # from other anchor points does not cover all possible cases
+      unique_labels_df <- data.frame(id = labels_short) |>
+        group_by(id) |>
+        mutate(label = paste(id, row_number(), sep = "_"))
+      labels_short <- unique_labels_df$label
+
+    }
+    labels_short
 }
 
+#' Test if an array has repeated element
+#'
+#' @param array
+#'
+#' @returns TRUE if all elements in the array are unique
+.repeated_elements <- function(array) {
+  if (length(array) > length(unique(array))) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
 
 #' Generate a human-readable normalization function string
 #'
