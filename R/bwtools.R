@@ -595,6 +595,50 @@ keep_canonical <- function(gr) {
     GenomeInfoDb::keepSeqlevels(gr, slevels, pruning.mode = "tidy")
 }
 
+#' Estimate the number of reads in a locus
+#'
+#' This is a helper tool to back-calculate a number that represents the raw
+#' counts in a locus. It is an estimate so one should consider several factors:
+#' a) fraglen parameter needs to be accurate; b) fraglen is a constant, so if
+#' the original distribution of fragment length was very heterogeneous, it
+#' will over/under estimate locus where fragments are shorter or longer than
+#' the average. c) If there was a scaling done in the original bigWig, this
+#' number will not have a 1 to 1 correspondence with the original number of
+#' reads.
+#'
+#' @param mean_cov Mean coverage
+#' @param width Width of the locus
+#' @param fraglen Fragment length
+#'
+#' @return An integer representing the estimated number of reads
+#'   (mean_cov*width) / fragment_length
+#' @export
+#'
+estimate_read_counts <- function(mean_cov, width, fraglen) {
+    round((mean_cov*width)/fraglen)
+}
+
+
+#' Convert a GRanges object with coverage values to estimated counts
+#'
+#' This method uses estimate_read_counts across a GRanges object and converts
+#' the values to read counts.
+#'
+#' @param gr GRanges object
+#' @param mcol_names Columns to calculate on
+#' @param fraglen Fragment length to use for the estimate
+#'
+#' @return A GRanges object with count values.
+#' @importFrom dplyr all_of mutate across
+#' @export
+#'
+#' @examples
+gr_coverage_to_read_counts <- function(gr, mcol_names, fraglen) {
+  df <- data.frame(gr) |>
+    mutate(across(all_of(mcol_names), ~ estimate_read_counts(.x, width, fraglen)))
+  GenomicRanges::makeGRangesFromDataFrame(df, keep.extra.columns = TRUE)
+}
+
 # Helpers ---------------------------------------------------
 #' Score a GRanges object against a BigWig file
 #'

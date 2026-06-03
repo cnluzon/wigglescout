@@ -1153,3 +1153,45 @@ test_that("tile_seqinfo returns correct bins", {
   )
   expect_equal(gr, gr_result)
 })
+
+## estimate_read_counts -------------------------------------
+
+test_that("estimate_read_counts returns correct value for valid parameters", {
+    expect_equal(estimate_read_counts(1, 10, 5), 2)
+    expect_equal(estimate_read_counts(1.5, 10, 5), 3)
+    # with rounding
+    expect_equal(estimate_read_counts(2.1, 5, 2), 5)
+})
+
+
+## gr_coverage_to_read_counts -------------------------------
+
+test_that("gr_coverage_to_read_counts returns correct value", {
+    bw <- local_create_sample_bigwig(get_testfile("bed1.bed"), c(200, 200))
+    bins <- .bw_ranges(bw, make_test_tiles(), per_locus_stat = "mean")
+
+    gr <- gr_coverage_to_read_counts(bins, "score", 10)
+
+    score_result <- c(2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40)
+    expect_equal(gr$score, score_result)
+})
+
+test_that("gr_coverage_to_read_counts returns correct values for GRranges width different widths", {
+    # GRanges object with 3 ranges and 1 metadata column:
+    #     seqnames    ranges strand |     score
+    #        <Rle> <IRanges>  <Rle> | <numeric>
+    # [1]     chr1      1-10      * |        10
+    # [2]     chr1       5-9      * |         7
+    # [3]     chr1     10-19      * |         3
+    gr <- GenomicRanges::GRanges(
+        c("chr1", "chr1", "chr1"),
+        IRanges::IRanges(c(1, 5, 10), width = c(10, 5, 10)),
+        score = c(10, 7, 3)
+    )
+    gr <- gr_coverage_to_read_counts(gr, "score", 10)
+    # 3.5 rounds to 4
+    score_result <- c(10, 4, 3)
+    expect_equal(gr$score, score_result)
+})
+
+
