@@ -27,6 +27,7 @@ bigWig file was mapped to.
 ## Examples
 
 ``` r
+
 tile_seqinfo(GenomeInfoDb::Seqinfo(genome = "mm9"), 50000)
 #> GRanges object with 54531 ranges and 0 metadata columns:
 #>               seqnames          ranges strand

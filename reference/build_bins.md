@@ -34,6 +34,7 @@ A GRanges object with a tiled genome
 ## Examples
 
 ``` r
+
 build_bins(bin_size = 50000, genome = "mm9")
 #> GRanges object with 54531 ranges and 0 metadata columns:
 #>               seqnames          ranges strand

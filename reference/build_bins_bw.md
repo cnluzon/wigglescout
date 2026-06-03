@@ -27,6 +27,7 @@ bigWig file was mapped to.
 ## Examples
 
 ``` r
+
 bw <- system.file("extdata", "sample_H33_ChIP.bw", package="wigglescout")
 build_bins_bw(bw, 50000)
 #> GRanges object with 2070 ranges and 0 metadata columns:

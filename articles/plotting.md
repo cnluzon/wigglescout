@@ -44,6 +44,7 @@ For a set of bigWig files, it is possible to visualize the genome-wide
 signal distribution. For example:
 
 ``` r
+
 plot_bw_bins_violin(h33_chip, bin_size = 2000, selection = locus)
 ```
 
@@ -55,6 +56,7 @@ functions take to run. Reasonable resolution for this is 5000 or 10000.
 It is possible to plot several bigWig files at a time:
 
 ``` r
+
 plot_bw_bins_violin(c(h33_chip, input_chip), bin_size = 2000, selection = locus)
 ```
 
@@ -64,6 +66,7 @@ Additionally, one can highlight bins that overlap with a certain set of
 interest loci. This is done via the `highlight` parameter:
 
 ``` r
+
 plot_bw_bins_violin(
   c(h33_chip, input_chip),
   bin_size = 2000,
@@ -81,6 +84,7 @@ case, one could want to use the input values to normalize the H3.3 ChIP
 data:
 
 ``` r
+
 # bg_bwfiles parameter is set now to input_chip
 plot_bw_bins_violin(
   h33_chip, 
@@ -98,6 +102,7 @@ If `norm_mode` is provided, it is possible to log-transform these values
 as well:
 
 ``` r
+
 # bg_bwfiles parameter is set now to input_chip
 plot_bw_bins_violin(
   h33_chip, 
@@ -124,6 +129,7 @@ You can see more details in the function documentation.
 One example would be looking at H3.3 versus H3K9me3 in this sample data:
 
 ``` r
+
 plot_bw_bins_scatter(
   x = h33_chip,
   y = h3k9me3_chip,
@@ -142,6 +148,7 @@ set of loci to highlight within the bins, and normalize to given
 signals:
 
 ``` r
+
 plot_bw_bins_scatter(
   x = h33_chip,
   bg_x = input_chip,
@@ -178,6 +185,7 @@ corresponding bigWig file in a given category in the BED file, for
 example:
 
 ``` r
+
 # ChromHMM is a genome-wide annotation according to epigenetics marks. Each
 # locus is tagged by a category. And the amount of categories must be limited.
 # In this case, it is fifteen. 
@@ -211,6 +219,7 @@ It is possible as in the previous types of plots to provide bigWig files
 as normalization / input tracks and use them in the same way as before:
 
 ``` r
+
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
   bg_bwfiles = c(input_chip, input_chip),
@@ -234,6 +243,7 @@ be the mean of those mean values, and **median of means**
 noisy, so a median of means could be useful in some cases.
 
 ``` r
+
 plot_bw_loci_summary_heatmap(
   c(h33_chip, h3k9me3_chip),
   bg_bwfiles = c(input_chip, input_chip),
@@ -252,6 +262,7 @@ across a set of *loci*. In order to do that you can use the
 `plot_bw_profile` function:
 
 ``` r
+
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
   loci = genes,
@@ -272,6 +283,7 @@ It is possible to align only 3’ ends, 5’ ends or center of loci,
 similarly to what formatting text alignment would do:
 
 ``` r
+
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
   loci = genes,
@@ -285,6 +297,7 @@ plot_bw_profile(
 It is also possible to specify the upstream and downstream lengths:
 
 ``` r
+
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
   loci = genes,
@@ -298,6 +311,7 @@ plot_bw_profile(
 ![](plotting_files/figure-html/unnamed-chunk-14-1.png)
 
 ``` r
+
 plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
   loci = genes,
@@ -317,6 +331,7 @@ Finally, it is possible to look at the profile across a set of *loci* in
 a per-*locus* way by looking at heatmaps.
 
 ``` r
+
 plot_bw_heatmap(
   h33_chip,
   loci = genes
@@ -334,6 +349,7 @@ Most of the parameters are shared between `plot_bw_profile` and
 other later on, so it is possible to align them in different ways:
 
 ``` r
+
 plot_bw_heatmap(
   h33_chip,
   loci = genes,
@@ -349,6 +365,7 @@ It is possible to specify `bin_size` to increase or decrease resolution
 (this can also be done on profile plots):
 
 ``` r
+
 plot_bw_heatmap(
   h33_chip,
   loci = genes,
@@ -370,6 +387,7 @@ mostly to plot together several heatmaps with the same color scale. For
 example:
 
 ``` r
+
 plot_bw_heatmap(
   h33_chip,
   loci = genes,
@@ -388,6 +406,7 @@ It is also possible to change the color of the heatmap using any
 `RColorBrewer` available palette:
 
 ``` r
+
 plot_bw_heatmap(
   h33_chip,
   loci = genes,
@@ -422,6 +441,7 @@ calculated by `bw_loci` and `bw_bins` functions can be passed to
 - `plot_gr_density`. Makes a 2d histogram plot of two different columns.
 
 ``` r
+
 gr <- bw_bins(
   c(h33_chip, h3k9me3_chip),
   bin_size = 2000,
@@ -451,6 +471,7 @@ essentially you can overlay any other data you want or further customize
 the results. For example:
 
 ``` r
+
 profile_plot <- plot_bw_profile(
   c(h33_chip, h3k9me3_chip, input_chip),
   loci = genes
@@ -464,10 +485,11 @@ profile_plot +
 ![](plotting_files/figure-html/unnamed-chunk-22-1.png)
 
 ``` r
+
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.6.0 (2026-04-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -487,49 +509,49 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#> [1] wigglescout_0.20.0   rtracklayer_1.70.1   GenomicRanges_1.62.1
-#> [4] Seqinfo_1.0.0        IRanges_2.44.0       S4Vectors_0.48.0    
-#> [7] BiocGenerics_0.56.0  generics_0.1.4       ggplot2_4.0.2       
+#> [1] wigglescout_0.21.0   rtracklayer_1.72.0   GenomicRanges_1.64.0
+#> [4] Seqinfo_1.2.0        IRanges_2.46.0       S4Vectors_0.50.1    
+#> [7] BiocGenerics_0.58.1  generics_0.1.4       ggplot2_4.0.3       
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] SummarizedExperiment_1.40.0 beeswarm_0.4.0             
+#>  [1] SummarizedExperiment_1.42.0 beeswarm_0.4.0             
 #>  [3] gtable_0.3.6                rjson_0.2.23               
-#>  [5] xfun_0.56                   bslib_0.10.0               
-#>  [7] Biobase_2.70.0              lattice_0.22-7             
-#>  [9] Cairo_1.7-0                 vctrs_0.7.1                
-#> [11] tools_4.5.2                 bitops_1.0-9               
-#> [13] curl_7.0.0                  parallel_4.5.2             
+#>  [5] xfun_0.58                   bslib_0.11.0               
+#>  [7] Biobase_2.72.0              lattice_0.22-9             
+#>  [9] Cairo_1.7-0                 vctrs_0.7.3                
+#> [11] tools_4.6.0                 bitops_1.0-9               
+#> [13] curl_7.1.0                  parallel_4.6.0             
 #> [15] tibble_3.3.1                pkgconfig_2.0.3            
-#> [17] Matrix_1.7-4                RColorBrewer_1.1-3         
-#> [19] cigarillo_1.0.0             S7_0.2.1                   
+#> [17] Matrix_1.7-5                RColorBrewer_1.1-3         
+#> [19] cigarillo_1.2.0             S7_0.2.2                   
 #> [21] desc_1.4.3                  lifecycle_1.0.5            
-#> [23] stringr_1.6.0               compiler_4.5.2             
-#> [25] farver_2.1.2                Rsamtools_2.26.0           
-#> [27] textshaping_1.0.5           Biostrings_2.78.0          
+#> [23] stringr_1.6.0               compiler_4.6.0             
+#> [25] farver_2.1.2                Rsamtools_2.28.0           
+#> [27] textshaping_1.0.5           Biostrings_2.80.1          
 #> [29] codetools_0.2-20            vipor_0.4.7                
-#> [31] GenomeInfoDb_1.46.2         htmltools_0.5.9            
-#> [33] sass_0.4.10                 RCurl_1.98-1.17            
+#> [31] GenomeInfoDb_1.48.0         htmltools_0.5.9            
+#> [33] sass_0.4.10                 RCurl_1.98-1.18            
 #> [35] yaml_2.3.12                 tidyr_1.3.2                
 #> [37] pillar_1.11.1               pkgdown_2.2.0              
 #> [39] crayon_1.5.3                jquerylib_0.1.4            
-#> [41] BiocParallel_1.44.0         cachem_1.1.0               
-#> [43] DelayedArray_0.36.0         abind_1.4-8                
+#> [41] BiocParallel_1.46.0         cachem_1.1.0               
+#> [43] DelayedArray_0.38.2         abind_1.4-8                
 #> [45] tidyselect_1.2.1            digest_0.6.39              
-#> [47] stringi_1.8.7               purrr_1.2.1                
-#> [49] dplyr_1.2.0                 restfulr_0.0.16            
+#> [47] stringi_1.8.7               purrr_1.2.2                
+#> [49] dplyr_1.2.1                 restfulr_0.0.16            
 #> [51] labeling_0.4.3              fastmap_1.2.0              
-#> [53] grid_4.5.2                  SparseArray_1.10.9         
-#> [55] cli_3.6.5                   magrittr_2.0.4             
-#> [57] S4Arrays_1.10.1             XML_3.99-0.22              
-#> [59] withr_3.0.2                 UCSC.utils_1.6.1           
+#> [53] grid_4.6.0                  SparseArray_1.12.2         
+#> [55] cli_3.6.6                   magrittr_2.0.5             
+#> [57] S4Arrays_1.12.0             XML_3.99-0.23              
+#> [59] withr_3.0.2                 UCSC.utils_1.8.0           
 #> [61] scales_1.4.0                ggbeeswarm_0.7.3           
-#> [63] rmarkdown_2.30              XVector_0.50.0             
+#> [63] rmarkdown_2.31              XVector_0.52.0             
 #> [65] httr_1.4.8                  matrixStats_1.5.0          
-#> [67] ragg_1.5.1                  evaluate_1.0.5             
+#> [67] ragg_1.5.2                  evaluate_1.0.5             
 #> [69] ggrastr_1.0.2               knitr_1.51                 
-#> [71] BiocIO_1.20.0               rlang_1.1.7                
-#> [73] glue_1.8.0                  jsonlite_2.0.0             
-#> [75] R6_2.6.1                    MatrixGenerics_1.22.0      
-#> [77] GenomicAlignments_1.46.0    systemfonts_1.3.2          
-#> [79] fs_1.6.7
+#> [71] BiocIO_1.22.0               rlang_1.2.0                
+#> [73] glue_1.8.1                  jsonlite_2.0.0             
+#> [75] R6_2.6.1                    MatrixGenerics_1.24.0      
+#> [77] GenomicAlignments_1.48.0    systemfonts_1.3.2          
+#> [79] fs_2.1.0
 ```

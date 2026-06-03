@@ -12,6 +12,7 @@
 <url><loc>https://cnluzon.github.io/wigglescout/reference/build_bins.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/build_bins_bw.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/bw_bins.html</loc></url>
+<url><loc>https://cnluzon.github.io/wigglescout/reference/bw_chr_coverage.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/bw_global_coverage.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/bw_heatmap.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/bw_loci.html</loc></url>
@@ -69,9 +70,11 @@
 <url><loc>https://cnluzon.github.io/wigglescout/reference/dot-validate_references.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/dot-validate_references_with_external_seqinfo.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/dot-violin_body.html</loc></url>
+<url><loc>https://cnluzon.github.io/wigglescout/reference/estimate_read_counts.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/get_datafile.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/get_heatmap_values.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/get_testfile.html</loc></url>
+<url><loc>https://cnluzon.github.io/wigglescout/reference/gr_coverage_to_read_counts.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/index.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/keep_canonical.html</loc></url>
 <url><loc>https://cnluzon.github.io/wigglescout/reference/local_create_sample_bigwig.html</loc></url>

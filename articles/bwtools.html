@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Summarizing bigWig files • wigglescout</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Summarizing bigWig files">
 </head>
@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">wigglescout</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.20.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.21.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,19 +74,33 @@
 Please refer to the quick start guide for more information about the
 bundled data.</p>
 <p>bigWig data can be summarized genome-wide using calculation functions
-that leverage <code>rtracklayer</code> for handling bigWig files (and
-<code>furrr</code> to boost performance for large use cases):
+that leverage <code>rtracklayer</code> for handling bigWig files:
+<code>bw_global_coverage</code>, <code>bw_chr_coverage</code>,
 <code>bw_bins</code>, <code>bw_loci</code>, <code>bw_heatmap</code> or
 <code>bw_profile</code>.</p>
 <div class="section level3">
 <h3 id="genome-wide-analysis">Genome-wide analysis<a class="anchor" aria-label="anchor" href="#genome-wide-analysis"></a>
 </h3>
+<p>You can get a single global coverage value from a bigWig file with
+<code>bw_global_coverage</code>, or compute it per chromosome or contig
+by calling <code>bw_chr_coverage</code>. The latter returns a dataframe
+with matched <code>seqnames</code>, <code>width</code> and a mean
+coverage per element.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This returns a single value</span></span>
+<span><span class="fu"><a href="../reference/bw_global_coverage.html">bw_global_coverage</a></span><span class="op">(</span><span class="va">h33_chip</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2.030646</span></span>
+<span></span>
+<span><span class="co"># This returns a data frame with one entry per contig</span></span>
+<span><span class="fu"><a href="../reference/bw_chr_coverage.html">bw_chr_coverage</a></span><span class="op">(</span><span class="va">h33_chip</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   seqnames start       end     width strand    score</span></span>
+<span><span class="co">#&gt; 1    chr15     1 103494974 103494974      * 2.030646</span></span></code></pre></div>
 <p><code>bw_bins</code> function returns a <code>GRanges</code> object
 where each entry is a locus of length <code>bin_size</code> and its
 score is the mean coverage.</p>
 <p><strong>Note:</strong> Small bin sizes (&lt; 5000bp) take longer to
 run.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Several bwfiles can be provided at once</span></span>
 <span><span class="fu"><a href="../reference/bw_bins.html">bw_bins</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">input_chip</span><span class="op">)</span>,</span>
 <span>        bin_size <span class="op">=</span> <span class="fl">2000</span>,</span>
@@ -112,7 +126,7 @@ run.</p>
 background to normalize the bin values to. For instance, in the previous
 case, one could want to use the input values to normalize the H3.3 ChIP
 data:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bw_bins.html">bw_bins</a></span><span class="op">(</span><span class="va">h33_chip</span>, bg_bwfiles <span class="op">=</span> <span class="va">input_chip</span>,</span>
 <span>        bin_size <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>        genome <span class="op">=</span> <span class="st">"mm9"</span>,</span>
@@ -135,7 +149,7 @@ data:</p>
 <span><span class="co">#&gt;   seqinfo: 35 sequences from an unspecified genome; no seqlengths</span></span></code></pre></div>
 <p>If you want to get the log2 ratio sample / input, select
 <code>norm_mode = "log2fc"</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bw_bins.html">bw_bins</a></span><span class="op">(</span><span class="va">h33_chip</span>, bg_bwfiles <span class="op">=</span> <span class="va">input_chip</span>,</span>
 <span>        bin_size <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>        genome <span class="op">=</span> <span class="st">"mm9"</span>,</span>
@@ -169,6 +183,13 @@ about chromosome length. This is obtained relying on function
 <code>Seqinfo</code> from <code>GenomeInfoDb</code> package. So, in
 theory, any genome ID that would return a <code>Seqinfo</code> object by
 doing <code>Seqinfo(genome="your_genome")</code> should work.</p>
+<p>For more custom applications, there are also auxiliary functions
+<code>build_bins</code> to obtain a <code>GRanges</code> object that can
+then be used in <code>bw_loci</code>, and also a further
+<code>build_bins_bw</code> which takes a bigWig file and tiles it based
+on the references found in it. This is useful when you are not certain
+exactly which reference version was used in a bigWig or when you do not
+want to rely on internet connection for tiling.</p>
 </div>
 </div>
 <div class="section level3">
@@ -182,7 +203,7 @@ want to look at, rather than general genome-wide trends.</p>
 <p>To calculate values on a <em>locus</em> specific manner you can use
 <code>bw_loci</code> function. For instance, we can look at the genes at
 this region:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bw_loci.html">bw_loci</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">h33_chip</span>, <span class="va">input_chip</span><span class="op">)</span>, loci <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; GRanges object with 26 ranges and 3 metadata columns:</span></span>
 <span><span class="co">#&gt;        seqnames              ranges strand | sample_H33_ChIP sample_Input</span></span>
@@ -216,7 +237,7 @@ this region:</p>
 <p>Many of the options available for <code>bw_bins</code> are shared
 with <code>bw_loci</code>, so you can also use background bigWig
 files:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/bw_loci.html">bw_loci</a></span><span class="op">(</span><span class="va">h33_chip</span>, bg_bwfiles <span class="op">=</span> <span class="va">input_chip</span>, loci <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span>
 <span><span class="co">#&gt; GRanges object with 26 ranges and 2 metadata columns:</span></span>
 <span><span class="co">#&gt;        seqnames              ranges strand | sample_H33_ChIP        name</span></span>
@@ -238,7 +259,7 @@ files:</p>
 <em>loci</em> IDs.</p>
 <p>You can also provide <code>GRanges</code> objects instead of
 <code>BED</code> files:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">genes_granges</span> <span class="op">&lt;-</span> <span class="fu">rtracklayer</span><span class="fu">::</span><span class="fu">import</span><span class="op">(</span><span class="va">genes</span>, format <span class="op">=</span> <span class="st">"BED"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/bw_loci.html">bw_loci</a></span><span class="op">(</span><span class="va">h33_chip</span>, bg_bwfiles <span class="op">=</span> <span class="va">input_chip</span>, loci <span class="op">=</span> <span class="va">genes_granges</span><span class="op">)</span></span>
@@ -265,7 +286,7 @@ files:</p>
 <p>It is also possible to aggregate values by some kind of category.
 This is useful for <code>BED</code> files where ID is not an individual
 entity but rather a category, for instance, ChromHMM annotations:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">chrom_ranges</span> <span class="op">&lt;-</span> <span class="fu">import</span><span class="op">(</span><span class="va">chromhmm</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">chrom_ranges</span></span>
@@ -287,7 +308,7 @@ entity but rather a category, for instance, ChromHMM annotations:</p>
 <span><span class="co">#&gt;   seqinfo: 1 sequence from an unspecified genome; no seqlengths</span></span></code></pre></div>
 <p>It is possible to get a single value per category using
 <code>aggregate_by</code> parameter.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># If aggregate_by is not provided, you get a non-aggregated GRanges</span></span>
 <span><span class="fu"><a href="../reference/bw_loci.html">bw_loci</a></span><span class="op">(</span><span class="va">h33_chip</span>,</span>
 <span>        bg_bwfiles <span class="op">=</span> <span class="va">input_chip</span>,</span>
@@ -338,7 +359,7 @@ across a set of <em>loci</em>. This is calculated by
 provided bed file and slices it into a fixed number of bins (this is
 determined by <code>bin_size</code> parameter). Each bin is aggregated
 together across loci.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bw_profile.html">bw_profile</a></span><span class="op">(</span><span class="va">h33_chip</span>, loci <span class="op">=</span> <span class="va">genes</span>, bin_size <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">profile</span><span class="op">)</span></span>
@@ -356,7 +377,7 @@ by index. This index determines its bin.</p>
 <p>You can also provide <code>upstream</code> and
 <code>downstream</code> base pairs values to include in this
 calculation.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">profile</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bw_profile.html">bw_profile</a></span><span class="op">(</span><span class="va">h33_chip</span>, loci <span class="op">=</span> <span class="va">genes</span>, bin_size <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>                      upstream <span class="op">=</span> <span class="fl">500</span>, downstream <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span>
 <span></span>
@@ -384,7 +405,7 @@ what you get with <code>bw_heatmap</code>. <code>bw_heatmap</code>
 returns a <code>matrix</code> where each row is a locus and each column
 is a bin. The rest of parameters are analogous to
 <code>bw_profile</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bw_heatmap.html">bw_heatmap</a></span><span class="op">(</span><span class="va">h33_chip</span>, loci <span class="op">=</span> <span class="va">genes</span>, bin_size <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>                  upstream <span class="op">=</span> <span class="fl">5000</span>, downstream <span class="op">=</span> <span class="fl">5000</span><span class="op">)</span></span>
 <span></span>
@@ -437,11 +458,11 @@ an interface with the underlying <code>rtracklayer</code> summary
 function. It defaults to <code>mean</code> and it is not recommended to
 change it.</li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span><span class="co">#&gt; R version 4.6.0 (2026-04-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 24.04.3 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.4 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
@@ -461,50 +482,50 @@ change it.</li>
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] wigglescout_0.20.0   rtracklayer_1.70.1   GenomicRanges_1.62.1</span></span>
-<span><span class="co">#&gt; [4] Seqinfo_1.0.0        IRanges_2.44.0       S4Vectors_0.48.0    </span></span>
-<span><span class="co">#&gt; [7] BiocGenerics_0.56.0  generics_0.1.4       ggplot2_4.0.2       </span></span>
+<span><span class="co">#&gt; [1] wigglescout_0.21.0   rtracklayer_1.72.0   GenomicRanges_1.64.0</span></span>
+<span><span class="co">#&gt; [4] Seqinfo_1.2.0        IRanges_2.46.0       S4Vectors_0.50.1    </span></span>
+<span><span class="co">#&gt; [7] BiocGenerics_0.58.1  generics_0.1.4       ggplot2_4.0.3       </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] SummarizedExperiment_1.40.0 beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt;  [1] SummarizedExperiment_1.42.0 beeswarm_0.4.0             </span></span>
 <span><span class="co">#&gt;  [3] gtable_0.3.6                rjson_0.2.23               </span></span>
-<span><span class="co">#&gt;  [5] xfun_0.56                   bslib_0.10.0               </span></span>
-<span><span class="co">#&gt;  [7] Biobase_2.70.0              lattice_0.22-7             </span></span>
-<span><span class="co">#&gt;  [9] vctrs_0.7.1                 tools_4.5.2                </span></span>
-<span><span class="co">#&gt; [11] bitops_1.0-9                curl_7.0.0                 </span></span>
-<span><span class="co">#&gt; [13] parallel_4.5.2              tibble_3.3.1               </span></span>
-<span><span class="co">#&gt; [15] pkgconfig_2.0.3             Matrix_1.7-4               </span></span>
-<span><span class="co">#&gt; [17] RColorBrewer_1.1-3          cigarillo_1.0.0            </span></span>
-<span><span class="co">#&gt; [19] S7_0.2.1                    desc_1.4.3                 </span></span>
+<span><span class="co">#&gt;  [5] xfun_0.58                   bslib_0.11.0               </span></span>
+<span><span class="co">#&gt;  [7] Biobase_2.72.0              lattice_0.22-9             </span></span>
+<span><span class="co">#&gt;  [9] vctrs_0.7.3                 tools_4.6.0                </span></span>
+<span><span class="co">#&gt; [11] bitops_1.0-9                curl_7.1.0                 </span></span>
+<span><span class="co">#&gt; [13] parallel_4.6.0              tibble_3.3.1               </span></span>
+<span><span class="co">#&gt; [15] pkgconfig_2.0.3             Matrix_1.7-5               </span></span>
+<span><span class="co">#&gt; [17] RColorBrewer_1.1-3          cigarillo_1.2.0            </span></span>
+<span><span class="co">#&gt; [19] S7_0.2.2                    desc_1.4.3                 </span></span>
 <span><span class="co">#&gt; [21] lifecycle_1.0.5             stringr_1.6.0              </span></span>
-<span><span class="co">#&gt; [23] compiler_4.5.2              farver_2.1.2               </span></span>
-<span><span class="co">#&gt; [25] Rsamtools_2.26.0            textshaping_1.0.5          </span></span>
-<span><span class="co">#&gt; [27] Biostrings_2.78.0           codetools_0.2-20           </span></span>
-<span><span class="co">#&gt; [29] vipor_0.4.7                 GenomeInfoDb_1.46.2        </span></span>
+<span><span class="co">#&gt; [23] compiler_4.6.0              farver_2.1.2               </span></span>
+<span><span class="co">#&gt; [25] Rsamtools_2.28.0            textshaping_1.0.5          </span></span>
+<span><span class="co">#&gt; [27] Biostrings_2.80.1           codetools_0.2-20           </span></span>
+<span><span class="co">#&gt; [29] vipor_0.4.7                 GenomeInfoDb_1.48.0        </span></span>
 <span><span class="co">#&gt; [31] htmltools_0.5.9             sass_0.4.10                </span></span>
-<span><span class="co">#&gt; [33] RCurl_1.98-1.17             yaml_2.3.12                </span></span>
+<span><span class="co">#&gt; [33] RCurl_1.98-1.18             yaml_2.3.12                </span></span>
 <span><span class="co">#&gt; [35] tidyr_1.3.2                 pillar_1.11.1              </span></span>
 <span><span class="co">#&gt; [37] pkgdown_2.2.0               crayon_1.5.3               </span></span>
-<span><span class="co">#&gt; [39] jquerylib_0.1.4             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt; [41] cachem_1.1.0                DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt; [39] jquerylib_0.1.4             BiocParallel_1.46.0        </span></span>
+<span><span class="co">#&gt; [41] cachem_1.1.0                DelayedArray_0.38.2        </span></span>
 <span><span class="co">#&gt; [43] abind_1.4-8                 tidyselect_1.2.1           </span></span>
 <span><span class="co">#&gt; [45] digest_0.6.39               stringi_1.8.7              </span></span>
-<span><span class="co">#&gt; [47] purrr_1.2.1                 dplyr_1.2.0                </span></span>
+<span><span class="co">#&gt; [47] purrr_1.2.2                 dplyr_1.2.1                </span></span>
 <span><span class="co">#&gt; [49] restfulr_0.0.16             fastmap_1.2.0              </span></span>
-<span><span class="co">#&gt; [51] grid_4.5.2                  SparseArray_1.10.9         </span></span>
-<span><span class="co">#&gt; [53] cli_3.6.5                   magrittr_2.0.4             </span></span>
-<span><span class="co">#&gt; [55] S4Arrays_1.10.1             XML_3.99-0.22              </span></span>
-<span><span class="co">#&gt; [57] withr_3.0.2                 UCSC.utils_1.6.1           </span></span>
+<span><span class="co">#&gt; [51] grid_4.6.0                  SparseArray_1.12.2         </span></span>
+<span><span class="co">#&gt; [53] cli_3.6.6                   magrittr_2.0.5             </span></span>
+<span><span class="co">#&gt; [55] S4Arrays_1.12.0             XML_3.99-0.23              </span></span>
+<span><span class="co">#&gt; [57] withr_3.0.2                 UCSC.utils_1.8.0           </span></span>
 <span><span class="co">#&gt; [59] scales_1.4.0                ggbeeswarm_0.7.3           </span></span>
-<span><span class="co">#&gt; [61] rmarkdown_2.30              XVector_0.50.0             </span></span>
+<span><span class="co">#&gt; [61] rmarkdown_2.31              XVector_0.52.0             </span></span>
 <span><span class="co">#&gt; [63] httr_1.4.8                  matrixStats_1.5.0          </span></span>
-<span><span class="co">#&gt; [65] ragg_1.5.1                  evaluate_1.0.5             </span></span>
+<span><span class="co">#&gt; [65] ragg_1.5.2                  evaluate_1.0.5             </span></span>
 <span><span class="co">#&gt; [67] ggrastr_1.0.2               knitr_1.51                 </span></span>
-<span><span class="co">#&gt; [69] BiocIO_1.20.0               rlang_1.1.7                </span></span>
-<span><span class="co">#&gt; [71] glue_1.8.0                  jsonlite_2.0.0             </span></span>
-<span><span class="co">#&gt; [73] R6_2.6.1                    MatrixGenerics_1.22.0      </span></span>
-<span><span class="co">#&gt; [75] GenomicAlignments_1.46.0    systemfonts_1.3.2          </span></span>
-<span><span class="co">#&gt; [77] fs_1.6.7</span></span></code></pre></div>
+<span><span class="co">#&gt; [69] BiocIO_1.22.0               rlang_1.2.0                </span></span>
+<span><span class="co">#&gt; [71] glue_1.8.1                  jsonlite_2.0.0             </span></span>
+<span><span class="co">#&gt; [73] R6_2.6.1                    MatrixGenerics_1.24.0      </span></span>
+<span><span class="co">#&gt; [75] GenomicAlignments_1.48.0    systemfonts_1.3.2          </span></span>
+<span><span class="co">#&gt; [77] fs_2.1.0</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

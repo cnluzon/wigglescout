@@ -105,6 +105,8 @@ BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
   : Build a tiles GRanges out of a bigWig file on a given bin size.
 - [`bw_bins()`](https://cnluzon.github.io/wigglescout/reference/bw_bins.md)
   : Build a binned-scored GRanges object from a set of bigWig files
+- [`bw_chr_coverage()`](https://cnluzon.github.io/wigglescout/reference/bw_chr_coverage.md)
+  : Calculate bigWig coverage per chromosome
 - [`bw_global_coverage()`](https://cnluzon.github.io/wigglescout/reference/bw_global_coverage.md)
   : Calculate bigWig global coverage.
 - [`bw_heatmap()`](https://cnluzon.github.io/wigglescout/reference/bw_heatmap.md)
@@ -232,12 +234,16 @@ BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
 - [`.violin_body()`](https://cnluzon.github.io/wigglescout/reference/dot-violin_body.md)
   : Internal function to plot ranges in violin plot with a highlighted
   GRanges.
+- [`estimate_read_counts()`](https://cnluzon.github.io/wigglescout/reference/estimate_read_counts.md)
+  : Estimate the number of reads in a locus
 - [`get_datafile()`](https://cnluzon.github.io/wigglescout/reference/get_datafile.md)
   : Return the full path of a test file in wigglescout package
 - [`get_heatmap_values()`](https://cnluzon.github.io/wigglescout/reference/get_heatmap_values.md)
   : Get heatmap fixture from bw_heatmap for test plotting
 - [`get_testfile()`](https://cnluzon.github.io/wigglescout/reference/get_testfile.md)
   : Return the full path of a test file in wigglescout package
+- [`gr_coverage_to_read_counts()`](https://cnluzon.github.io/wigglescout/reference/gr_coverage_to_read_counts.md)
+  : Convert a GRanges object with coverage values to estimated counts
 - [`keep_canonical()`](https://cnluzon.github.io/wigglescout/reference/keep_canonical.md)
   : Filter out unplaced contigs and uncharacterized chromosomes from a
   GRanges object.
