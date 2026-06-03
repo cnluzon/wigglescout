@@ -327,6 +327,17 @@ test_that("bw_global_coverage returns correct value", {
     expect_equal(value, 10.5)
 })
 
+## bw_ref_coverage ----------------------------------------
+
+test_that("bw_chr_coverage returns correct value", {
+    bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+    result <- bw_chr_coverage(bw1)
+
+    expect_equal(result[result$seqnames == "chr1", "score"], 5.5)
+    expect_equal(result[result$seqnames == "chr2", "score"], 15.5)
+})
+
+
 ## bw_loci ---------------------------------------------------
 
 test_that("bw_loci returns correct per locus values", {
