@@ -1,3 +1,12 @@
+# wigglescout 0.21.0
+
+## Features
+
+* `gr_coverage_to_counts` function to convert a `GRanges` object calculated by
+mean coverage into an estimate of raw counts.
+* `bw_chr_coverage` function to calculate a global mean per chromosome or
+reference present in a bigWig file. 
+
 # wigglescout 0.20.0
 
 Date: 09/03/2026
