@@ -1,5 +1,14 @@
 # Changelog
 
+## wigglescout 0.21.2
+
+- Chromosome sizes returned by `Seqinfo::Seqinfo(genome = "genome")`
+  function calls are snapshot and kept as internal data, so reliance on
+  external API is reduced and the unit tests are kept internal. The
+  snapshot involved commonly used assemblies as mm39, hg38, and some
+  more. Non-included references will be queried against `GenomeInfoDb`
+  api.
+
 ## wigglescout 0.21.1
 
 Date 04/06/2026

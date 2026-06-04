@@ -46,6 +46,9 @@
   : Filter scatterplot data with quantile threshold on both axes
 - [`.filter_violin_data()`](https://cnluzon.github.io/wigglescout/reference/dot-filter_violin_data.md)
   : Filter violin plot data with quantile threshold
+- [`.format_labels()`](https://cnluzon.github.io/wigglescout/reference/dot-format_labels.md)
+  : Shorten labels to a max length and verify no repeated elements are
+  produced
 - [`.get_wrapper_parameter_values()`](https://cnluzon.github.io/wigglescout/reference/dot-get_wrapper_parameter_values.md)
   : Get matching parameters of a target function with current context
 - [`.granges_left_join()`](https://cnluzon.github.io/wigglescout/reference/dot-granges_left_join.md)

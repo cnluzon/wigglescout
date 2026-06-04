@@ -434,7 +434,7 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#> [1] wigglescout_0.21.1   rtracklayer_1.72.0   GenomicRanges_1.64.0
+#> [1] wigglescout_0.21.2   rtracklayer_1.72.0   GenomicRanges_1.64.0
 #> [4] Seqinfo_1.2.0        IRanges_2.46.0       S4Vectors_0.50.1    
 #> [7] BiocGenerics_0.58.1  generics_0.1.4       ggplot2_4.0.3       
 #> 
