@@ -20,4 +20,4 @@ Get a valid label
 
 ## Value
 
-A valid label name
+A valid set of labels

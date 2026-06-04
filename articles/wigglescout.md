@@ -295,7 +295,7 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#> [1] wigglescout_0.21.0   rtracklayer_1.72.0   GenomicRanges_1.64.0
+#> [1] wigglescout_0.21.1   rtracklayer_1.72.0   GenomicRanges_1.64.0
 #> [4] Seqinfo_1.2.0        IRanges_2.46.0       S4Vectors_0.50.1    
 #> [7] BiocGenerics_0.58.1  generics_0.1.4       ggplot2_4.0.3       
 #> 
@@ -316,7 +316,7 @@ sessionInfo()
 #> [27] textshaping_1.0.5           Biostrings_2.80.1          
 #> [29] codetools_0.2-20            vipor_0.4.7                
 #> [31] GenomeInfoDb_1.48.0         htmltools_0.5.9            
-#> [33] sass_0.4.10                 RCurl_1.98-1.18            
+#> [33] sass_0.4.10                 RCurl_1.98-1.19            
 #> [35] yaml_2.3.12                 tidyr_1.3.2                
 #> [37] pillar_1.11.1               pkgdown_2.2.0              
 #> [39] crayon_1.5.3                jquerylib_0.1.4            

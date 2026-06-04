@@ -200,6 +200,8 @@ BiocManager::install(c('GenomeInfoDb', 'GenomicRanges', 'rtracklayer'))
   : Make profile labels
 - [`.remove_top_by_mean()`](https://cnluzon.github.io/wigglescout/reference/dot-remove_top_by_mean.md)
   : Remove top loci in a GRanges column by mean of specified values
+- [`.repeated_elements()`](https://cnluzon.github.io/wigglescout/reference/dot-repeated_elements.md)
+  : Test if an array has repeated element
 - [`.round_ignore_null()`](https://cnluzon.github.io/wigglescout/reference/dot-round_ignore_null.md)
   : Round a value. If it's NULL, returns NULL.
 - [`.scatterplot_body()`](https://cnluzon.github.io/wigglescout/reference/dot-scatterplot_body.md)
