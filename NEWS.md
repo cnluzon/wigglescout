@@ -4,9 +4,10 @@ Date 04/06/2026
 
 ## Bug fix
 
-* `bw_profile` and `plot_bw_profile` would mix up the labels when these shared
-a long enough prefix. Now these functions check for uniqueness, and fix repeated
-labels it by adding a number and throwing a warning.
+* Label handling was not behaving correctly when there were repeated labels,
+leading to inconsistent behavior. Now all the main functions with labels 
+check for uniqueness in a more consistent way and throw an informative 
+warning when this requirement is not met.
 
 # wigglescout 0.20.0
 
