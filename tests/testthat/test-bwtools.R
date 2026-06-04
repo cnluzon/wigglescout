@@ -702,6 +702,33 @@ test_that("bw_loci on non-existing bed file throws an error", {
   "Files not found: invalidname.bed")
 })
 
+test_that("bw_loci fixes repeated labels and throws a warning", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), chromsizes)
+
+  values <- expect_warning({
+    bw_loci(c(bw1, bw2),
+                    get_testfile("labeled.bed"), labels = c("b", "b"),
+                    per_locus_stat = "mean")
+  })
+
+  expect_equal(GenomicRanges::mcols(values) |> colnames(), c("b_1", "b_2", "name"))
+})
+
+test_that("bw_loci throws a warning when names share a long prefix and no labels are provided", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  expect_warning({
+    values <- bw_loci(c(bw1, bw2), loci = get_testfile("labeled.bed")
+    )
+  })
+
+  expect_equal(
+    GenomicRanges::mcols(values) |> colnames(),
+    c("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_1", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_2", "name")
+  )
+})
+
 ## bw_bins ---------------------------------------------------
 
 test_that("bw_bins returns correct per locus values", {
@@ -738,6 +765,22 @@ test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
   expect_is(values, 'GRanges')
   expect_equal(values[1]$bw1, 1)
   expect_equal(values[2]$bw1, 1)
+})
+
+test_that("bw_bins fixes repeated labels and throws a warning", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), chromsizes)
+
+  values <- expect_warning({
+    bw_bins(
+      c(bw1, bw2),
+      selection = import(get_testfile("labeled.bed")),
+      labels = c("b", "b"),
+      per_locus_stat = "mean"
+    )
+  })
+
+  expect_equal(GenomicRanges::mcols(values) |> colnames(), c("b_1", "b_2"))
 })
 
 ## bw_profile -------------------------
