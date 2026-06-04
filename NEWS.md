@@ -1,4 +1,17 @@
+# wigglescout 0.21.1
+
+Date 04/06/2026
+
+## Bug fix
+
+* Label handling was not behaving correctly when there were repeated labels,
+leading to inconsistent behavior. Now all the main functions with labels 
+check for uniqueness in a more consistent way and throw an informative 
+warning when this requirement is not met.
+
 # wigglescout 0.21.0
+
+Date 03/06/2026
 
 ## Features
 

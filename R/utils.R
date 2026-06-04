@@ -317,17 +317,68 @@
 #'
 #' @param obj Something to convert to label
 #' @param max_length Max length allowed for a label to have (35)
+#' @importFrom dplyr group_by ungroup mutate select
 #'
-#' @return A valid label name
+#' @return A valid set of labels
 .make_label_from_object <- function(obj, max_length = 35) {
+    labels <- NULL
     if (is.character(obj)) {
-        filename_clean <- basename(tools::file_path_sans_ext(obj))
-        sapply(make.names(filename_clean), .trunc_str, max_length = max_length)
+      labels <- basename(tools::file_path_sans_ext(obj)) |> make.names()
     } else {
-      sapply(make.names(class(obj)), .trunc_str, max_length = max_length)
+      labels <- make.names(class(obj))
     }
+
+    .format_labels(labels, max_length)
 }
 
+#' Shorten labels to a max length and verify no repeated elements are produced
+#'
+#' @param labels List of labels
+#' @param max_length Number of characters the shorten labels can have (35)
+#'
+#' @returns An array of strings
+.format_labels <- function(labels, max_length = 35) {
+  labels_short <- sapply(labels, .trunc_str, max_length = max_length)
+  # make labelling robust to data.frame conventions
+  labels_short <- make.names(labels_short)
+  if (.repeated_elements(labels_short)) {
+    # This is really the only way to guarantee different labels, truncating
+    # from other anchor points does not cover all possible cases
+    unique_labels_df <- data.frame("full_id" = labels, "id" = labels_short) |>
+      group_by(.data$id) |>
+      mutate(label = paste(.data$id, row_number(), sep = "_")) |>
+      ungroup()
+
+    labels_short <- unique_labels_df$label
+
+    df_str <- unique_labels_df |>
+      select(.data$full_id, .data$label) |>
+      print() |>
+      utils::capture.output()
+
+    warning(paste0(
+      "Labels must be unique. Some samples share a prefix longer than ",
+      "max label length (", max_length, "): ",
+      "Consider using the labels parameter or renaming your files:"),
+      paste(df_str, collapse = "\n")
+    )
+
+  }
+  labels_short
+}
+
+#' Test if an array has repeated element
+#'
+#' @param array An array of char
+#'
+#' @returns TRUE if all elements in the array are unique
+.repeated_elements <- function(array) {
+  if (length(array) > length(unique(array))) {
+    TRUE
+  } else {
+    FALSE
+  }
+}
 
 #' Generate a human-readable normalization function string
 #'

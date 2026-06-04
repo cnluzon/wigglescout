@@ -701,6 +701,45 @@ test_that("bw_loci fails if aggregate_by in an unnamed bed file", {
   )
 })
 
+test_that("bw_loci on non-existing bed file throws an error", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  expect_error({
+    values <- bw_loci(bw1,
+                      "invalidname.bed",
+                      per_locus_stat = "mean",
+                      aggregate_by = "true_mean"
+    )
+  },
+  "Files not found: invalidname.bed")
+})
+
+test_that("bw_loci fixes repeated labels and throws a warning", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), chromsizes)
+
+  values <- expect_warning({
+    bw_loci(c(bw1, bw2),
+                    get_testfile("labeled.bed"), labels = c("b", "b"),
+                    per_locus_stat = "mean")
+  })
+
+  expect_equal(GenomicRanges::mcols(values) |> colnames(), c("b_1", "b_2", "name"))
+})
+
+test_that("bw_loci throws a warning when names share a long prefix and no labels are provided", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  expect_warning({
+    values <- bw_loci(c(bw1, bw2), loci = get_testfile("labeled.bed")
+    )
+  })
+
+  expect_equal(
+    GenomicRanges::mcols(values) |> colnames(),
+    c("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_1", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_2", "name")
+  )
+})
+
 ## bw_bins ---------------------------------------------------
 
 test_that("bw_bins returns correct per locus values", {
@@ -739,6 +778,22 @@ test_that("bw_bins returns 1 when bwfile == bg_bwfile", {
   expect_equal(values[2]$bw1, 1)
 })
 
+test_that("bw_bins fixes repeated labels and throws a warning", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), chromsizes)
+
+  values <- expect_warning({
+    bw_bins(
+      c(bw1, bw2),
+      selection = import(get_testfile("labeled.bed")),
+      labels = c("b", "b"),
+      per_locus_stat = "mean"
+    )
+  })
+
+  expect_equal(GenomicRanges::mcols(values) |> colnames(), c("b_1", "b_2"))
+})
+
 ## bw_profile -------------------------
 
 test_that("bw_profile on an empty list throws an error", {
@@ -751,17 +806,6 @@ test_that("bw_profile on an empty list throws an error", {
   "File list provided is empty.")
 })
 
-test_that("bw_loci on non-existing bed file throws an error", {
-  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
-  expect_error({
-    values <- bw_loci(bw1,
-                     "invalidname.bed",
-                     per_locus_stat = "mean",
-                     aggregate_by = "true_mean"
-    )
-  },
-  "Files not found: invalidname.bed")
-})
 
 test_that("bw_profile on non-existing bed file throws an error", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
@@ -773,6 +817,7 @@ test_that("bw_profile on non-existing bed file throws an error", {
   },
   "Files not found: invalidname.bed")
 })
+
 
 test_that("bw_profile errors on non existing files on bwlist", {
   bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), chromsizes)
@@ -796,6 +841,41 @@ test_that("bw_profile runs quiet on valid parameters", {
                          bin_size = 1
     )
   })
+})
+
+test_that("bw_profile throws a warning when names share a long prefix and no labels are provided", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  expect_warning({
+    values <- bw_profile(c(bw1, bw2),
+                         loci = get_testfile("labeled.bed"),
+                         upstream = 1,
+                         downstream = 1,
+                         bin_size = 1
+    )
+  })
+})
+
+test_that("bw_profile handles long shared names appending a number", {
+  bw1 <- local_create_sample_bigwig(get_testfile("bed1.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+  bw2 <- local_create_sample_bigwig(get_testfile("bed2.bed"), f = tempfile(pattern = paste0(rep("a",40), collapse = ""), fileext = ".bw"), chromsizes)
+
+  expect_warning({values <- bw_profile(
+    c(bw1, bw2),
+    loci = get_testfile("labeled.bed"),
+    upstream = 1,
+    downstream = 1,
+    bin_size = 1
+  )})
+
+  sample_labels <- values$sample |> unique()
+  end_1 <- substr(sample_labels[1], nchar(sample_labels[1]), nchar(sample_labels[1])+1)
+  end_2 <- substr(sample_labels[2], nchar(sample_labels[2]), nchar(sample_labels[2])+1)
+
+  expect_false(sample_labels[1] == sample_labels[2])
+  expect_equal(end_1, "1")
+  expect_equal(end_2, "2")
+
 })
 
 test_that("bw_profile runs on GRanges object", {

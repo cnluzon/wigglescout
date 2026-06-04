@@ -12,7 +12,7 @@
 \item{max_length}{Max length allowed for a label to have (35)}
 }
 \value{
-A valid label name
+A valid set of labels
 }
 \description{
 Get a valid label
