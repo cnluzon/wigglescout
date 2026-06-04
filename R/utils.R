@@ -317,6 +317,7 @@
 #'
 #' @param obj Something to convert to label
 #' @param max_length Max length allowed for a label to have (35)
+#' @importFrom dplyr group_by ungroup mutate select
 #'
 #' @return A valid set of labels
 .make_label_from_object <- function(obj, max_length = 35) {
@@ -329,18 +330,26 @@
 
     labels_short <- sapply(labels, .trunc_str, max_length = max_length)
     if (.repeated_elements(labels_short)) {
+      # This is really the only way to guarantee different labels, truncating
+      # from other anchor points does not cover all possible cases
+      unique_labels_df <- data.frame("full_id" = labels, "id" = labels_short) |>
+        group_by(.data$id) |>
+        mutate(label = paste(.data$id, row_number(), sep = "_")) |>
+        ungroup()
+
+      labels_short <- unique_labels_df$label
+
+      df_str <- unique_labels_df |>
+        select(.data$full_id, .data$label) |>
+        print() |>
+        utils::capture.output()
+
       warning(paste0(
         "Labels must be unique. Some samples share a prefix longer than ",
         "max label length (", max_length, "): ",
-        "Consider using the labels parameter or renaming your files.")
+        "Consider using the labels parameter or renaming your files:"),
+        paste(df_str, collapse = "\n")
       )
-      # This is really the only way to guarantee different labels, truncating
-      # from other anchor points does not cover all possible cases
-      unique_labels_df <- data.frame("id" = labels_short) |>
-        group_by(.data$id) |>
-        mutate(label = paste(.data$id, row_number(), sep = "_"))
-      labels_short <- unique_labels_df$label
-
     }
     labels_short
 }
