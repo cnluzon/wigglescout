@@ -328,30 +328,43 @@
       labels <- make.names(class(obj))
     }
 
-    labels_short <- sapply(labels, .trunc_str, max_length = max_length)
-    if (.repeated_elements(labels_short)) {
-      # This is really the only way to guarantee different labels, truncating
-      # from other anchor points does not cover all possible cases
-      unique_labels_df <- data.frame("full_id" = labels, "id" = labels_short) |>
-        group_by(.data$id) |>
-        mutate(label = paste(.data$id, row_number(), sep = "_")) |>
-        ungroup()
+    .format_labels(labels, max_length)
+}
 
-      labels_short <- unique_labels_df$label
+#' Shorten labels to a max length and verify no repeated elements are produced
+#'
+#' @param labels List of labels
+#' @param max_length Number of characters the shorten labels can have (35)
+#'
+#' @returns An array of strings
+.format_labels <- function(labels, max_length = 35) {
+  labels_short <- sapply(labels, .trunc_str, max_length = max_length)
+  # make labelling robust to data.frame conventions
+  labels_short <- make.names(labels_short)
+  if (.repeated_elements(labels_short)) {
+    # This is really the only way to guarantee different labels, truncating
+    # from other anchor points does not cover all possible cases
+    unique_labels_df <- data.frame("full_id" = labels, "id" = labels_short) |>
+      group_by(.data$id) |>
+      mutate(label = paste(.data$id, row_number(), sep = "_")) |>
+      ungroup()
 
-      df_str <- unique_labels_df |>
-        select(.data$full_id, .data$label) |>
-        print() |>
-        utils::capture.output()
+    labels_short <- unique_labels_df$label
 
-      warning(paste0(
-        "Labels must be unique. Some samples share a prefix longer than ",
-        "max label length (", max_length, "): ",
-        "Consider using the labels parameter or renaming your files:"),
-        paste(df_str, collapse = "\n")
-      )
-    }
-    labels_short
+    df_str <- unique_labels_df |>
+      select(.data$full_id, .data$label) |>
+      print() |>
+      utils::capture.output()
+
+    warning(paste0(
+      "Labels must be unique. Some samples share a prefix longer than ",
+      "max label length (", max_length, "): ",
+      "Consider using the labels parameter or renaming your files:"),
+      paste(df_str, collapse = "\n")
+    )
+
+  }
+  labels_short
 }
 
 #' Test if an array has repeated element
