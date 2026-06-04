@@ -40,11 +40,23 @@ This vignette uses the bundled data to showcase these functions. Please refer
 to the quick start guide for more information about the bundled data.
 
 bigWig data can be summarized genome-wide using calculation functions that
-leverage `rtracklayer` for handling bigWig files (and `furrr` to boost
-performance for large use cases): `bw_bins`, `bw_loci`, `bw_heatmap` or
-`bw_profile`.
+leverage `rtracklayer` for handling bigWig files: `bw_global_coverage`,
+`bw_chr_coverage`, `bw_bins`, `bw_loci`, `bw_heatmap` or `bw_profile`.
 
 ## Genome-wide analysis
+
+You can get a single global coverage value from a bigWig file with
+`bw_global_coverage`, or compute it per chromosome or contig by calling 
+`bw_chr_coverage`. The latter returns a dataframe with matched `seqnames`,
+`width` and a mean coverage per element.
+
+```{r}
+# This returns a single value
+bw_global_coverage(h33_chip)
+
+# This returns a data frame with one entry per contig
+bw_chr_coverage(h33_chip)
+```
 
 `bw_bins` function returns a `GRanges` object where each entry is a locus of 
 length `bin_size` and its score is the mean coverage.
@@ -89,6 +101,13 @@ requires information about chromosome length. This is obtained relying on
 function `Seqinfo` from `GenomeInfoDb` package. So, in theory, any genome ID
 that would return a `Seqinfo` object by doing `Seqinfo(genome="your_genome")`
 should work.
+
+For more custom applications, there are also auxiliary functions `build_bins`
+to obtain a `GRanges` object that can then be used in `bw_loci`, and also a 
+further `build_bins_bw` which takes a bigWig file and tiles it based on the
+references found in it. This is useful when you are not certain exactly which
+reference version was used in a bigWig or when you do not want to rely on 
+internet connection for tiling.
 
 ## Locus-based analysis
 
