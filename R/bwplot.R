@@ -907,8 +907,7 @@ plot_gr_violin <- function(gr, columns,
 #' @param highlight_label Labels for the highlight groups.
 #'  If not provided, column names are used.
 #' @param highlight_colors Array of color values for the highlighting groups
-#' @importFrom ggplot2 ggplot geom_point aes
-#'  geom_bin2d scale_fill_gradient scale_color_manual
+#' @importFrom ggplot2 ggplot geom_point aes geom_bin2d scale_fill_gradient scale_color_manual
 #' @importFrom ggrastr rasterise
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
@@ -953,8 +952,7 @@ plot_gr_violin <- function(gr, columns,
 #'
 #' @param gr GRanges
 #' @param binwidth Size of the bin in histogram (resolution of the plot)
-#' @importFrom ggplot2 ggplot geom_bin_2d aes
-#'  geom_bin2d scale_fill_distiller scale_color_manual after_stat
+#' @importFrom ggplot2 ggplot geom_bin_2d aes geom_bin2d scale_fill_distiller scale_color_manual after_stat
 #' @importFrom ggrastr rasterise
 #' @return A ggplot object
 .density_body <- function(gr, binwidth = 0.05) {
@@ -970,8 +968,7 @@ plot_gr_violin <- function(gr, columns,
 #'
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyselect any_of
-#' @importFrom ggplot2 ggplot aes geom_violin theme geom_jitter
-#'   scale_color_manual
+#' @importFrom ggplot2 ggplot aes geom_violin theme geom_jitter scale_color_manual
 #' @return A named list where plot is a ggplot object and calculated is a list
 #'   of calculated values (for verbose mode).
 .violin_body <- function(gr,
