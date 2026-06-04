@@ -1,3 +1,13 @@
+# wigglescout 0.21.1
+
+Date 04/06/2026
+
+## Bug fix
+
+* `bw_profile` and `plot_bw_profile` would mix up the labels when these shared
+a long enough prefix. Now these functions check for uniqueness, and fix repeated
+labels it by adding a number and throwing a warning.
+
 # wigglescout 0.20.0
 
 Date: 09/03/2026

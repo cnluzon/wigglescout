@@ -1,6 +1,6 @@
 Package: wigglescout
 Title: Explore and Visualize Genomics BigWig Data
-Version: 0.20.0
+Version: 0.21.1
 Authors@R: 
     person(given = "Carmen",
            family = "Navarro",
@@ -15,7 +15,6 @@ Description: A set of tools to easily extract, summarize and visualize coverage
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Depends: R (>= 4.2)
 biocViews: Software, Visualization, Sequencing, Coverage, ChIPSeq, ATACSeq
 Imports:
@@ -45,3 +44,4 @@ Suggests:
 VignetteBuilder: knitr
 URL: https://github.com/cnluzon/wigglescout, https://cnluzon.github.io/wigglescout/
 BugReports: https://github.com/cnluzon/wigglescout/issues
+Config/roxygen2/version: 8.0.0
