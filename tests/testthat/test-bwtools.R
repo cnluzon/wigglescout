@@ -1185,6 +1185,12 @@ test_that("build_bins crashes on unknown or not included genome", {
   })
 })
 
+test_that("build_bins runs for an un-cached genome", {
+  testthat::skip('Skipping test that calls actual GenomeInfoDb API')
+  values <- build_bins(bin_size = 1000, genome = "wuhCor1")
+  expect_is(values, "GRanges")
+})
+
 test_that("build_bins runs for mm9", {
   values <- build_bins(bin_size = 50000, genome = "mm9")
   expect_is(values, "GRanges")

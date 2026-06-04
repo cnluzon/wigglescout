@@ -534,11 +534,16 @@ bw_profile <- function(bwfiles,
 #' build_bins(bin_size = 50000, genome = "hg38")
 #' build_bins(bin_size = 50000, genome = "mm10", canonical = TRUE)
 build_bins <- function(bin_size = 10000, genome = "mm9", canonical = FALSE) {
-    seqinfo <- Seqinfo(genome = genome)
+    seqinfo <- NULL
+    if (genome %in% names(seqinfo_data)) {
+        seqinfo <- seqinfo_data[[genome]]
+    } else {
+        seqinfo <- Seqinfo(genome = genome)
+    }
     if (canonical == TRUE) {
-      # Remove all alternative, fixes, unknown location contigs
-      canonical_chrs <- GenomeInfoDb::standardChromosomes(seqinfo)
-      seqinfo <- seqinfo[canonical_chrs]
+        # Remove all alternative, fixes, unknown location contigs
+        canonical_chrs <- GenomeInfoDb::standardChromosomes(seqinfo)
+        seqinfo <- seqinfo[canonical_chrs]
     }
     tile_seqinfo(seqinfo, bin_size)
 }
